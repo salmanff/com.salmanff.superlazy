@@ -1,0 +1,14 @@
+/* slackChannels.css — the shared Slack channel-preferences UI (slackChannelsUi.js), loaded on
+   every page that mounts it: the setup page (Channels tab + messaging-only welcome) and slacklab. */
+.slch-status { padding: 8px 10px; background: var(--sl-surface-2, #f2f2f0); border-radius: 8px; margin: 8px 0; font-weight: 500; font-size: 13.5px; }
+.slch-status.slch-bad { color: #b3261e; }
+.slch-muted { color: var(--sl-text-2, #6b6b66); font-size: 12.5px; margin: 4px 0; }
+.slch-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+.slch-conn { max-width: 100%; }
+.slch-pill { font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--sl-surface-2, #eee); }
+.slch-pill-on { background: #d8efd8; color: #1a5c1a; }
+.slch-btn { padding: 6px 14px; border: 1px solid var(--sl-border, #ccc); border-radius: 8px; background: var(--sl-accent, #2b4d8c); color: #fff; cursor: pointer; }
+.slch-btn:disabled { opacity: 0.5; cursor: default; }
+.slch-table { border-collapse: collapse; width: 100%; margin: 6px 0; font-size: 13px; }
+.slch-table th, .slch-table td { text-align: left; padding: 4px 10px 4px 0; border-bottom: 1px solid var(--sl-border, #e4e4e0); }
+.slch-table th { font-weight: 600; color: var(--sl-text-2, #6b6b66); font-size: 12px; }

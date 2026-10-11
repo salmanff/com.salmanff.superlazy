@@ -1,0 +1,273 @@
+<div id="app" class="su sl-v2">
+  <div id="topbar"></div>
+
+  <div id="status" class="status info">Checking your setup…</div>
+
+  <!-- shown until init() decides which view this visit gets (the page pulls a lot up front) -->
+  <div id="pageLoading" class="su-page-loading">
+    <span class="freezr-spinner"></span>
+    <span class="su-muted">Loading SuperLazy…</span>
+  </div>
+
+  <!-- ============ view 1: welcome / onboarding (first run + permission gates) ============ -->
+  <section id="welcomeView" style="display:none">
+    <h1 class="su-hero">Welcome to SuperLazy</h1>
+    <p id="welcomeLead" class="su-lead"></p>
+
+    <!-- gate states (no mail permission / no mail account): just the lead text + one action link -->
+    <div id="gateActions" style="display:none">
+      <a id="gateLink" class="su-primary su-linkbtn" href="#"></a>
+    </div>
+
+    <!-- messaging-only first run: pick which Slack conversations to track, right here (the same
+         UI as the status page's Channels tab — slackChannelsUi.js) -->
+    <div id="welcomeChannels" style="display:none"></div>
+    <!-- work-only first run (an AI-agent session store, no mail): the same UI as the Channels tab's
+         AI agents section — workSessionsUi.js -->
+    <div id="welcomeWork" style="display:none"></div>
+
+    <!-- full first-run setup (permission granted + accounts available): ONE account at a time.
+         SuperLazy reads that mailbox in a single pass and shows you what it understood before
+         anything is saved. -->
+    <div id="setupBody" style="display:none">
+      <div class="su-onboard-block">
+        <h2>Which mailbox should SuperLazy learn?</h2>
+        <p id="accountChoiceNote" class="su-muted">One account at a time — its own address is what counts
+          as “you”. You can set up your other accounts afterwards, from this same page.</p>
+        <div id="accounts" class="bs-accounts"></div>
+        <div id="meLine" class="hint bs-meline"></div>
+      </div>
+
+      <p class="su-lead-small">SuperLazy reads that window of mail <b>in one pass</b> and works out what
+        you are actually dealing with: your projects and what is outstanding on each, who the people
+        around you are, and which senders are not worth reading. You review all of it — and correct
+        anything wrong before saving. — <b>Do NOT close the tab until you are done </b>since sueprlazy 
+        doesn't save anything until you press save at the end.</p>
+
+      <div class="su-onboard-block su-days">
+        <label>Read the last
+          <input id="days" type="number" min="2" max="120" value="28"> days of email
+          <span class="su-muted small">more days = a fuller picture of your work, and a bigger single call</span>
+        </label>
+      </div>
+
+      <div class="su-onboard-block su-cost-choices">
+        <label class="su-cost-row">Which AI reads your mail
+          <select id="model"><option id="model-default" value="default">Your freezr default</option></select>
+          <span id="modelHint" class="su-muted small"></span>
+        </label>
+      </div>
+
+      <details class="su-advanced">
+        <summary>Anything SuperLazy should know up front?</summary>
+        <label class="su-adv-row">
+          <textarea id="seed" rows="2" placeholder="optional — e.g. &quot;I'm an analyst at a software company; Anna is my colleague&quot;"></textarea>
+          <span class="su-muted small">optional: a line of context makes the first pass noticeably better</span>
+        </label>
+      </details>
+
+      <div class="su-train-options">
+        <div class="su-train-card">
+          <p class="su-muted">This takes a few minutes on a busy mailbox and costs one large AI call —
+            the running cost is shown as it goes. Nothing is saved until you press save at the end.</p>
+          <button id="startSetupBtn" type="button" class="su-primary" disabled>Read my mail &amp; show me what you find</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ view 2: status & preferences (training complete) ============ -->
+  <section id="statusView" style="display:none">
+    <div class="su-tabs">
+      <button id="tabStatusBtn" type="button" class="su-tab active">Sources</button>
+      <button id="tabRulesBtn" type="button" class="su-tab">Instructions</button>
+      <button id="tabConnectedBtn" type="button" class="su-tab">Connected apps</button>
+      <button id="tabPrefsBtn" type="button" class="su-tab">Preferences</button>
+    </div>
+
+    <div id="tabStatus">
+      <h2>Your sources</h2>
+      <p class="su-muted">Everything SuperLazy can read — mail accounts, Slack workspaces and the sessions of your AI agents — with its state. Select one for its details, its setup and its actions.</p>
+      <div class="su-res-layout">
+        <div id="resourceList" class="su-res-list"></div>
+        <div id="resourceDetail" class="su-res-detail"></div>
+      </div>
+
+      <!-- what the analysis currently costs, on the page a returning user actually lands on: the
+           first-run form (where these are chosen) is long gone by then -->
+      <div id="costSummary" class="su-cost-summary" style="display:none"></div>
+
+    </div>
+
+    <div id="tabRules" style="display:none">
+      <div id="rulesForm"></div>
+    </div>
+
+    <div id="tabConnected" style="display:none">
+      <div id="connectedForm"></div>
+    </div>
+
+    <div id="tabPrefs" style="display:none">
+      <div id="prefsForm"></div>
+      <!-- the global "start over" lives ONLY here (user, 2026-09-09 — it was showing under every tab) -->
+  <div class="su-danger-zone" id="wipeZone">
+    <button id="wipeBtn" type="button" class="su-danger">Delete processed data &amp; start over</button>
+    <span class="su-muted small">removes stored projects, events, accounts and settings <b>for ALL your mail accounts</b> (this is not per-account) — your mail is untouched, and learned newsletter/admin/social senders are KEPT (they cost tokens to learn; their mail keeps auto-filing)</span>
+  </div>
+
+    </div>
+  </section>
+
+  <!-- ============ view 3: the read-and-review run ============================================
+       Identical structure to the standalone bootstrap page (kept for testing), driven by the same
+       bootstrapUi.js — the run bar says what is happening, the tabs fill as the model works, and
+       the banner carries the one action that ends setup. -->
+  <section id="progressView" style="display:none">
+    <section id="runbar" class="bs-runbar">
+      <div class="bs-runbar-main">
+        <span id="spinner" class="freezr-spinner bs-spinner" hidden></span>
+        <div class="bs-runbar-text">
+          <div id="phase" class="bs-phase">Ready</div>
+          <div id="phaseSub" class="bs-phase-sub"></div>
+        </div>
+        <div class="bs-runbar-actions">
+          <button id="startBtn" type="button" class="su-primary">Read &amp; analyse my mail</button>
+          <button id="stopBtn" type="button" disabled>Stop</button>
+        </div>
+      </div>
+      <div class="bs-runbar-meta">
+        <span id="elapsed" class="bs-meta-item">—</span>
+        <span id="cost" class="bs-meta-item" title="what this setup has spent so far — background jobs and other apps on the same API key are not in this figure">$0.0000 · 0 calls</span>
+        <span id="dumpStats" class="bs-meta-item"></span>
+        <span id="pendingNote" class="bs-meta-item bs-pending" hidden></span>
+        <button id="diagToggle" type="button" class="bs-linkbtn">cost per call</button>
+      </div>
+      <div id="diagWrap" class="bs-diagwrap" hidden>
+        <div id="diag" class="bs-diag">—</div>
+      </div>
+    </section>
+
+    <section id="resumePanel" hidden>
+      <div class="bs-guide bs-guide-warn" id="resumeMsg"></div>
+      <div class="run-controls">
+        <button id="resumeBtn" type="button" class="su-primary">Continue where it stopped</button>
+        <span class="hint">it picks up from what already arrived, so this costs a fraction of starting over</span>
+      </div>
+    </section>
+
+    <section id="resultPanel">
+      <div id="banner" class="bs-banner" hidden>
+        <div id="bannerMsg" class="bs-banner-msg"></div>
+        <button id="skipQBtn" type="button" class="bs-ghostbtn" hidden>Ignore the questions</button>
+        <button id="adoptBtn" type="button" class="su-primary" disabled>Save and start using SuperLazy</button>
+      </div>
+
+      <!-- Saving writes several stores in turn and can take a moment on a big map. Rather than one
+           opaque spinner, each store reports as it lands: what has been written is then a matter of
+           record, which is what you want if it ever fails half way. -->
+      <div id="saveProgress" class="bs-saveprog" hidden>
+        <div class="bs-saveprog-bar"><div id="saveProgressFill"></div></div>
+        <ul id="saveSteps" class="bs-savesteps"></ul>
+      </div>
+
+      <nav id="tabs" class="bs-tabs" role="tablist">
+        <button class="bs-tab" data-tab="situation" role="tab" disabled>Your situation<span class="bs-tabnew" hidden>new</span></button>
+        <button class="bs-tab" data-tab="projects" role="tab" disabled>Projects<span class="bs-tabcount"></span><span class="bs-tabnew" hidden>new</span></button>
+        <button class="bs-tab" data-tab="people" role="tab" disabled>People<span class="bs-tabcount"></span><span class="bs-tabnew" hidden>new</span></button>
+        <button class="bs-tab" data-tab="autofile" role="tab" disabled>Not worth reading<span class="bs-tabcount"></span><span class="bs-tabnew" hidden>new</span></button>
+        <button class="bs-tab bs-tab-q" data-tab="questions" role="tab" disabled>Questions<span class="bs-tabcount"></span><span class="bs-tabnew" hidden>new</span></button>
+        <button class="bs-tab bs-tab-raw" data-tab="raw" role="tab">Under the hood<span class="bs-tabcount"></span><span class="bs-tabnew" hidden>new</span></button>
+      </nav>
+
+      <div class="bs-panels">
+        <p id="tabsIdle" class="bs-idle">Each tab fills itself as the model works: what it understands
+          about your situation, the projects it finds with their open items, the people in them, the
+          senders not worth reading, and anything it needs to ask you.</p>
+
+        <div class="bs-panel-tab" data-panel="situation" hidden>
+          <p class="bs-guide">This is what SuperLazy understands about your work and the people in it.
+            Everything it decides later — which project an email belongs to, who is on your team, what
+            matters — starts here, so it is worth a read. <strong>Edit anything wrong or missing</strong>;
+            your wording wins and is saved as written.</p>
+          <textarea id="contextEdit" class="bs-context" rows="14"></textarea>
+          <div class="run-controls">
+            <button id="saveCtxBtn" type="button" disabled>Save my edits</button>
+            <span id="ctxSaved" class="hint"></span>
+          </div>
+        </div>
+
+        <div class="bs-panel-tab" data-panel="projects" hidden>
+          <p class="bs-guide">Each project groups work that belongs together, with the open items found.
+            These become your projects board. If two of these are really one effort, or something is
+            missing or invented, say so on the <strong>Questions</strong> tab — quicker than editing
+            each card.</p>
+          <div id="projects" class="bs-cards"></div>
+        </div>
+
+        <div class="bs-panel-tab" data-panel="people" hidden>
+          <p class="bs-guide">How SuperLazy reads each person — their relationship to you and what they
+            handle. This drives who it thinks your team is and who it would suggest delegating to.
+            <strong>If someone is seriously mischaracterised, press “This is wrong”</strong> and say who
+            they really are.</p>
+          <div id="people" class="bs-cards"></div>
+        </div>
+
+        <div class="bs-panel-tab" data-panel="autofile" hidden>
+          <p class="bs-guide">These senders look like newsletters, receipts and notifications — worth
+            filing, not worth paying to analyse. Once saved, their mail goes straight to its reading
+            bucket and is <strong>never sent to the AI</strong>, which is where most of your ongoing
+            savings come from. If one of them sometimes needs real attention, press
+            <strong>“Read this sender”</strong>.</p>
+          <div id="autofile" class="bs-cards"></div>
+        </div>
+
+        <div class="bs-panel-tab" data-panel="questions" hidden>
+          <p class="bs-guide">Answering these is the single best thing you can do for the result — each
+            answer improves the whole map, not just its own question. Sending them re-reads your mail
+            from cache, so it costs a fraction of the first pass.</p>
+          <div id="questions" class="bs-questions"></div>
+          <div class="field">
+            <label for="freeText">Anything else it got wrong?</label>
+            <textarea id="freeText" rows="3" placeholder="e.g. “Acme and Acme Corp are the same client” · “Anna is my assistant, not a vendor” · “the office move is finished”"></textarea>
+          </div>
+          <div class="run-controls">
+            <button id="sendAnswersBtn" type="button" class="su-primary" disabled>Send my answers</button>
+            <span id="answersHint" class="hint"></span>
+          </div>
+          <div id="sentNotes" class="bs-sent" hidden>
+            <div class="bs-sent-h">Already sent — folded into the map above</div>
+            <div id="sentNotesList"></div>
+          </div>
+        </div>
+
+        <div class="bs-panel-tab" data-panel="raw" hidden>
+          <p class="bs-guide">For anyone who wants to look under the hood. Nothing here needs your
+            attention — it is the exact material of the run: what was handed to the model, and what
+            came back before this page made it readable.</p>
+          <nav class="bs-subtabs" role="tablist">
+            <button class="bs-subtab bs-subtab-on" data-sub="input" role="tab">What we sent</button>
+            <button class="bs-subtab" data-sub="output" role="tab">What came back</button>
+            <button class="bs-subtab" data-sub="thinking" role="tab">How it reasoned</button>
+          </nav>
+          <div class="bs-subpanel" data-subpanel="input">
+            <p class="hint">Your mail as the model received it: whole threads, oldest message first,
+              trimmed of quoted replies and signatures, with short stand-in ids in place of the real ones.</p>
+            <pre id="dumpPreview" class="bs-pre">nothing sent yet.</pre>
+          </div>
+          <div class="bs-subpanel" data-subpanel="output" hidden>
+            <p class="hint">The model's reply, reassembled into one object.</p>
+            <div class="run-controls"><button id="copyBtn" type="button">Copy JSON</button></div>
+            <pre id="rawJson" class="bs-pre">nothing back yet.</pre>
+          </div>
+          <div class="bs-subpanel" data-subpanel="thinking" hidden>
+            <p class="hint">The model's own working-out, streamed as it happens and kept for the whole
+              session. <span id="thinkStats"></span></p>
+            <pre id="thinkText" class="bs-pre bs-think">no reasoning yet.</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+
+</div>

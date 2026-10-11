@@ -1,0 +1,321 @@
+/* mail.css — the shared full-email viewer (emailViewer.js), the reply composer (replyComposer.js
+   + richEditor.js) and the suggested-reply draft block's composer states. Loaded after index.css.
+   The look is Mac Mail's (user, 2026-09-27): a grey title bar, a soft grey message list with a
+   blue selection, a white reading pane with a translucent action toolbar, an avatar header, and
+   a compose card with borderless To/Cc/Subject rows and blue quote bars. */
+
+.emv-modal, .rc {
+  --m-ink: #1d1d1f;
+  --m-text: #3a3a3c;
+  --m-2: #6e6e73;
+  --m-3: #8e8e93;
+  --m-4: #aeaeb2;
+  --m-line: #e5e5ea;
+  --m-line-2: #d8d8de;
+  --m-list: #f5f5f7;
+  --m-hover: rgba(0, 0, 0, 0.045);
+  --m-sel: var(--accent, #2f6df0);
+  --m-font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ---- the window ------------------------------------------------------------------------------ */
+/* CONSTANT size: a fixed-height flex column whatever the message length (the panes scroll) */
+.emv-modal {
+  max-width: 1180px; width: 100%; height: 88vh; max-height: 88vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  padding: 0; border-radius: 12px; background: #fff; font-family: var(--m-font);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(0, 0, 0, 0.22);
+}
+.emv-modal > .epv-modal-x {
+  top: 10px; right: 12px; width: 26px; height: 26px; padding: 0; z-index: 4;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; background: rgba(0, 0, 0, 0.06); color: var(--m-2); font-size: 12px;
+}
+.emv-modal > .epv-modal-x:hover { background: rgba(0, 0, 0, 0.12); color: var(--m-ink); }
+
+/* title bar: "4 related emails, 1 unsent draft, 2 projects:" + the project pills */
+.emv-title {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 7px; flex: 0 0 auto;
+  margin: 0; padding: 11px 56px 10px 18px;
+  background: linear-gradient(#f8f8f9, #eeeef0); border-bottom: 1px solid var(--m-line-2);
+  font-size: 13px; font-weight: 600; color: var(--m-text);
+}
+.emv-title-txt { color: var(--m-text); }
+.emv-modal .epv-modal-body { flex: 1 1 auto; min-height: 0; margin-top: 0; gap: 0; }
+
+/* ---- the message list ------------------------------------------------------------------------ */
+.emv-rail {
+  flex: 0 0 300px; height: 100%; overflow: auto; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 0; align-content: flex-start;
+  background: var(--m-list); border-right: 1px solid var(--m-line-2); padding: 6px 0 10px;
+}
+.emv-rail > * { flex: 0 0 auto; } /* snippets keep their natural height — never stretch to fill */
+.emv-rail .epv-loader, .emv-rail .epv-empty { padding: 10px 18px; font-size: 12px; color: var(--m-3); }
+
+.emv-snip {
+  position: relative; display: block; width: auto; margin: 0 8px; box-sizing: border-box;
+  text-align: left; font: inherit; font-family: var(--m-font); cursor: pointer;
+  border: 0; border-radius: 8px; background: transparent; padding: 9px 12px 10px 22px; color: var(--m-ink);
+}
+/* hairline separators between rows, inset like Mail's — hidden around the selection */
+.emv-snip + .emv-snip::before {
+  content: ''; position: absolute; top: 0; left: 22px; right: 10px; border-top: 1px solid var(--m-line);
+}
+.emv-snip.active::before, .emv-snip.active + .emv-snip::before { display: none; }
+.emv-snip:hover { background: var(--m-hover); }
+.emv-snip:focus-visible { outline: 2px solid var(--m-sel); outline-offset: -2px; }
+.emv-snip.active { background: var(--m-sel); color: #fff; }
+.emv-snip-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.emv-snip-from { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; font-size: 13px; color: inherit; }
+.emv-snip-date { flex: 0 0 auto; font-size: 11.5px; color: var(--m-3); font-variant-numeric: tabular-nums; }
+.emv-snip-subj { margin-top: 2px; font-size: 12.5px; color: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emv-snip-sum { margin-top: 2px; font-size: 12px; color: var(--m-2); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.emv-snip-projs { margin-top: 4px; font-size: 11px; color: var(--m-4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emv-snip.active .emv-snip-date, .emv-snip.active .emv-snip-sum, .emv-snip.active .emv-snip-projs { color: rgba(255, 255, 255, 0.82); }
+/* the message this viewer was opened on — Mail's blue dot in the gutter */
+.emv-snip-dot { position: absolute; left: 8px; top: 15px; width: 8px; height: 8px; border-radius: 50%; background: var(--m-sel); }
+.emv-snip.active .emv-snip-dot { background: #fff; }
+/* an unsent suggested reply: Mail's orange "Draft" voice */
+.emv-snip-draft .emv-snip-from { color: #c25e00; font-weight: 600; }
+.emv-snip-draft.active .emv-snip-from { color: #fff; }
+
+/* ---- the reading pane ------------------------------------------------------------------------ */
+.emv-detail { flex: 1 1 auto; min-width: 0; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 28px 32px; background: #fff; }
+.emv-detail > .epv-loader { padding: 24px 0; color: var(--m-3); }
+
+/* the action toolbar — pinned while the message scrolls under it */
+.emv-toolbar {
+  position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 2px;
+  margin: 0 -28px; padding: 8px 22px;
+  background: rgba(255, 255, 255, 0.9); -webkit-backdrop-filter: saturate(180%) blur(12px); backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--m-line);
+}
+.emv-tb-btn {
+  display: inline-flex; align-items: center; gap: 6px; font: 12.5px/1 var(--m-font); color: var(--m-text);
+  padding: 6px 10px; border: 1px solid transparent; border-radius: 7px; background: transparent; cursor: pointer;
+}
+.emv-tb-btn:hover:not(:disabled) { background: rgba(0, 0, 0, 0.055); }
+.emv-tb-btn:active:not(:disabled) { background: rgba(0, 0, 0, 0.1); }
+.emv-tb-btn:focus-visible { outline: 2px solid var(--m-sel); outline-offset: 1px; }
+.emv-tb-btn:disabled { opacity: 0.42; cursor: not-allowed; }
+.emv-tb-ico { font-size: 14px; color: var(--m-sel); letter-spacing: -2px; }
+.emv-tb-btn:disabled .emv-tb-ico { color: var(--m-3); }
+.emv-tb-note { margin-left: 10px; min-width: 0; font-size: 11.5px; color: #8a5a00; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emv-tb-fix, .ev-draft-fix { color: var(--m-sel, #2f6df0); font-weight: 600; text-decoration: none; }
+.emv-tb-fix:hover, .ev-draft-fix:hover { text-decoration: underline; }
+.ev-draft-off { display: block; margin-top: 6px; font-size: 11.5px; color: #8a5a00; }
+.rc-from-v { font-size: 12.5px; color: var(--m-2); }
+.emv-tb-when { display: none; margin-left: auto; font-size: 11.5px; color: var(--m-3); white-space: nowrap; } /* phones only — the header carries it */
+
+/* Mail's message header: subject, then avatar · sender · recipients · date */
+.emv-subject { margin: 18px 0 14px; font-size: 20px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; color: var(--m-ink); overflow-wrap: anywhere; }
+.emv-mailhead-row { display: flex; align-items: flex-start; gap: 12px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--m-line); }
+.emv-avatar {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font: 600 15px/1 var(--m-font); color: #fff; letter-spacing: 0.02em;
+  background: linear-gradient(hsl(var(--av-h, 211) 58% 63%), hsl(var(--av-h, 211) 52% 47%));
+}
+.emv-mailhead-who { flex: 1 1 auto; min-width: 0; }
+.emv-from-line { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.emv-modal .emv-from-name { font-size: 14px; font-weight: 650; color: var(--m-ink); text-decoration: none; }
+.emv-from-addr { font-size: 12px; color: var(--m-3); }
+.emv-rcpt-line { margin-top: 3px; font-size: 12px; line-height: 1.45; color: var(--m-2); }
+.emv-rcpt-l { color: var(--m-3); margin-right: 5px; }
+.emv-mailhead-date { flex: 0 0 auto; font-size: 12px; color: var(--m-3); white-space: nowrap; padding-top: 2px; }
+.emv-addr { color: inherit; }
+.emv-addr-link { font: inherit; background: none; border: none; padding: 0; color: inherit; cursor: pointer; text-decoration: none; }
+.emv-addr-link:hover { color: var(--m-sel); text-decoration: underline; text-underline-offset: 2px; }
+
+/* the other channels (note / chat / agent turn) keep a label grid, restyled to match */
+.emv-modal .epv-eml-head {
+  display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px;
+  margin: 18px 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--m-line);
+  font-size: 12.5px; line-height: 1.5; color: var(--m-text);
+}
+.emv-modal .epv-eml-head > div { display: contents; }
+.emv-modal .epv-eml-head b { color: var(--m-3); font-weight: 500; text-align: right; }
+
+/* the model's summary of this message */
+.emv-modal .epv-eml-sum {
+  margin: 0 0 14px; padding: 9px 12px; border: 0; border-radius: 8px;
+  background: #f3f6fc; color: #3b4a63; font-style: normal; font-size: 12.5px; line-height: 1.5;
+}
+.emv-modal .epv-eml-sum::before { content: 'Summary'; display: block; margin-bottom: 2px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #7d8aa3; }
+
+/* filtered viewer: the "this input also serves…" note */
+.emv-other-projs { margin: 0 0 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.emv-other-projs-label { font-size: 12px; color: var(--m-2); }
+
+/* the tasks this message raised or changed */
+.emv-msg-tasks { margin: 0 0 16px; }
+.emv-msg-tasks .epv-modal-head { margin: 0 0 5px; font-size: 10.5px; color: var(--m-3); letter-spacing: 0.05em; }
+.emv-msg-tasks-list { border: 1px solid var(--m-line); border-radius: 10px; padding: 4px 12px; background: #fbfbfc; }
+
+.emv-warn { font-size: 12px; padding: 7px 11px; border-radius: 8px; margin-bottom: 10px; background: #fff4e0; color: #7a4f00; }
+.emv-html-host { background: #fff; color: #111; padding: 2px 0 8px; overflow: auto; }
+.emv-modal .emv-body {
+  max-height: none; margin: 0; padding: 2px 0 8px; border: 0; background: transparent;
+  font: 14px/1.6 var(--m-font); color: var(--m-ink); white-space: pre-wrap; word-break: break-word;
+}
+.emv-atts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.emv-att {
+  font: 12px var(--m-font); padding: 6px 11px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--m-line); background: #f5f5f7; color: var(--m-text);
+}
+.emv-att:hover:not(:disabled) { background: #ebebef; }
+.emv-att:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* a draft selected in the list */
+.emv-detail > .ev-draft { margin-top: 18px; }
+
+/* ---- the reply composer (replyComposer.js) --------------------------------------------------- */
+.emv-compose-slot:empty { display: none; }
+.emv-compose-slot { padding-top: 14px; }
+.rc {
+  font-family: var(--m-font); background: #fff; color: var(--m-ink);
+  border: 1px solid var(--m-line-2); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.09), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.rc-head { display: flex; align-items: center; gap: 8px; padding: 7px 10px 7px 14px; background: linear-gradient(#fafafb, #f1f1f3); border-bottom: 1px solid var(--m-line); }
+.rc-title { flex: 1 1 auto; min-width: 0; font-size: 12.5px; font-weight: 650; color: var(--m-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rc-head-acts { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.rc-send {
+  display: inline-flex; align-items: center; gap: 6px; font: 600 12.5px/1 var(--m-font); cursor: pointer;
+  padding: 6px 14px; border: 0; border-radius: 7px; background: var(--m-sel); color: #fff;
+  box-shadow: 0 1px 2px rgba(20, 60, 160, 0.25);
+}
+.rc-send:hover:not(:disabled) { filter: brightness(1.07); }
+.rc-send:disabled { background: #c9d6ee; box-shadow: none; cursor: not-allowed; }
+.rc-send-ico { font-size: 11px; }
+.rc-btn {
+  font: 12.5px/1 var(--m-font); padding: 6px 11px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--m-line-2); background: #fff; color: var(--m-text);
+}
+.rc-btn:hover { background: #f4f4f6; }
+
+.rc-field { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px; border-bottom: 1px solid var(--m-line); }
+.rc-field[hidden] { display: none; }
+.rc-field-l { flex: 0 0 56px; text-align: right; font-size: 12.5px; color: var(--m-3); }
+.rc input.rc-in[type="text"] {
+  flex: 1 1 auto; min-width: 0; width: auto; height: auto; margin: 0; box-sizing: border-box;
+  border: 0; border-radius: 0; box-shadow: none; outline: none; background: transparent;
+  padding: 8px 0; font: 13px var(--m-font); color: var(--m-ink);
+}
+.rc input.rc-subj[type="text"] { font-weight: 600; }
+.rc-cc-toggle { font: 12px var(--m-font); border: 0; background: none; color: var(--m-3); cursor: pointer; padding: 2px 4px; }
+.rc-cc-toggle:hover { color: var(--m-sel); }
+.rc-field-static { color: var(--m-text); font-size: 13px; }
+.rc-chat-target { font-weight: 600; }
+
+/* the formatted body (richEditor.js) */
+.rte-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 1px; padding: 4px 10px; border-bottom: 1px solid var(--m-line); background: #fcfcfd; }
+.rte-btn {
+  min-width: 28px; height: 26px; padding: 0 6px; border: 0; border-radius: 6px; background: transparent; cursor: pointer;
+  font: 13px/1 var(--m-font); color: #48484a;
+}
+.rte-btn:hover { background: #ececf0; }
+.rte-btn.on { background: #e0e9fa; color: var(--m-sel); }
+.rte-b { font-weight: 800; }
+.rte-i { font-style: italic; font-family: Georgia, "Times New Roman", serif; }
+.rte-u { text-decoration: underline; }
+.rte-s { text-decoration: line-through; }
+.rte-sep { width: 1px; height: 16px; background: var(--m-line-2); margin: 0 5px; }
+.rte-body { position: relative; min-height: 150px; max-height: 46vh; overflow: auto; padding: 12px 16px; outline: none; font: 14px/1.55 var(--m-font); color: var(--m-ink); overflow-wrap: anywhere; }
+.rte-empty .rte-body::before { content: attr(data-placeholder); position: absolute; color: #a1a1a6; pointer-events: none; }
+.rte-body blockquote, .ev-draft-body-html blockquote { margin: 6px 0; padding-left: 12px; border-left: 2px solid #4a8ff0; color: #3d6fb4; }
+.rte-body ul, .rte-body ol, .ev-draft-body-html ul, .ev-draft-body-html ol { margin: 4px 0; padding-left: 24px; }
+.rte-body a, .ev-draft-body-html a { color: #0a66d8; }
+.rte-body p, .rte-body div, .ev-draft-body-html p { margin: 0; }
+
+/* the quoted thread under the text */
+.rc-quote { margin: 0 16px 12px; padding-top: 10px; border-top: 1px dashed var(--m-line-2); }
+.rc-quote-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.rc-quote-label { flex: 1 1 auto; min-width: 0; font-size: 12px; color: var(--m-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-quote-acts { display: flex; gap: 10px; flex: 0 0 auto; }
+.rc-link { font: 12px var(--m-font); border: 0; background: none; padding: 0; color: var(--m-sel); cursor: pointer; }
+.rc-link:hover { text-decoration: underline; }
+/* capped but SCROLLABLE — the box used to clip with a fade and could not be scrolled, which on a
+   project card left most of the thread unreachable (user, 2026-09-27); Show all lifts the cap */
+.rc-quote-host {
+  max-height: 260px; overflow-y: auto; padding-left: 12px; border-left: 2px solid #4a8ff0;
+}
+.rc-quote-host-fwd { border-left-color: var(--m-line-2); }
+.rc-quote-open .rc-quote-host { max-height: none; }
+.rc-quote-off .rc-quote-body, .rc-quote-off .rc-quote-note { display: none; }
+.rc-quote-off .rc-quote-label { text-decoration: line-through; color: var(--m-4); }
+.rc-quote-note { margin-top: 6px; font-size: 11.5px; color: var(--m-3); font-style: italic; }
+.rc-quote-note:empty { display: none; }
+.rc-chat .rc-quote-host { border-left-color: var(--m-line-2); }
+
+.rc-status { padding: 0 16px 10px; font-size: 12px; color: var(--m-2); }
+.rc-status:empty { display: none; }
+.rc-busy { opacity: 0.7; pointer-events: none; }
+.rc-sent { box-shadow: none; }
+.rc-sent-note { padding: 12px 16px; font-size: 13px; font-weight: 650; color: var(--done, #23a558); }
+
+.rc-compact .rte-body { min-height: 100px; max-height: 36vh; }
+.rc-compact .rc-quote-host { max-height: 220px; }
+
+/* ---- the suggested-reply block: read view extras + its composer state ------------------------ */
+.ev-draft-flag { font-size: 10.5px; font-weight: 650; color: #8a5a00; background: #fff1d6; border-radius: 9px; padding: 1px 7px; }
+.ev-draft-body-html { white-space: normal; }
+.ev-draft-editing { padding: 0; background: transparent; }
+.ev-draft-full { margin-left: auto; }
+/* on a project card: the draft block sits inside the card's coloured left rule */
+.epv-resp-live { padding: 0; background: #fff; overflow: hidden; }
+.epv-resp-live .ev-draft { background: transparent; padding: 10px 12px; border-radius: 0; }
+.epv-resp-live .ev-draft-editing { padding: 0; }
+.epv-resp-live .rc { border: 0; border-radius: 0; box-shadow: none; }
+
+/* the task row's ✉ beside the ✏️ — on a narrow row the ✏️ already claims the line end */
+.task-shortline .task-editbtn + .task-threadbtn { margin-left: 0; }
+
+/* ---- narrow screens: the message list becomes a DRAWER over the message ----------------------
+   It slides in from the left on the ☰ and back out when an item is picked — the shape every
+   phone mail client uses (user, 2026-09-12). The rail comes OUT OF FLOW, so the message has the
+   whole width and nothing re-lays-out when the drawer moves. */
+.emv-railbtn { display: none; position: absolute; top: 8px; left: 10px; z-index: 4; align-items: center; gap: 5px;
+  font: 13px/1 var(--m-font); padding: 5px 9px; min-height: 30px;
+  border: 1px solid var(--m-line-2); border-radius: 7px; background: #fff; color: var(--m-text); cursor: pointer; }
+.emv-railbtn:hover { background: #f4f4f6; }
+.emv-railbtn:focus-visible { outline: 2px solid var(--m-sel); outline-offset: 2px; }
+.emv-railbtn-n:empty { display: none; }
+.emv-railbtn-n { font-size: 11px; font-weight: 700; color: var(--m-3); }
+.emv-railscrim { display: none; }
+@media (max-width: 700px) {
+  .emv-modal { height: 94vh; max-height: 94vh; border-radius: 10px; }
+  .emv-modal .emv-title { padding-left: 56px; } /* clear of the ☰ in the corner */
+  .emv-modal .epv-modal-body { position: relative; overflow: hidden; }
+  .emv-modal .emv-rail {
+    position: absolute; inset: 0 auto 0 0; z-index: 3;
+    width: min(320px, 86%); flex: 0 0 auto; height: auto;
+    box-shadow: 7px 0 26px rgba(0, 0, 0, 0.2);
+    transform: translateX(-102%); /* 102%: clears its own box-shadow, not just the box */
+    /* visibility, delayed until the slide finishes, keeps a CLOSED drawer out of the tab order */
+    visibility: hidden;
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
+  }
+  .emv-modal .epv-modal-body.emv-rail-open .emv-rail { transform: none; visibility: visible; transition: transform 0.22s ease, visibility 0s; }
+  .emv-modal .emv-railscrim {
+    display: block; position: absolute; inset: 0; z-index: 2;
+    background: rgba(0, 0, 0, 0.28); opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
+  }
+  .emv-modal .epv-modal-body.emv-rail-open .emv-railscrim { opacity: 1; pointer-events: auto; }
+  .emv-detail { padding: 0 14px 24px; }
+  .emv-toolbar { margin: 0 -14px; padding: 6px 8px; }
+  .emv-railbtn { display: inline-flex; }
+  .emv-subject { font-size: 17px; margin-top: 14px; }
+  .emv-avatar { width: 34px; height: 34px; font-size: 13px; }
+  .rc-field-l { flex-basis: 48px; }
+}
+@media (max-width: 480px) {
+  .emv-tb-lbl { display: none; } /* icons only — the toolbar has to fit a phone */
+  .emv-tb-ico { font-size: 16px; }
+  .emv-mailhead-date { display: none; } /* the toolbar carries the date instead */
+  .emv-tb-when { display: inline; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .emv-modal .emv-rail, .emv-modal .emv-railscrim { transition: none; }
+}

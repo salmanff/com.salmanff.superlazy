@@ -1,0 +1,30 @@
+<div id="app" class="sl-v2 ra-page">
+  <div id="topbar"></div>
+
+  <div id="raStatus" class="ra-status">Loading…</div>
+
+  <div class="ra-bar">
+    <button id="raToggle" type="button" class="ra-btn ra-btn-primary">…</button>
+    <label class="ra-lbl">keep <input id="raDays" type="number" min="1" max="30" value="3"> days</label>
+    <label class="ra-lbl">show last
+      <select id="raWindow">
+        <option value="6">6 hours</option>
+        <option value="24" selected>24 hours</option>
+        <option value="72">3 days</option>
+        <option value="0">everything kept</option>
+      </select>
+    </label>
+    <button id="raRefresh" type="button" class="ra-btn">Refresh</button>
+    <button id="raClear" type="button" class="ra-btn ra-btn-danger">Delete all recorded requests</button>
+  </div>
+  <div class="ra-note ra-muted">
+    Dev tool. While recording is ON, every LLM exchange the per-message engine makes (background job or foreground check) is
+    stored verbatim — the turns sent, the reply, the provider's usage and prices — and pruned after the retention window.
+    Toggle it here or from the Setup page console: <code>superlazy.audit(true)</code> / <code>superlazy.audit(false)</code>.
+    Prices marked <b>eq</b> are equivalents: the call ran on a $0 local connector and is priced as the same model via the API.
+  </div>
+
+  <div id="raTotals" class="ra-totals"></div>
+  <div id="raSystem"></div>
+  <div id="raList" class="ra-list"></div>
+</div>

@@ -1,0 +1,49 @@
+<div class="sl-lab">
+  <div class="sl-lab-header">
+    <h1>Slack lab — formation dry-run (dev)</h1>
+    <div class="sl-lab-links">
+      <a href="/apps/com.salmanff.superlazy/index">Dashboard</a>
+      <a href="/apps/com.salmanff.superlazy/setup">Setup &amp; Prefs</a>
+    </div>
+  </div>
+
+  <div id="slStatus" class="sl-lab-status">Loading…</div>
+  <div class="slch-muted">Channel setup (which conversations to track) lives on Setup &amp; Prefs →
+    Channels — the SAME picker is mounted below for convenience. This page's own tool is the DRY
+    RUN: build chunks over a window without persisting anything, to inspect boundaries,
+    transcripts, user resolution and volume.</div>
+
+  <div id="slSetup" class="sl-lab-panel" hidden>
+    <h2>Connection &amp; conversations</h2>
+    <div id="slChannelsHost"></div>
+
+    <h2>Dry run</h2>
+    <div class="slch-row">
+      <label>history window
+        <select id="slDaysSel">
+          <option value="2">2 days</option>
+          <option value="6" selected>6 days</option>
+          <option value="14">14 days</option>
+          <option value="30">30 days</option>
+        </select>
+      </label>
+      <button id="slBuildBtn" type="button" class="slch-btn">Build chunks (dry run)</button>
+      <span id="slBuildNote" class="slch-muted"></span>
+    </div>
+  </div>
+
+  <div id="slResults" class="sl-lab-panel" hidden>
+    <h2>Volume &amp; cost projection</h2>
+    <div id="slVolume"></div>
+
+    <h2>Who was seen (user resolution)</h2>
+    <div class="slch-muted">Raw resolution only — Slack id → name / attested email / bot.</div>
+    <table id="slUsers" class="slch-table">
+      <thead><tr><th>slack id</th><th>display name</th><th>email</th><th>bot</th><th>msgs</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>Chunks <span id="slChunkCount" class="slch-muted"></span></h2>
+    <div id="slChunks"></div>
+  </div>
+</div>

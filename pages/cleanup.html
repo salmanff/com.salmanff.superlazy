@@ -1,0 +1,91 @@
+<div id="app" class="sl-v2 ml-page cl-page">
+  <div id="topbar"></div>
+
+  <div id="clStatus" class="ml-status">Loading…</div>
+
+  <details id="clSetup" class="ml-setup">
+    <summary class="ml-setup-sum">Settings <span class="ml-muted">— model, windows and thresholds; tuned here against real data, saved as your defaults</span></summary>
+    <div class="cl-help">
+      <b>What is always sent:</b> the whole map — every active project with its open to-dos and its last few closed ones, the people you deal with, your standing instructions with usage counts, your situation text. <b>The windows only decide the history that goes with it:</b> the <i>input window</i> is how many days of incoming items (mail, chat, notes, agent work) are listed for the model to read against the map; the <i>hand-edits window</i> is how many days of your own manual changes the rules/learn sections look at for patterns; the <i>focus horizon</i> is how far ahead the Focus section plans. Thresholds are <b>all ANDs</b>: a to-do is "stale" when it is open AND its importance is at most the limit AND it is older than the age AND nothing has touched it for the quiet days; a project is an "archive candidate" when it has no open items AND has been quiet for the months given.
+    </div>
+    <div class="ml-knobs">
+      <div class="ml-knob-group">
+        <h3>Model</h3>
+        <label><select id="clModel"><option id="cl-model-default" value="default">User default</option></select></label>
+        <div id="clModelHint" class="ml-muted"></div>
+      </div>
+      <div class="ml-knob-group">
+        <h3>Windows</h3>
+        <label><input id="clDays" type="number" value="7" min="1" max="60"> days of incoming items <span class="ml-muted">(the input window — history, not the map)</span></label>
+        <label>Send <select id="clMode"><option value="index">the index (all channels — one line per item, bodies on request)</option><option value="full">full mail threads (mail only, ~10× the tokens)</option></select></label>
+        <label><input id="clEditDays" type="number" value="30" min="7" max="180"> days of my hand edits <span class="ml-muted">(rules / learn need repetitions)</span></label>
+        <label><input id="clFocusDays" type="number" value="7" min="1" max="30"> days ahead for Focus</label>
+      </div>
+      <div class="ml-knob-group cl-accounts-group">
+        <h3>Accounts <span class="cl-accounts-tools"><button type="button" class="ml-btn cl-link" id="clAccountsAll">all</button> · <button type="button" class="ml-btn cl-link" id="clAccountsNone">none</button></span></h3>
+        <div id="clAccounts" class="cl-accounts"><span class="ml-muted">loading…</span></div>
+        <div class="ml-muted cl-accounts-note">Which accounts' items go into the input window (mail accounts, Slack workspaces, AI agent stores, local notes). Default all; this is a per-run choice, not saved — the scheduled clean-up always uses all. With a restriction the model sees ONLY the projects those accounts fed (by provenance, plus any a selected account touched in the window) with their people, and only their items — projects and to-dos the chosen accounts never touched are not sent, so nothing is proposed about them. Rules are always sent whole.</div>
+      </div>
+      <div class="ml-knob-group">
+        <h3>Stale tasks (all conditions AND)</h3>
+        <label>open, importance ≤ <input id="clImp" type="number" value="3" min="1" max="5"></label>
+        <label>older than <input id="clAge" type="number" value="30" min="1" max="365"> days</label>
+        <label>untouched for <input id="clQuiet" type="number" value="21" min="1" max="365"> days</label>
+      </div>
+      <div class="ml-knob-group">
+        <h3>Archive candidates (AND)</h3>
+        <label>no open items, quiet <input id="clDormant" type="number" value="3" min="1" max="36"> months</label>
+      </div>
+      <div class="ml-knob-group">
+        <h3>Sections</h3>
+        <div id="clSections" class="cl-sections"></div>
+      </div>
+    </div>
+  </details>
+
+  <div class="ml-runbar">
+    <button id="clEstimate" type="button" class="ml-btn">Estimate size &amp; cost</button>
+    <button id="clRun" type="button" class="ml-btn ml-btn-primary">Run the clean-up</button>
+    <button id="clPending" type="button" class="ml-btn">Show pending from earlier runs</button>
+    <span id="clElapsed" class="ml-muted"></span>
+    <span id="clCost" class="ml-cost"></span>
+  </div>
+  <div id="clEstimateLine" class="cl-estimate ml-muted">Press “Estimate” to see how many tokens the run would send and what that costs at the chosen model (the reply's size, and so its cost, is only known afterwards).</div>
+  <div class="ml-muted ml-runnote">Everything only PREVIEWS. Accept what you agree with, then press Apply — that takes the ingestion lock, writes, logs one event per change, and clears the cached analysis snapshot. Ignoring is permanent: an ignored suggestion is never shown again. To-do rows are live — ticking or editing one here is a normal hand edit, exactly as on the other pages.</div>
+
+  <div id="clView"></div>
+
+  <details id="clHood" class="ml-history">
+    <summary>Under the hood</summary>
+    <div class="cl-hood-tabs">
+      <button type="button" class="ml-btn cl-hood-tab sel" data-tab="state">Current state</button>
+      <button type="button" class="ml-btn cl-hood-tab" data-tab="input">Input window</button>
+      <button type="button" class="ml-btn cl-hood-tab" data-tab="closing">Closing turn</button>
+      <button type="button" class="ml-btn cl-hood-tab" data-tab="raw">Model output (JSONL)</button>
+      <button type="button" class="ml-btn cl-hood-tab" data-tab="thinking">Thinking</button>
+      <button type="button" class="ml-btn cl-hood-tab" data-tab="meta">Sizes &amp; call metrics</button>
+    </div>
+    <pre id="clHoodPre" class="cl-hood-pre">(estimate or run the clean-up first)</pre>
+  </details>
+
+  <details id="clHouse" class="ml-history">
+    <summary>Housekeeping (free, deterministic)</summary>
+    <div class="ml-knobs">
+      <div class="ml-knob-group">
+        <label>Keep events for <input id="clRetention" type="number" value="90" min="0" max="3650"> days <span class="ml-muted">(0 = forever; saved as your default)</span></label>
+      </div>
+    </div>
+    <button id="clRunHouse" type="button" class="ml-btn">Preview pruning + interaction rebuild + orphan thread links</button>
+    <div id="clHouseNote" class="ml-muted"></div>
+  </details>
+
+  <details id="clArchive" class="ml-history">
+    <summary>Archived projects</summary>
+    <div id="clArchiveBody"></div>
+  </details>
+
+  <details id="clHistory" class="ml-history">
+    <summary>Past runs</summary>
+    <div id="clHistoryBody"></div>
+  </details>
+</div>

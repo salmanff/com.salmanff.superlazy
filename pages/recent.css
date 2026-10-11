@@ -1,0 +1,102 @@
+/* recent.css — styles unique to the TASKS page: the page-wide tab bar (the card's .epv-tab
+   language from index.css, page-scale), the cross-project task lists, the per-person grouping,
+   and the Events tab (Resolved / decisions / project-activity story). Clicking a project opens
+   the live card in a full-screen modal (see ui.js openProjectModal / modalStack.js). Task rows,
+   chips and marks are styled by entities.css; colours come from tokens.css. */
+
+/* ---- the page tab bar: reuses .epv-tab (index.css) so it reads like the card's tabs ---- */
+.rc-tabs { display: flex; flex-wrap: wrap; gap: 5px; margin: 2px 0 16px; border-bottom: 1px solid var(--border); }
+.rc-tab { font-size: 12.5px; padding: 6px 13px; border-bottom: none; }
+/* the split: direction tabs left, the page-wide views (People / All Tasks / Messages / Events)
+   right — same separation as the project card's tab bar */
+.rc-tab-gap { margin-left: auto; }
+.rc-tab.active { background: var(--surface); }
+
+/* ---- People tab: master-detail like the People page — sortable person list left, the
+   selected person's owed/team items right ---- */
+.rc-people-cols { display: flex; gap: 16px; align-items: flex-start; }
+.rc-people-list { flex: 0 0 250px; max-width: 250px; display: flex; flex-direction: column; gap: 5px; max-height: 70vh; overflow: auto; }
+.rc-person-detail { flex: 1 1 auto; min-width: 0; }
+@media (max-width: 760px) {
+  .rc-people-cols { flex-direction: column; }
+  .rc-people-list { flex: none; max-width: none; width: 100%; max-height: 40vh; }
+}
+.rc-people-sort { display: flex; align-items: center; gap: 5px; padding: 0 2px 3px; }
+.rc-people-sortlbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--faint); }
+.rc-people-sortbtn { font: inherit; font-size: 11px; padding: 1px 9px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); cursor: pointer; }
+.rc-people-sortbtn:hover { background: var(--surface-tint); }
+.rc-people-sortbtn.active { background: var(--surface-tint); border-color: var(--faint); color: var(--ink); font-weight: 650; }
+.rc-people-row { display: block; width: 100%; text-align: left; font: inherit; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; background: var(--surface); cursor: pointer; }
+.rc-people-row:hover { background: var(--surface-tint); }
+.rc-people-row.active { border-color: var(--faint); background: var(--surface-tint); }
+.rc-people-row-top { display: flex; align-items: center; gap: 7px; }
+.rc-people-row-name { flex: 1 1 auto; min-width: 0; font-size: 12.5px; font-weight: 650; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-people-row-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+.rc-person { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; margin-bottom: 10px; }
+.rc-person-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.rc-person-name { font: inherit; font-size: 13px; font-weight: 700; color: var(--ink); background: none; border: none; padding: 0; cursor: pointer; }
+.rc-person-name:hover { color: var(--accent); text-decoration: underline; }
+.rc-person-meta { font-size: 11px; color: var(--muted); }
+.rc-person-dir { display: flex; align-items: center; gap: 6px; margin: 8px 0 4px; }
+.rc-person-dirlbl { font-size: 11.5px; font-weight: 650; color: var(--text-2); }
+.rc-person .rc-tasklist { border: none; padding: 0 0 0 6px; }
+
+/* ---- All Tasks tab: direction section heads ---- */
+.rc-all-head { display: flex; align-items: center; gap: 6px; margin: 14px 0 6px; font-size: 12px; font-weight: 700; color: var(--text-2); }
+
+/* ---- the Events tab's "Load older" (only when timeframe = All and the log has more) ---- */
+.rc-older { text-align: center; margin: 6px 0 20px; }
+.rc-older-btn { font: inherit; font-size: 12px; padding: 5px 16px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); cursor: pointer; }
+.rc-older-btn:hover:not(:disabled) { color: var(--ink); border-color: var(--faint); }
+.rc-older-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ---- sections ---- */
+.rc-section { margin-bottom: 20px; }
+.rc-sec-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+.rc-sec-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+.rc-sec-count { font-size: 11px; font-weight: 700; color: var(--accent); background: #eef4ff; border-radius: 20px; padding: 1px 8px; }
+.rc-sec-hint { font-size: 11px; color: var(--faint); }
+/* the page's SORT control: right-aligned on the section-title line ("I owe" / "Team owes" / …),
+   in the project card's pill language rather than buried in the filter bar (user, 2026-08-31).
+   .epv-sortbtn-held (index.css) tints it amber when a priority edit is holding the order still. */
+/* margin-left:auto is what pushes it to the RIGHT EDGE of the head row, so nothing later may
+   reset it — .rc-sortbtn used to re-declare margin-left:0 (to beat .epv-sortbtn's 8px) and, being
+   the later rule of equal specificity, quietly won and left the pill next to the title. The
+   two-class selector below settles it whatever the order. (user, 2026-09-01) */
+.rc-sec-head > .rc-sec-tools { margin-left: auto; align-self: center; }
+.rc-sortbtn { font-size: 11px; padding: 2px 10px; }
+.rc-empty { font-size: 12px; color: var(--muted); padding: 8px 2px; }
+
+/* ---- project activity cards — a project REFERENCE (pentagon + name), not a project card:
+   plain title line, no band, no description ---- */
+.rc-proj { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; margin-bottom: 8px; cursor: pointer; }
+.rc-proj:hover { border-color: var(--faint); }
+.rc-proj-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rc-proj-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.rc-proj-meta { font-size: 11px; color: var(--muted); flex: 1 1 auto; min-width: 0; }
+.rc-proj-explore { font-size: 11px; color: var(--accent); white-space: nowrap; }
+.rc-proj-acts { margin-top: 7px; display: flex; flex-direction: column; gap: 4px; }
+.rc-act { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text); min-width: 0; }
+.rc-act-manual { color: var(--text-2); }
+.rc-act-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; line-height: 1.5; display: inline-flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.rc-act-text b { font-weight: 600; color: var(--ink); }
+.rc-act-when { font-size: 10.5px; color: var(--faint); white-space: nowrap; }
+.rc-act-more { font-size: 11px; color: var(--faint); font-style: italic; }
+/* activity lines share the Events-tab language: kind disc + who + summary */
+.rc-act .ev-disc { width: 18px; height: 18px; font-size: 9px; }
+.rc-act-summary { font-style: italic; color: var(--text-2); }
+
+/* the For-you / Resolved lists: standard task rows in a light frame */
+.rc-tasklist { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 4px 10px; }
+
+/* Automation decisions: a sender put on autopilot (or a straddle flagged). Tinted like a warning
+   because the row exists to be overruled, not just read. */
+.rc-decision { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.rc-dec-who { font-weight: 600; }
+.rc-dec-verb { font-size: 12px; color: var(--muted); }
+.rc-dec-why { flex: 1 1 100%; font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#rcDecisions .rc-tasklist { background: var(--warn-bg); border-color: #efd9a0; }
+.rc-dec-stop, .rc-dec-edit { font: inherit; font-size: 11.5px; cursor: pointer; padding: 2px 8px; border-radius: 6px; border: 1px solid #c3ccd8; background: #fff; }
+.rc-dec-stop { color: var(--warn-ink); border-color: currentColor; }
+.rc-dec-stop:disabled, .rc-dec-edit:disabled { opacity: 0.45; cursor: default; }

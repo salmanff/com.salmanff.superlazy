@@ -1,0 +1,107 @@
+/* replay.css — the /replay demo page: a setup panel nobody sees during the demo, and THE STAGE,
+   which is the only thing that goes on the slide. The stage is a FIXED-SIZE frame (half-slide
+   portrait by default) so what you see while setting up is exactly what the audience sees; the
+   Present button scales that same frame to fill the screen rather than reflowing it. */
+
+.rp-page { max-width: 1180px; margin: 0 auto; padding: 0 16px 48px; color: var(--text); }
+.rp-h { font-size: 20px; color: var(--ink); margin: 18px 0 10px; }
+.rp-muted { color: var(--muted); font-weight: 400; font-size: 13px; }
+
+.rp-status { border: 1px solid var(--border); background: var(--surface-tint); border-radius: 8px; padding: 8px 12px; font-size: 13px; margin-bottom: 14px; }
+.rp-status.ok { border-color: #cfe8d8; background: var(--ok-bg); color: var(--ok); }
+.rp-status.error { border-color: #f0c9c9; background: var(--err-bg); color: var(--err); }
+
+/* ---- setup ---------------------------------------------------------------------------- */
+.rp-controls { display: flex; flex-wrap: wrap; gap: 18px 26px; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--surface); }
+.rp-ctl-group { display: flex; flex-direction: column; gap: 5px; font-size: 13px; }
+.rp-ctl-label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.rp-ctl-group label { display: flex; align-items: center; gap: 6px; }
+.rp-controls input[type="date"], .rp-controls input[type="number"], .rp-controls select { border: 1px solid var(--border-2); border-radius: 6px; padding: 4px 6px; font: inherit; color: var(--text); background: var(--surface); }
+.rp-controls input[type="number"] { width: 70px; }
+.rp-ctl-projects select { min-width: 240px; }
+.rp-ctl-actions { justify-content: flex-end; }
+
+.rp-btn { border: 1px solid var(--border-2); background: var(--surface); color: var(--text); border-radius: 6px; padding: 6px 12px; font: inherit; cursor: pointer; }
+.rp-btn:hover:not(:disabled) { background: var(--surface-alt); }
+.rp-btn:disabled { opacity: .45; cursor: default; }
+.rp-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.rp-btn-primary:hover:not(:disabled) { filter: brightness(1.06); background: var(--accent); }
+
+.rp-transport { display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; }
+.rp-transport input[type="range"] { flex: 1; }
+
+/* ---- the stage ------------------------------------------------------------------------- */
+.rp-stagewrap { display: flex; justify-content: center; }
+.rp-stage {
+  background: var(--surface); border: 1px solid var(--ent-project-line); border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(28, 36, 48, .08);
+  display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; overflow: hidden;
+  transform-origin: center center;
+}
+/* the right half of a 16:9 slide */
+.rp-stage-half { width: 640px; height: 760px; }
+/* a whole 16:9 slide */
+.rp-stage-full { width: 1180px; height: 664px; }
+
+.rp-presenting { position: fixed; inset: 0; z-index: 9000; background: #101722; display: flex; align-items: center; justify-content: center; }
+.rp-presenting .rp-stage { box-shadow: 0 0 60px rgba(0, 0, 0, .5); }
+
+/* ---- the input strip -------------------------------------------------------------------- */
+.rp-in { border: 1px solid var(--border); border-radius: 10px; background: var(--surface-tint); padding: 12px 14px; flex: 0 0 auto; }
+.rp-in-empty { color: var(--faint); font-size: 14px; text-align: center; padding: 18px 0; }
+.rp-in-head { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.rp-in-glyph { font-size: 15px; }
+.rp-in-who { font-weight: 600; color: var(--ink); }
+.rp-in-repo { color: var(--muted); font-size: 12px; }
+.rp-in-when { margin-left: auto; color: var(--faint); font-size: 12px; }
+.rp-in-subject { font-size: 15px; font-weight: 600; color: var(--ink); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-in-lines { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+.rp-in-line { display: flex; gap: 8px; align-items: baseline; font-size: 13.5px; line-height: 1.35; }
+.rp-in-tag { flex: 0 0 auto; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); min-width: 64px; }
+.rp-in-line-agent .rp-in-tag { color: var(--accent); }
+.rp-in-text { color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rp-in-foot { margin-top: 8px; }
+.rp-tag { font-size: 11.5px; border-radius: 999px; padding: 2px 9px; border: 1px solid var(--border-2); color: var(--text-2); background: var(--surface); }
+.rp-tag-auto { border-color: var(--border-2); color: var(--muted); }
+.rp-tag-manual { border-color: var(--warn); color: var(--warn-ink); background: var(--warn-bg); }
+.rp-tag-read { border-color: #cfe0ff; color: var(--accent); background: #f2f7ff; }
+
+/* ---- the board -------------------------------------------------------------------------- */
+.rp-board { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: hidden; } /* a long board clips rather than printing over the counter */
+.rp-stage-full .rp-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+.rp-sec { border-top: 2px solid var(--hairline); padding-top: 6px; }
+.rp-sec-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.rp-sec-title { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.rp-sec-count { font-size: 12px; color: var(--faint); }
+.rp-sec-empty { color: var(--faint); font-size: 13px; padding: 2px 0 4px; }
+.rp-sec-more { font-size: 12px; color: var(--muted); padding: 3px 0 0 26px; }
+.rp-sec-resolved .rp-sec-title { color: var(--ok); }
+
+/* the stripe's COLOUR is the priority (imp-bl-N, entities.css) — so only width + style here: a
+   `border-left` shorthand loads after entities.css and paints every stripe grey */
+.rp-row { display: flex; gap: 8px; align-items: flex-start; padding: 5px 6px 5px 8px; border-left-width: 3px; border-left-style: solid; border-radius: 0 6px 6px 0; }
+.rp-row > .imp-badge { flex: 0 0 auto; margin-top: 1px; }
+.rp-row + .rp-row { margin-top: 2px; }
+.rp-row-mid { min-width: 0; flex: 1; }
+.rp-row-text { font-size: 13.5px; color: var(--ink); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.rp-row-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 11.5px; color: var(--faint); }
+.rp-row-who { color: var(--muted); }
+.rp-row-done .rp-row-text { color: var(--text-2); text-decoration: line-through; text-decoration-color: var(--border-2); }
+
+/* what this step moved — a short flash, so the eye lands on it at 0.25s a frame */
+@keyframes rpFlash {
+  0% { background: #fff4c9; box-shadow: inset 0 0 0 1px #f0d888; }
+  100% { background: transparent; box-shadow: none; }
+}
+.rp-row-flash { animation: rpFlash 1.1s ease-out; }
+
+/* ---- the counter under the stage ---------------------------------------------------------- */
+.rp-prog { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--hairline); padding-top: 8px; flex: 0 0 auto; }
+.rp-prog-step { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text-2); }
+.rp-prog-cost { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 720px) {
+  .rp-stage-half, .rp-stage-full { width: 100%; height: auto; min-height: 520px; }
+  .rp-stage-full .rp-board { grid-template-columns: 1fr; }
+}

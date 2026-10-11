@@ -1,0 +1,2382 @@
+{
+  "identifier": "com.salmanff.superlazy",
+  "version": "0.13",
+  "display_name": "superlazy",
+  "description": "Message intelligence: Turn your emails, slacks and coding chats into self-updating todo list",
+  "app_services": {
+    "description": "Email gateway for other apps: subscribe to a semantic slice of the user's mail (e.g. 'all invoices') and receive the LLM's answer per matching email, optionally with the original email and attachments shared — without your app needing any mail access of its own.",
+    "contract": "app-comms.md"
+  },
+  "pages": {
+    "index": {
+      "page_title": "Dashboard",
+      "html_file": "pages/shell.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "pages/threads.css",
+        "shared/topbar.css",
+        "shared/filterbar.css",
+        "pages/setup.css",
+        "pages/events.css",
+        "pages/recent.css",
+        "pages/people.css",
+        "pages/cleanup.css"
+      ],
+      "modules": [
+        "pages/shell.js"
+      ],
+      "Description": "The main dashboard, served from the SHARED SHELL page (shell.html + shell.js — one document hosting the Dashboard and To-dos views; switching between them is an in-page repaint over one loaded data set, with pushState keeping URLs/back-forward honest). This view: the persisted project board (manual edits persist), filterable via its own filter bar (min PROJECT importance + hide toggles + text search), board tools (expand/collapse all), and the due-date interpreter maintenance pass. Mail checking, the account picker, the ＋ Add… button and the email viewer are mounted once by the shell. Redirects to the setup page when no mail account is set up or training is unfinished."
+    },
+    "recent": {
+      "page_title": "To-dos",
+      "html_file": "pages/shell.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "pages/threads.css",
+        "shared/topbar.css",
+        "shared/filterbar.css",
+        "pages/setup.css",
+        "pages/events.css",
+        "pages/recent.css",
+        "pages/people.css"
+      ],
+      "modules": [
+        "pages/shell.js"
+      ],
+      "Description": "TO-DOS, served from the SHARED SHELL page (see the index page entry) — every to-do of every project, sliced page-wide: tabs I owe / Team / Owed / Read (flat cross-project lists of the standard to-do rows), People (master-detail grouping of Owed/Team items by debtor), All To-dos (the archive), Messages (the mail history rendered with the Events page's cards), and Events (the 'what happened since I last checked?' digest with automation decisions and a Load-older button). Its own filter bar cuts ONE working set for every tab: timeframe on processed time, min-priority, “show only” restrictors, hide toggles and search. The ORDER is chosen separately, on a pill right-aligned on the section-title line under the tabs. Events come from the shell's shared windowed loader — switching views refetches nothing."
+    },
+    "threads": {
+      "page_title": "Threads",
+      "html_file": "pages/shell.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "pages/threads.css",
+        "shared/topbar.css",
+        "shared/filterbar.css",
+        "pages/setup.css",
+        "pages/events.css",
+        "pages/recent.css",
+        "pages/people.css"
+      ],
+      "modules": [
+        "pages/shell.js"
+      ],
+      "Description": "THREADS view of the shell (same shell.html/shell.js): every email thread / Slack conversation as a Mail-style summary row; choosing one opens the email viewer embedded as columns 2 + 3."
+    },
+    "events": {
+      "page_title": "Events (Chronological View)",
+      "html_file": "pages/shell.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "pages/threads.css",
+        "shared/topbar.css",
+        "shared/filterbar.css",
+        "pages/setup.css",
+        "pages/events.css",
+        "pages/recent.css",
+        "pages/people.css"
+      ],
+      "modules": [
+        "pages/shell.js"
+      ],
+      "Description": "Chronological MESSAGES, served from the SHARED SHELL page (see the index page entry) — a mail-client-like ruled list (newest first by the message's own date, grouped by day) of the events audit log: every analysed email, auto-processed message and manual edit, kind shown by the glyph disc (📧/⚙/✍️), with the tasks each raised/resolved as typed chips, badges, cost, and its own filter bar (min-priority, hide resolved/manual/auto, search). Any event opens the shared full-email viewer. Events come from the shell's shared windowed loader; Show more / Load older page the feed on."
+    },
+    "people": {
+      "page_title": "View People",
+      "html_file": "pages/shell.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "pages/threads.css",
+        "shared/topbar.css",
+        "shared/filterbar.css",
+        "pages/setup.css",
+        "pages/events.css",
+        "pages/recent.css",
+        "pages/people.css"
+      ],
+      "modules": [
+        "pages/shell.js"
+      ],
+      "Description": "People directory, served from the SHARED SHELL page (see the index page entry): everyone from the analysed mail, with its own filter bar (min PERSON importance, bulk-sender toggle, sort, search) and a per-person meeting-prep detail view in sub-tabs under a header card with the rank control. Selection rides on the URL hash (#<address>) — deep links keep working. Manual rank (1-5) overrides the model's importance; the person editor here carries the on-demand 'Update with AI' re-profile (job when background-capable, in-tab otherwise). Tops the shell's shared events log up to 2000 rows for the message-history panels."
+    },
+    "setup": {
+      "page_title": "Setup & Prefs",
+      "html_file": "pages/setup.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "shared/topbar.css",
+        "pages/setup.css",
+        "pages/bootstrap.css",
+        "pages/slackChannels.css",
+        "pages/workSessions.css"
+      ],
+      "modules": [
+        "pages/setup.js"
+      ],
+      "Description": "Onboarding + SETUP + status/prefs. A welcome hero gates on ONE input permission (mail OR messaging) plus llm, then: a mail account gets the first-run form (ONE mailbox, history window, model) and the ONE big AI pass (jobs/bootstrap/*) with correction rounds, saved via adopt.js; a MESSAGING-ONLY install instead gets the Slack channel picker inline (slackChannelsUi.js) — save the tracked conversations and the normal checks take over. Returning users land on the STATUS tab — since 2026-09-09 a RESOURCES layout: a left list of every source (mail accounts, Slack workspaces, AI agent stores) with its state (trained / training / saved / not started / needs re-authorisation / paused), and a right detail panel: the mail account panel (train / continue / pause / forget), or the channel module for a Slack row (slackChannelsUi, fixed to that workspace) / a work row (workSessionsUi, fixed to that store), each with the save-then-analyse-now-or-later offer — the Channels tab is gone. Then the RULES tab (all custom instructions at every scope), CONNECTED APPS and PREFERENCES. An agents-only install gets the AI agents picker inline on the welcome. New mail is NOT handled here — the dashboard does that."
+    },
+    "cleanup": {
+      "page_title": "Clean-up",
+      "html_file": "pages/cleanup.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "shared/topbar.css",
+        "shared/filterbar.css",
+        "pages/setup.css",
+        "pages/events.css",
+        "pages/recent.css",
+        "pages/people.css",
+        "pages/cleanup.css"
+      ],
+      "modules": [
+        "pages/cleanup.js"
+      ],
+      "Description": "The WEEKLY CLEAN-UP page (specs/superlazy-weekly-cleanup.md; not in the nav — the experimentation host, later also a Setup tab). One streamed model call over the app's current state (situation, standing instructions with usage, catalog with open + recently closed to-dos, people, gathering-dust and archive-candidate lists, the user's graded hand edits, earlier decisions) plus an INPUT WINDOW — by default an index of every analysed item across channels (optionally restricted to ticked accounts) with bodies fetched on the model's request, or full mail threads — returns SECTIONS: a period summary, a focus list for the horizon ahead, attention cards (summary + recommendation + the to-dos to act on), and proposals in the ops vocabulary for stale tasks, archiving, merges, splits/moves/restructures, people, standing rules and learned patterns, plus questions with optional actionable options. A rail of sections with undecided counts, Accept / Ignore / Accept all per section, Apply under the audit lock. To-dos everywhere render as the standard live task row (same modals as the other pages). Also: a size and cost estimate before sending, input vs output cost after, model picker, windows and thresholds saved as prefs, under-the-hood texts, free housekeeping passes, the archived-projects list with Restore, past runs."
+    },
+    "styleguide": {
+      "page_title": "superlazy — style guide",
+      "html_file": "labs/styleguide.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "shared/topbar.css",
+        "pages/events.css",
+        "pages/people.css",
+        "labs/styleguide.css"
+      ],
+      "modules": [
+        "labs/styleguide.js"
+      ],
+      "Description": "Test page (not in the nav menu): the living style guide — renders every entity treatment (design tokens, cross-link chips, to-do rows, event rows, person avatars, the project card) through the REAL shared components with mock fixtures, for refining the per-entity visual identity before it is applied to the live pages."
+    },
+    "slacklab": {
+      "page_title": "Slack lab (debug)",
+      "html_file": "labs/slacklab.html",
+      "css_files": [
+        "shared/tokens.css",
+        "labs/slacklab.css",
+        "pages/slackChannels.css"
+      ],
+      "modules": [
+        "labs/slacklab.js"
+      ],
+      "Description": "DEV page (not in the nav): the Slack formation DRY RUN — build chunks over a chosen window WITHOUT persisting anything and review every chunk as a transcript, the user-resolution table (Slack id → display name / email / bot) and a volume & cost projection per conversation, for tuning chunking against a real workspace. Channel setup itself (the connection picker + conversation roster + Save selection) is the SHARED slackChannelsUi.js module, mounted here for convenience — its home is Setup & Prefs → Channels."
+    },
+    "inspect": {
+      "page_title": "Inspect (debug)",
+      "html_file": "labs/inspect.html",
+      "css_files": [
+        "shared/tokens.css",
+        "labs/inspect.css"
+      ],
+      "modules": [
+        "labs/inspect.js"
+      ],
+      "Description": "DEBUG: analyse ONE message at a time with full wire visibility — the exact request (system prompt / cached catalog turn / volatile block), every LLM round (request_more, repair), the raw response, thinking, tokens incl. cache read/write, and cost — and NOTHING is persisted until the user presses Save (Ignore keeps the results on screen and leaves the cursor in place, so the same message can be re-run in another tab under different Preferences for A/B comparison). Holds the run lock while inspecting so a background run can never race the same message."
+    },
+    "agentslab": {
+      "page_title": "AI agents (dev lab)",
+      "html_file": "labs/agentslab.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "shared/topbar.css",
+        "shared/filterbar.css",
+        "pages/events.css",
+        "pages/recent.css",
+        "pages/people.css",
+        "pages/workSessions.css",
+        "labs/agentslab.css"
+      ],
+      "modules": [
+        "labs/agentslab.js"
+      ],
+      "Description": "DEV page (not in the nav) for the WORK channel (specs/superlazy-sessions.md). Step 1 mounts the SAME channel-setup module the Setup page's Channels tab uses (workSessionsUi.js: fs store, ME, repos, first-read window, Save → the channel:'work' account record; the normal checks then read the sessions along with mail). Steps 2–3 are the dev tools: a formation DRY RUN (the exact turn items a run would queue, each openable as the viewer will show it plus its raw transcript records) and the ZERO-WRITE chronological run — the real analysis over every formed turn against an empty or the real catalog, painted with the real Events/project components, optionally SAVED to the database in one commit."
+    },
+    "requestauditlab": {
+      "page_title": "Request Audit Lab",
+      "html_file": "labs/requestauditlab.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/topbar.css",
+        "labs/requestauditlab.css"
+      ],
+      "modules": [
+        "labs/requestauditlab.js"
+      ],
+      "Description": "LAB / DEV TOOL (not in the nav): every LLM exchange the per-message engine made while recording was on (settings.llm_audit, toggled here or via superlazy.audit(true) in the Setup page console), grouped into request chains (analysis call + request_more detail rounds + repair rounds) per run, with the cost of each part (cached prefix read, new input, cache writes by TTL, output), the exact turns sent (cached durable turn loaded on demand from its blob), the reply, thinking and raw usage. Calls on $0 local connectors are priced as eq equivalents via the API price list. Records are pruned after llm_audit_days (default 3)."
+    },
+    "replay": {
+      "page_title": "superlazy — replay (demo)",
+      "html_file": "labs/replay.html",
+      "css_files": [
+        "shared/tokens.css",
+        "shared/entities.css",
+        "shared/index.css",
+        "shared/mail.css",
+        "shared/topbar.css",
+        "labs/replay.css"
+      ],
+      "modules": [
+        "labs/replay.js"
+      ],
+      "Description": "DEMO page: plays a recorded stretch of SuperLazy back at demo speed (default 0.25s per input) — the input arriving on top of the stage, the to-do list moving underneath (3 I owe / 3 Team / 3 resolved, each with a \"+N more\"). Criteria: from/to dates, channels, repos, projects, which event kinds count as a step. NO model calls, NO mail fetch, NOTHING written: steps come from the events log and the board is reconstructed from each to-do's created_asof + evidence[].changed diffs (replayEngine.todoAsOf). The stage is a fixed half-slide (or full-slide) frame with a Present button that scales it to fill the screen."
+    }
+  },
+  "files": [
+    {
+      "path": "pages/subscriptionsData.js",
+      "Description": "Browser data layer for inter-app subscriptions: request intake from the message inbox into the subscriptions collection, the approve/deny/pause/resume/revoke lifecycle with status messages back to the requester, LLM prefilter derivation at approval, and the delivery flusher that shares originals then sends pending delivery records as inter-app messages."
+    },
+    {
+      "path": "pages/connectedTab.js",
+      "Description": "The Connected apps tab on Setup & Prefs: shows each requesting app's server-verified identity and verbatim prompt, with approve/deny (plus prefilter suggestion), pause/resume/revoke, and delivery counts — the human consent surface for inter-app subscriptions."
+    },
+    {
+      "path": "jobs/analyze_thread/subscriptionsCore.js",
+      "Description": "Job-side core of inter-app subscriptions: loads active subscriptions per run (before durable-sig/pin adoption), builds the deterministic per-subscription detector lines for the cached durable turn, the cheap prefilter gate that rescues matching mail from the autopilot short-circuit, and the idempotent delivery writer + message sender used by the app_subscription workflow."
+    },
+    {
+      "path": "pages/bootstrapUi.js",
+      "Description": "All rendering for the Setup page's bulk bootstrap (first-run) flow: the run bar and live progress (waiting/thinking/writing), the model's reasoning kept on screen, per-call diagnostics, the tab/sub-tab and banner state machines (the first section opens its tab, nothing auto-switches after that; saving stays locked until answers are sent or waived), progressive per-section rendering in the app's entity identity, and the correction controls whose notes go back with the next round."
+    },
+    {
+      "path": "pages/bootstrap.css",
+      "Description": "Styles for the Setup page's bulk bootstrap flow: sticky run bar, banner, tabs and panels, project/person/autofile cards, question rows and the raw-output drawer."
+    },
+    {
+      "path": "jobs/bootstrap/bootstrapPrompt.js",
+      "Description": "The BULK BOOTSTRAP system prompt (BOOTSTRAP_PROMPT_VERSION) and the refinement-message builder: produces THE MAP — business context (written FOR the per-message analyst), project skeletons with their live to-dos, people profiles, per-sender autofile candidates and open questions — as a JSONL stream, cheap sections first, 'done' last. Its 'What a project is' paragraph is copied VERBATIM from jobs/analyze_thread/prompt.js (test-enforced)."
+    },
+    {
+      "path": "jobs/bootstrap/dumpBuilder.js",
+      "Description": "Builds the mailbox dump: thread-grouped markdown, newest thread first / oldest message first, SHORT SURROGATE ids (m0001/th001, separate namespaces) with translation maps back to real ids, ME tagging, deterministic byte budget with graceful degrade, and the full bodies kept aside for fetch requests."
+    },
+    {
+      "path": "jobs/bootstrap/adopt.js",
+      "Description": "Turns the bootstrap MAP into the real stores — projects (with their to-dos, dated by the email that raised them, and partial_threads for threads cut by the window), people profiles, auto-file senders (the standing per-sender action the per-message workflow reads), settings (incl. the business context), the account record whose CURSOR is set one millisecond past the newest message read, and — for the emails the map actually QUOTED as evidence — their stored bodies plus one event each naming the to-dos they produced (the summary event says plainly that uncited mail was read together and not stored individually). Writes records indistinguishable from the ones the per-message engine would have written (same id minting, same shapes)."
+    },
+    {
+      "path": "jobs/bootstrap/bootstrapCall.js",
+      "Description": "The bootstrap LLM calls: streaming JSONL section parser, the incremental assembler, the first pass, the refinement rounds (same cached conversation) and resume-from-partial, with auto-continuation when the output budget runs out and cost/meta merged across turns."
+    },
+    {
+      "path": "test/verifyBootstrap.mjs",
+      "Description": "OFFLINE verification of the bulk-bootstrap modules (no server, no LLM, no personal data in the file; runs against the user's stored mail when present, otherwise a built-in synthetic mailbox): dump determinism and format, the surrogate↔real id round-trip, the prompt sync contract with analyze_thread/prompt.js, JSONL streaming/continuation/resume behaviour, and the Setup page's bootstrap html↔js↔css contract."
+    },
+    {
+      "path": "test/costReport.mjs",
+      "Description": "OFFLINE cost diagnosis: reads the events log from the local datastore and prints per-message spend (model, in/out/cache read/cache write tokens, fetch rounds) plus the measured REQUEST composition (request_profile: chars per section, snapshot size), then aggregates — cache efficiency, fetch-round overhead, biggest sections — so cost drift shows as a pattern, not a feeling. node test/costReport.mjs [N]."
+    },
+    {
+      "path": "test/verifyBatch.mjs",
+      "Description": "OFFLINE verification of the batch/cache/staleness-tier pipeline (specs/pipeline-walkthrough.md §5–§7): hydrates the real stores from the local datastore, checks catalog snapshot vs live delta, the FULL/BRIEF/DORMANT tiers, batch assembly and the missing-entry re-queue."
+    },
+    {
+      "path": "test/verifyProjectMerge.mjs",
+      "Description": "Offline proof of the concurrency rules: the merge/heal cases as unit checks, then healDuplicateProjects run read-only over the real stored projects to report duplicate project_ids. node test/verifyProjectMerge.mjs"
+    },
+    {
+      "path": "test/verifyTaskHistory.mjs",
+      "Description": "OFFLINE proof of the task-history trail: what the analyzer records when it creates or changes a to-do (evidence diffs + the llm_* baselines), what a manual edit records, and that a burst of manual fiddling collapses into ONE evidence entry and one upserted event per field. node test/verifyTaskHistory.mjs"
+    },
+    {
+      "path": "shared/tokens.css",
+      "Description": "App-wide design tokens (:root custom properties, loaded FIRST on every page): neutrals, status colours, the importance 1-5 scale (mirrored in renderUtils.js IMP_COLORS), the canonical task-direction set, event-kind colours, and the project/person entity accents."
+    },
+    {
+      "path": "shared/entities.css",
+      "Description": "The per-entity visual-identity components (chips, task rows, avatars, event kind discs, importance badge + imp-fg/imp-bl utility classes), the shared thread-grouped message-history rows (pp-msg / pp-thread — messageHistory.js renders on every page), plus .sl-v2-scoped restyles of existing epv-/ev-/pp- classes that pages opt into; loaded right after tokens.css on every page. Carries the fenced 'TASK CHECKBOX — EXPERIMENT' block: task-row checkboxes are drawn by hand (white box, coloured border, coloured tick) to match .done-mark instead of the native accent-color solid fill; --task-check-on switches green↔blue and deleting the block restores the native control."
+    },
+    {
+      "path": "shared/renderUtils.js",
+      "Description": "SHARED rendering primitives (sub-module, imported not listed in modules): element helpers, date formatters, the importance colour scale + badge, the four entity chips (project/task/event/person), the initials avatar, the event kind disc, and the shared task row (taskRowEl — its due slot shows the hint text only on the day it was written, the interpreted date after that). Also owns the shared reading of a task's HISTORY (evidenceTrailOf / evidenceSummary / evidenceLabel) and the task row's history strip: the FIRST and LAST todo.evidence entries as one comma-separated line, with a '+ N more' (N = total - 2) between them, each email-backed one opening THAT message in the thread viewer. The task NAME is a button that opens the task modal, like the △ does. Row anatomy (2026-08-25): checkbox · name (opens the task modal) + ✏️ (same modal) + history strip · due · [project pill] · priority · ✕ — the due date LEFT of the project chip, priority at the far right so a column of rows lines up. Hovering the NAME (not the whole row) slides the description/sub-tasks open under it; the ✏️ glyph replaced the retired △ everywhere (people wouldn't read a triangle as edit). The 'set by you' dot is absolutely positioned on the priority badge's corner so it adds no width. taskRowEl's showDirection opt puts, at the very front of the row (left of the checkbox), the ☑️/📥/👥/📖 direction mark — off by default (a direction-scoped tab already says it), on wherever the list mixes directions: the Events page's task rows, both 'All tasks' archives, and the tasks behind one email in the viewer. A row state change that REMOVES the row (resolve / reopen / cancel) wipes it shut before committing, so a quick second click cannot land on the row that slid up underneath; PRIORITY changes deliberately do NOT wipe — taskSort.js holds the order so the row keeps its place, and sliding a row that never moves was pure noise (user, 2026-09-01)."
+    },
+    {
+      "path": "shared/subTasks.js",
+      "Description": "Very light sub-tasks inside a task, stored as flat checklist lines ('- [ ]' / '- [x]') in the plain-text description — no schema change. Parse/stats/toggle helpers, the textContent-only DOM renderer (hover-revealed checkboxes, done = grey + strikethrough, ticked rows restyle themselves in place), and wireBulletContinuation (textarea Enter continues a '- ' list, Enter on an empty bullet exits it). Used by taskRowEl's hover slide-open description panel and the task editor / add-form textareas. Ticks persist via a manual_edit (target todo, field description) that page listeners deliberately do NOT repaint on — a repaint would slam the open panel shut."
+    },
+    {
+      "path": "labs/styleguide.html",
+      "Description": "Styleguide test page body: intro note, click-feedback line, and the sections host (wrapped in the sl-v2 opt-in class)."
+    },
+    {
+      "path": "labs/styleguide.js",
+      "Description": "Styleguide entry point: renders tokens swatches, cross-link chips, to-do rows, event rows, people avatars/rows and the project card through the real shared renderers with mock fixtures; clicks flash a note instead of acting."
+    },
+    {
+      "path": "labs/styleguideFixtures.js",
+      "Description": "Mock projects/todos/events/people (real record shapes) used only by the styleguide page."
+    },
+    {
+      "path": "labs/styleguide.css",
+      "Description": "Layout styles for the styleguide page only (sections, captions, token swatches, legend)."
+    },
+    {
+      "path": "pages/shell.html",
+      "Description": "The shared shell page body (serves the index, recent, events AND people page keys): top bar + status + one container per view — Dashboard, Tasks, Events (full-width feed) and People — each with its own filter bar host, plus the hidden stubs for shared ui.js renderers. shell.js shows one container at a time."
+    },
+    {
+      "path": "pages/shell.js",
+      "Description": "Entry point of the shared shell page: reads the URL for the initial view (index/recent/events/people), switches views in place with pushState/popstate, and mounts every cross-view singleton exactly ONCE — setup guard, appStore load, the ui.js hooks, the manual-event listener, the email-viewer context, mail tools (+ status poller), the ＋ Add… button, visibilitychange and hashchange — dispatching repaints (and per-view person-editor options) to the active view. It also wires the ui.js injections that need the store: setProjectDeleter (the project editor's Delete — out of the working set and out of storage) and setHostRepaint (every card edit repaints the active view behind the modal)."
+    },
+    {
+      "path": "pages/appStore.js",
+      "Description": "The shell's ONE in-memory working set (createAppStore): loads projects/profiles/instructions/accounts/settings via persist.loadAll plus a single shared windowed events loader (base 1000, ensureEventCoverage/loadOlder for more), merges session-raised extra events, and reloads wholesale only when new data definitely exists — view switches reuse it untouched. Deliberately no browser storage (shared origin across freezr apps)."
+    },
+    {
+      "path": "pages/index.js",
+      "Description": "The DASHBOARD VIEW module of the shell page (createDashboardView): the project board with its own filter bar (min importance / hide toggles / search), expand-collapse-all board tools, the 'No projects yet' banner and the due-date interpreter pass — data and cross-view wiring come from the shell/appStore."
+    },
+    {
+      "path": "shared/newMail.js",
+      "Description": "Page-side entry points for ingestion: runNewMailCheck (in-tab, blocking, keep-page-open) and startBackgroundRun (hands off to the freezr job, FIRE-AND-FORGET because POST /jobs/run blocks for the whole run). Both thin wrappers over jobs/analyze_thread/ingest.js."
+    },
+    {
+      "path": "shared/failureHint.js",
+      "Description": "Turns a stopped-run error into an actionable sentence (no LLM credit left / mail token expired / rate-limited / offline / unusable model output). Shared by the training page and the dashboard mail check so both explain a stop the same way."
+    },
+    {
+      "path": "shared/modelPicker.js",
+      "Description": "The model chooser, labelled with each model's TOKEN PRICE from freezr.llm.ping ('$3 in / $15 out per Mtok'), cheapest first. Deliberately NOT a cents-per-email estimate: that depends on thread length, stored history, extra context rounds and re-profiles, so the REAL per-email cost is measured and shown after the fact instead (engine.js spendSummary). Shared by the first-run form, the Status tab's start-training form, the mid-run switcher and Preferences."
+    },
+    {
+      "path": "shared/processingNotice.js",
+      "Description": "The background-status strip under the top bar (pure renderer — mailTools' poller drives it): live progress from the run lock, 'N messages processed' after a run lands, stalled-run recovery pointer, mail-token-expired warning, and the mode-off standing reminder. Also the clean-up RESULTS bar (above the strip, until clicked) and kind-aware busy text with a spinner."
+    },
+    {
+      "path": "shared/processingModal.js",
+      "Description": "The keep-this-page-open modal for in-browser processing runs: do-not-refresh warning, live progress bar, Recent/Events watch-along links (new window), background-jobs grant pitch when not capable, Stop button, beforeunload guard (setUnloadGuard also used by the training view's banner). Stays up until the run finishes."
+    },
+    {
+      "path": "pages/onboarding.js",
+      "Description": "Onboarding helpers: permission grants (use_mail, use_llm, run_job/schedule_job), APP_SETTINGS_URL / RESOURCES_URL, and getBackgroundCapability (delegates to backgroundMode.probeCapability)."
+    },
+    {
+      "path": "pages/recent.js",
+      "Description": "The TASKS VIEW module of the shell page (createTasksView): owns the tab + filter state (timeframe/priority/search/hide/show-only), builds the cross-project working set (direction tabs, per-person grouping, archive, Messages, the Events digest) from the shared appStore, and paints it — persistence and shared handlers come from the shell. The SORT is not in the filter bar: it is a pill on the section-title line, right-aligned beside \"I owe\" / \"Team owes\" / …, cycling priority → date changed → date due → project (the filter bar says WHAT shows, not in what order). It also flags when a priority edit is HOLDING the order still (taskSort.js) and a click lets go and re-sorts. The filter bar's \"show only\" row (resolved / I owe / Team owes / Owed, in the tabs' own icons) restricts positively and composes with the hide toggles, so Hide-resolved + Only-resolved deliberately shows nothing."
+    },
+    {
+      "path": "pages/recentData.js",
+      "Description": "Data + digest model for the Tasks page: the windowed events loader (createEventsLoader — pages newest-first, ensureSince/ensureCount/loadOlder), the processed-time clock, and buildDigest() — windowed events → stats, resolved, decisions, per-project stories."
+    },
+    {
+      "path": "pages/recentUi.js",
+      "Description": "DOM rendering for the Tasks page: the page tab bar, cross-project task lists, the People master-detail view (sortable person list + selected person’s items), the All-Tasks archive view, plus the Events tab's Resolved list, Automation-decisions section and project-activity narrative cards."
+    },
+    {
+      "path": "pages/recent.css",
+      "Description": "Styles unique to the Tasks page: the page tab bar, the People master-detail split (person list rows, sort toggle, detail card), All-Tasks section heads, Load-older button, and the Events-tab digest layout (section rows, project narrative cards)."
+    },
+    {
+      "path": "shared/filterBar.js",
+      "Description": "SHARED filter bar under the top bar: composable slots (kind chips / timeframe presets All-past hour-since last night-custom via an X-hours-or-Y-days stepper popover, opening on PAST 2 HOURS / min-priority / selects / \"show only\" icon-toggles (the positive counterpart of hide: nothing pressed = no restriction, several = their union; it composes with hide rather than overriding it) / hide icon-toggles (☑️ resolved, ✍️ manual, ⚙ auto, ⏱ not due, 👥📥 not mine — a red no-entry ring overlays a hidden kind) / actions / search); pages own the state."
+    },
+    {
+      "path": "shared/filterbar.css",
+      "Description": "Styles for the shared filter bar (filterBar.js) — one row of grouped pill controls, used by every page that filters."
+    },
+    {
+      "path": "shared/topbar.js",
+      "Description": "Shared top bar (all pages): logo + page title + right-aligned menu via renderTopBar(pageKey). For the shell page it also takes onNavigate (in-page view switching for menu items the shell hosts) and setActiveTopBarPage(key) repaints just the title + you-are-here marker, leaving the mounted topbar tools untouched."
+    },
+    {
+      "path": "shared/topbar.css",
+      "Description": "Styles for the shared top bar (topbar.js)."
+    },
+    {
+      "path": "pages/events.js",
+      "Description": "The EVENTS VIEW module of the shell page (createEventsView): the reverse-chronological feed ordered by the message's own date, its filters (priority / hide resolved-manual-auto / search), lazy Gmail label-name resolution, and Show-more/Load-older paging over the shared appStore events loader."
+    },
+    {
+      "path": "pages/eventsData.js",
+      "Description": "eventClock — the analysis clock (the message's own date); eventsUi.js and the events view import it from here."
+    },
+    {
+      "path": "pages/eventsUi.js",
+      "Description": "DOM rendering for the events page: day-grouped feed of Mac-Mail-style rows (bold sender; folders/cost/time/kind icon right-aligned; subject; summary; inline reply drafts; live task rows), manual-edit summaries, the auto-file decision cards' counter buttons, and the search matcher."
+    },
+    {
+      "path": "pages/events.css",
+      "Description": "Styles unique to the events page (day headers, kind-coloured event cards, feed)."
+    },
+    {
+      "path": "shared/emailViewer.js",
+      "Description": "SHARED full-email viewer modal (Mac Mail-style reading pane): message list rail + reading pane with a Reply / Reply all / Forward toolbar (Reply for Slack chunks), avatar header, the message's tasks and its sanitised body; replies open the shared composer inline; prefer_latest lands on the thread's newest message."
+    },
+    {
+      "path": "shared/markdownLite.js",
+      "Description": "A small DOM-only markdown renderer (headings, lists incl. task items, fenced code, tables, blockquotes, inline bold/italic/code/strike, http(s)/mailto links) for agent-written plans and documents shown in the item modal. Untrusted input: builds nodes, never innerHTML; unsafe link schemes render as text. Imported by emailViewer.js — not a page module."
+    },
+    {
+      "path": "shared/modalStack.js",
+      "Description": "Shared modal shell (openModalShell): overlay + box + ✕ with a STACK so modals layer (email viewer on top of the project modal on top of the page); Escape closes only the topmost, z-index rises per level, overlay carries sl-v2 for entity styles. guardOutsideClick (text-entry editors): a stray outside click only pulses the box — closing from outside takes a double click. Opening a modal also moves FOCUS into it (and off the trigger): otherwise the clicked element keeps focus behind the overlay, tabbing starts outside the modal, and closing with Escape paints a :focus-visible ring on the trigger."
+    },
+    {
+      "path": "shared/projectEditor.js",
+      "Description": "The project EDIT modal (✏️ on an expanded card): rename, set priority 1-5, merge into another project, DELETE the project outright (a two-step button at the FAR LEFT of the footer, with Done at the far right so the irreversible action is nowhere near the dismiss button: the first click arms it into \"⚠ Are you sure? You cannot undo this action\", only the armed click deletes, and it disarms itself after a few seconds — offered only where the page wired ui.js setProjectDeleter), and bulk select/resolve via RIGHT-side blue selection checkboxes. Each task's ✏️ opens THE SHARED task editor (taskEditor.js) stacked on top — no inline mini-form of its own any more. Mutations go through ui.js ops (manual_edit events + persistence). It is about the PROJECT only — the task list, its selection checkboxes and its bulk resolve were removed (2026-08-21) as a thinner duplicate of the card sitting right behind the modal."
+    },
+    {
+      "path": "pages/newProjectModal.js",
+      "Description": "The \"+ Add Project\" create modal on the dashboard: name + priority, then the new project opens on its \"+ Add\" tab."
+    },
+    {
+      "path": "shared/taskEditor.js",
+      "Description": "THE ONE task edit modal (△ on any task row, and the project editor's per-task ✏️): staged rename / details / due date (live interpretation to a machine window) / priority 1-5 / ownership+who (known-people autocomplete after 2 letters; comma-separate joint owners; blank = unassigned), plus a collapsed searchable project picker to move the task or create a new project — applied on Save through ui.js taskEditOps. Outside clicks only pulse the box (double-click, Cancel, ✕ or Escape close it). Save / Cancel sit ABOVE the history (a long trail used to push them off the bottom of the modal). Below them it renders the task's full HISTORY — every todo.evidence entry newest-first with its field-level diff, the writer's reason and the model's message summary; entries backed by an email open that exact message in the shared thread viewer. Needs NO query: evidence travels on the project record. A manual priority override in that history offers 'revert to N' — restores llm_importance and unlocks the field, handing it back to the model (ui.js taskEditOps.revertImportance). The Priority row carries '↩ revert to automated priority N' beside its 'set by you' note — ONE action that drops the lock and restores llm_importance together; the number is omitted when the analyzer has not priced the task since that field existed, and the value then waits for the next analysis."
+    },
+    {
+      "path": "shared/dueField.js",
+      "Description": "THE shared due-date control: a text box, the asap / today / tomorrow / next wk quick-fills (resolved synchronously through the deterministic parser — no LLM call), and the interpreted machine window in small print under it. Used by BOTH the task editor modal and the project card’s \"+ Add\" tab, so adding a task and editing one are the same experience."
+    },
+    {
+      "path": "jobs/analyze_thread/dueDates.js",
+      "Description": "Due-date interpreter: free-text due hints → machine window { due_earliest, due_latest } (ISO dates) via a deterministic parser with an LLM fallback; single and batch (migration) variants."
+    },
+    {
+      "path": "shared/taskSort.js",
+      "Description": "THE task-list sort keys, and the HOLD that keeps a list still while you re-price it: lastTouchOf plus sortImportanceOf / sortTouchOf, which every task list (recent.js, expandableProjectView.js) sorts through. ui.js calls holdSortKeys the instant before a priority edit lands, freezing that row’s keys so it keeps its place instead of jumping out from under the cursor; isSortHeld drives the sort control’s \"out of order\" flag and releaseSortHold (a sort-control click, a tab switch, a reload) lets go."
+    },
+    {
+      "path": "shared/viewerContext.js",
+      "Description": "Builds the email viewer's shared superlazy context for any page: project-wide related messages, per-email tasks, still-relevant drafts, send capability, and sendMail — one implementation for Dashboard/Recent/Events/People. Also DURABLY retires suggested-reply drafts once the events log shows the user replied on the thread after the draft was made (retireStaleDrafts, run whenever the log loads)."
+    },
+    {
+      "path": "shared/messageHistory.js",
+      "Description": "SHARED thread-grouped message-history view (sub-module): one summary row per analysed email (kind disc, ←/→/· direction mark, date, subject, what-it-changed), threads collapsed under their newest message; plus projectHistoryEntries (the mail behind one project). Used by the People detail's Messages tab and the project card's Messages tab; styles in entities.css."
+    },
+    {
+      "path": "shared/personEditor.js",
+      "Description": "The person EDIT modal (person chips on expanded cards + ✏️ on the People page): edit the profile description + user_tone (a hand-edit locks the text against auto-overwrite), see the profile's lifecycle status (provisional, or grounded from full history), trigger the on-demand AI re-profile, and manage RULES for this sender (instructions collection — add scope=sender, or scope=domain via the 'everyone at this domain' checkbox; ALSO lists the domain/all-mail rules that apply to them read-only, with a pointer to Setup & Prefs → Rules where all scopes are managed)."
+    },
+    {
+      "path": "pages/people.js",
+      "Description": "The PEOPLE VIEW module of the shell page (createPeopleView): person view models (peopleData.buildPeople) from the shared appStore, hash-driven selection, its filter bar (importance/bulk/sort/search), the rank + profile-history edit path, and the on-demand AI re-profile (background job when capable, in-tab otherwise)."
+    },
+    {
+      "path": "pages/peopleData.js",
+      "Description": "Pure aggregation for the People page: per-person view models (open items by direction, shared projects, thread-grouped message history incl. sent mail via events.to_addresses, responsiveness), search / min-importance / sort / bulk-sender filtering, and the plain-text meeting brief."
+    },
+    {
+      "path": "pages/peopleUi.js",
+      "Description": "DOM rendering for the People page: list rows and the person detail panel — a header card (name, rank control, meeting brief) over SUB-TABS in the project card's tab language: Profile (summary/tone/stats/fit), I owe / Owed / Team / Read (standard task rows + that direction's resolved), Projects (live cards) and Messages (the shared thread-grouped history, messageHistory.js)."
+    },
+    {
+      "path": "pages/people.css",
+      "Description": "Styles unique to the People page (toolbar, list rows, detail cards, rank dots, direction groups)."
+    },
+    {
+      "path": "pages/setup.html",
+      "Description": "Setup & Prefs page body: page-loading spinner, welcome hero + gate/setup onboarding blocks (accounts, cost note, advanced options, train-live/background cards), status view (Status/Rules/Preferences tabs, account summary + detail, Check for New Mail), live progress view (progress bar, paused/done controls, three live cards, project board), delete-all danger zone."
+    },
+    {
+      "path": "pages/setup.js",
+      "Description": "Setup & Prefs entry point: the onboarding state machine (permission gates → first-run setup → training → status/prefs tabs), one shared runTrainingFlow for initial training / added accounts / new-mail checks (lock-guarded, auto on load + button), Stop/Continue/step controls, prefs saving, and the delete-all reset."
+    },
+    {
+      "path": "pages/setupUi.js",
+      "Description": "Startup-page rendering: welcome/gate screens, account picker, current-message card, latest-analysis card, the People-learned & auto-filing feed (every sender put on autopilot is listed with a “Don’t auto-process” button — repeats per sender merge into one counted row), the progress bar and the paused/done controls (remaining:null = not yet scanned). The projects board itself is rendered by the shared ui.js. The Latest-analysis card also shows WHO the message is with (the sender, or the recipients when the user sent it) and the project(s) it was filed into as clickable chips (open the project to read its description), plus the per-email time/cost/token line. Profile-feed rows carry an in-place 1-5 PRIORITY control (the same manual_rank the People page sets, click the same value to clear). The sender line and the assigned-project pills use the SHARED entity components (renderUtils.projectChip) so the training view speaks the same visual language as every other page."
+    },
+    {
+      "path": "pages/statusTab.js",
+      "Description": "Status-tab rendering for the setup page: per-account summary rows with trained/training/not-started chips (a PAUSED chip takes their place while accounts.sync_paused holds) and the per-account detail panel (shown only for the chosen account: trained note, continue action, or the start-training form with history/thread-context knobs), plus the per-account 'Pause syncing / Resume syncing' toggle (onTogglePause -> the page flips sync_paused on the stored record) and the 'Forget this account's data' control (onForget -> persist.deleteAccountData). The start-training form also carries the two cost dials (which AI + context per email), so a returning user meets that choice at the moment they commit to spending rather than having to find Preferences first. Since 2026-09-09 also renderResourceList (grouped left list of every source with a state chip) and renderResourceDetail (mail panel, or a channel-module mount + pause/forget for Slack and work rows)."
+    },
+    {
+      "path": "pages/prefsTab.js",
+      "Description": "The PREFERENCES tab: the editable settings form, incl. the background-checking block (mode toggle — disabled with the reason when the capability is missing — and the foreground poll interval). Includes the 'Context sent per email' dial (analysis_context_chars) — the quality/cost trade for how much history each analysis request carries."
+    },
+    {
+      "path": "pages/rulesTab.js",
+      "Description": "The RULES tab of Setup & Prefs: the one overview of the `instructions` collection — list every active rule (scope chips: all mail / one account / a domain / one sender), remove (soft-disable), and add new rules at any scope; sender/domain rules force matching mail through the AI, account/all rules are prompt guidance only."
+    },
+    {
+      "path": "shared/setupGuard.js",
+      "Description": "Shared page guard: redirects any page back to the setup page until an account exists and training_wip is false."
+    },
+    {
+      "path": "pages/setup.css",
+      "Description": "Styles for the setup & Prefs page (welcome grid, live cards, badges, progress bar); also styles the dashboard header/board wrap."
+    },
+    {
+      "path": "shared/ui.js",
+      "Description": "Shared project-board rendering and run-log helpers (the project board via expandableProjectView, the project modal, status/cost/log lines); text-only, no innerHTML of email content. Also owns MANUAL-EDIT RECORDING for to-dos: recordTodoChange writes the evidence entry + the manual_edit event for every field change (status / priority / text / due / ownership), COALESCING a burst — anything within 60s of the last change — into ONE evidence entry and one upserted event per field, so ten rephrasings of a description are one record saying what actually changed. taskEditOps.revertImportance(project, todo) restores the model's llm_importance and clears importance_locked — the 'revert to N' the task modal offers on a manual priority override. projectBulkOps.setAll(project, { direction, status }) is the per-bucket bulk op behind a tab's resolve-all / cancel-all — one manual_edit event carrying every change, plus one evidence entry per task. taskEditOps.revertImportance ALWAYS releases importance_locked and additionally restores llm_importance when one is stored. setHostRepaint lets the host page hand ui.js its own repaint: boardHandlers.onChange calls it, so a project card opened in a MODAL never leaves the page behind it stale — including for the card actions that raise no manual_edit event at all (adding a task, dismissing or editing a suggested reply). setProjectDeleter is the matching injection for the project editor's Delete."
+    },
+    {
+      "path": "shared/expandableProjectView.js",
+      "Description": "Reusable project renderer: base line (per-direction counts colour-coded by priority) → summary with horizontal tabs (I owe/Team/Owed/Read) of short-description rows with resolve/cancel → an All tab with full detail, a Messages tab (the mail behind the project as thread-grouped summary rows via messageHistory.js — shown when the page injects the events log through ui.js setEventsProvider) and an Events tab. Task lists sort NEWEST-FIRST on the row's own 'modified' date (created / resolved / latest evidence; priority breaks ties); resolved rows newest-resolution first; both open and resolved lists cap at a few rows with an in-place '+ N more' expander. Renders suggested replies (answer/delegate/reminder) with editable body + Send/Edit/Remove and ▲▼ priority controls. Board cards remember their expanded/tab state across re-renders (module registry keyed by project_id) so background refreshes never collapse what the user opened. The '+ Add' tab takes MULTI-LINE input: one task per line (pasted lists included), warning how many tasks will be created, all sharing the one Detail / Direction / Who / Priority / Due. Its Due field is the SHARED dueField.js control (asap / today / tomorrow / next wk quick-fills + the interpreted window underneath) and its priority row carries the task editor's ⏲ lower-until-due hold, so adding a task and editing one are the same experience. Its own impControl (the project header's dots/badge variant) follows renderUtils.impCtl's rule: the 'set by you' dot is anchored inside the display, not a sibling of the arrows. Card band (2026-08-21): name △ · draft pill · counts … priority — the TODAY tag and the whole-project 'resolve all' are gone; each TAB carries its own '✓ resolve all N' / '✕ cancel all N' for its own bucket. draftsByDirection()/draftCountOf() are THE draft bucketing: a draft lives where its TASK lives (its own `direction` goes stale when the user changes the task's ownership), so the pill counts exactly what the tabs render. Both open-task orders read their keys through taskSort.js, so nudging a row's priority never re-sorts the list under the cursor — the bucket bar's ⇅ pill goes amber to say the order is held, and clicking it releases and re-sorts."
+    },
+    {
+      "path": "shared/index.css",
+      "Description": "Styles shared by all pages (panels/board/log)."
+    },
+    {
+      "path": "shared/archiveSource.js",
+      "Description": "The Email Cabinet implementation of the MailSource interface (documented at the top of this file): createArchiveSource() → { listAccounts, listEnvelopes, getNewer, listRecentThreads, loadThreadRaw, loadSentSamples, getFullBody }. read_all on the archive's messages+files; fetches + MIME-parses stored EMLs into source-shaped raw messages."
+    },
+    {
+      "path": "shared/sourceFactory.js",
+      "Description": "The ONE place that picks a MailSource implementation: live mail by default (fresh installs), or the source the stored account records were trained with (accounts.source_id); detectSource() for pages that haven't loaded accounts themselves."
+    },
+    {
+      "path": "shared/postal-mime.js",
+      "Description": "Vendored postal-mime MIME parser (self-contained ESM bundle, v2.4.4); used only by the archive source — live-mail bodies arrive pre-parsed from the mail API."
+    },
+    {
+      "path": "jobs/analyze_thread/engine.js",
+      "Description": "PERMANENT core: the single per-message pipeline shared by every driver — createSession (stores + injected freezr/MailSource), ensureThread, ensureUserStyle, and processOneMessage (profiles → rules/short-circuit → assemble → LLM with bounded request_more loop → reconcile → profile lifecycle (graduation re-profiles via reprofiler.js) → triggers → events)."
+    },
+    {
+      "path": "jobs/analyze_thread/prompt.js",
+      "Description": "PERMANENT core: the analysis SYSTEM PROMPT (projects own to-dos; DELTA output incl. participants; four directions incl. read_only; fork-aware reply threading with parent + latest inlined; per-project roles decided by the model, ME-only seeding; suggested-reply drafts; workflow triggers; INVARIANTS + tunable POLICY) and PROMPT_VERSION."
+    },
+    {
+      "path": "jobs/analyze_thread/assemble.js",
+      "Description": "PERMANENT core: builds the per-message request — people (ME tagged, no role seeds), linked projects' full to-do lists, the catalog of other active projects, the prior-message index, the replied-to parent in full (plus the latest message on a fork), the new message in full, plus any request_more detail. SIZE CAPS: message bodies are capped (new message 24k chars, inlined parent 6k, request_more detail 24k), the prior-message index keeps the 60 most recent, and a whole-request budget (70k chars) trims the new body further if the parts still add up. Every cut is MARKED in the prompt so the model knows to use request_more, and assemble returns a `size` diagnostic. REDUCTION LADDER: the request is built at a detail level and rebuilt leaner until it fits prefs.analysis_context_chars (DEFAULT_CONTEXT_CHARS / CONTEXT_CHOICES, exported for the prefs form). Reduction is by RELEVANCE TIER, not text truncation: suggested replies + resolved to-dos go first, then per-to-do prose, then the catalog's summaries (it becomes a name+id list), then people's profile prose (everyone stays listed; the sender + user keep full detail), then index lines. Every to-do id, person and project NAME survives at every level so the model can never duplicate what it could not see; only message bodies are character-capped. Returns a `size` diagnostic with per-section char counts."
+    },
+    {
+      "path": "jobs/analyze_thread/analyze.js",
+      "Description": "PERMANENT core: the single LLM call (freezr passed in); parses + validates the output, returning either an analysis or a request_more, with one repair retry. The repair round is a CONVERSATION (prompt + the model's broken reply + a fix instruction), not a re-ask, so the model can repair its own output; a reply detected as truncated gets more output room and an instruction to be terser. The invalid-output dump labels the model's reply and OUR prompt unambiguously and collapses both. Output ceilings are 16k tokens (24k on a repair) — providers bill tokens generated, not the cap, so a low ceiling only buys truncated JSON. An EMPTY reply is handled specially: no empty assistant turn (providers reject it) and the retry drops responseType so the reply comes back as plain text."
+    },
+    {
+      "path": "jobs/analyze_thread/reconcile.js",
+      "Description": "PERMANENT core: applies the model's projects-nested OUTPUT to the project store — mints ids (maps tmp_id), MERGES the to-do + response + participant deltas (omission preserves), carries forward fields the render doesn't round-trip, reassigns moved to-dos, maintains evidence, enforces invariants, computes latest_delta + new/changed sets. Evidence entries now carry the field-level diff (`changed[]`), and the model's own values are stamped onto llm_importance / llm_short_description / llm_description so a later manual edit is distinguishable from — and revertable to — the machine's reading. The per-message diff is returned as todo_edits for the event record."
+    },
+    {
+      "path": "jobs/analyze_thread/projectStore.js",
+      "Description": "PERMANENT core: the cross-thread project store (in-memory working set) — mints project/todo/response ids, hydrate() to load persisted records and bump counters past used ids, thread↔project links, embedded todos + responses, linked-projects detail + lightweight catalog, representative importance."
+    },
+    {
+      "path": "jobs/analyze_thread/projectMerge.js",
+      "Description": "CONCURRENCY SAFETY for the projects collection (pure functions): the 3-way merge of a stored project record into the live one against a baseline (adopt what another writer added, never resurrect what we moved away, per-task newest-touch wins) plus healDuplicateProjects for rows that already share a project_id."
+    },
+    {
+      "path": "jobs/analyze_thread/profiles.js",
+      "Description": "PERMANENT core: the STABLE person profile store — summary, relationship, responsibilities (a LIST of entries, see responsibilities.js — used for delegation and for reading who owns what), user_tone, llm_importance/manual_rank, the auto_processes[] standing actions (see autoProcess.js), observed interaction_data, and the profile LIFECYCLE state (provisional until solidified_asof; applyReprofile applies re-profiler results; user_edited text is never auto-overwritten). The fit score / drift_log accumulator was removed 2026-09-19 — the model emitted no fit_concerns in 983 analyses, so it never moved. Writing to (or replying to) a sender who is on autopilot switches their auto-filing OFF on the spot (unlearnAutoFiling; a user-LOCKED mute is honoured) — takeUnlearned() drains the list so the engine can raise an 'autofile_off' event."
+    },
+    {
+      "path": "jobs/analyze_thread/responsibilities.js",
+      "Description": "PERMANENT core: the ONLY module that reads the shape of profile.responsibilities — a LIST of { id, text, source, locked, asof } entries, one per kind of work a person handles. Normalizes the legacy STRING on load; applyModelResponsibilities lets a model proposal refresh its OWN entries while every source:'user' entry survives untouched (the whole point: before this, anything the user typed was one re-profile away from being replaced); renders them for the prompt with [USER-SET] on the user's own; overlappingResponsibilities finds the same work claimed by two people, which the weekly clean-up resolves. Since prompt 0.65 the analysis request shows them in their own \"Who handles what\" section (assemble.renderWhoHandlesWhat), not on the person lines."
+    },
+    {
+      "path": "jobs/analyze_thread/profileTuning.js",
+      "Description": "PERMANENT core: every tunable constant of the profile lifecycle (provisional window size, re-profiler context caps) in one PROFILE_TUNING block, plus tuningFrom(prefs) to merge user overrides from settings.profile_tuning."
+    },
+    {
+      "path": "jobs/analyze_thread/reprofiler.js",
+      "Description": "PERMANENT core: the dedicated one-person profile LLM call (graduation / drift / user-request): assembleReprofile builds the context (current profile as hypothesis, drift log + flagged bodies, project participation, baseline bodies both ways for user_tone, correspondence index) with a bounded request_more loop; history builders for the engine session (historyFromSession) and the People page (historyFromEvents over events + email_bodies)."
+    },
+    {
+      "path": "jobs/analyze_thread/autoProcess.js",
+      "Description": "PERMANENT core: the shared AUTO-PROCESS contract — profile.auto_processes[] entries { type, active, details, locked, suggested, source } (first type: file_to_project); normalize/get/apply helpers used by both the engine and the UI, with lazy migration of legacy flat auto_file* fields. Also owns the THREE user-settable states (autoProcessState / userAutoProcessPatch): 'on' (auto-files, no LLM), 'off' (!active + LOCKED — never auto-files again) and 'reset' (!active, unlocked — the next message is analysed and the model MAY re-learn the sender). The lock is the only difference between off and reset, and it is what onTrigger checks before re-learning."
+    },
+    {
+      "path": "jobs/analyze_thread/rulesEngine.js",
+      "Description": "PERMANENT core: the rules-engine coordinator (stateless). preAnalyze() gathers matching user custom-instructions (by sender / domain / account / all) + auto-process action prompt lines and applies the pecking order to decide a short-circuit (skip the LLM) — sender/domain rules block short-circuiting, account/all rules are guidance only; dispatchTriggers() runs the onTrigger of each action the model fired ({ type, details } triggers)."
+    },
+    {
+      "path": "jobs/analyze_thread/workflows.js",
+      "Description": "PERMANENT core: the AUTO-PROCESS ACTION registry + the editable AUTOMATED_CATEGORIES list (each with a bucket name and the importance a short-circuited item gets). Each action colocates its prompt_instruction + onTrigger (post-reconcile) + optional shortCircuit (pre-LLM). The 'automated' action classifies bulk mail, learns the sender's category+bucket (a file_to_project auto-process), then files future mail without the LLM — reporting learned_first on the FIRST activation so the caller can write the prominent autofile_learned event. The admin_actions category exists for transactional mail that ASKS the user to act (payments due, bank-detail confirmations, distribution notices) — it files at importance 3, not 1, and is the tie-break winner over plain admin. Also exports backstopAutomatedItem (an 'automated' trigger with no filed item would leave the message with no row anywhere — synthesize it) and a free label-vs-learned-category mismatch signal, compared by family so admin_actions vs Gmail's coarse CATEGORY_UPDATES is not a false positive. THE HUMAN GUARD (autopilotVeto / looksMachineAddress): the app REFUSES to put a sender on autopilot when they look like a person — vetoed if the user has ever written to them (you don't reply to a robot) or if the address is not machine-shaped AND the mail system doesn't label the message as bulk. Checked in onTrigger (blocks learning; the filed item stays) AND in shortCircuit (so a sender wrongly learned earlier stops being auto-filed and self-heals), never overriding a user-LOCKED choice. The prompt's sender test is the first line of defence; this is the second, because a standing decision that hides someone's mail is too sticky to leave to a prompt."
+    },
+    {
+      "path": "jobs/analyze_thread/instructionStore.js",
+      "Description": "PERMANENT core: store of user-authored CUSTOM INSTRUCTIONS (rules) scoped to a sender / domain / one mail account / all mail; matched by exact string comparison (matching(sender, accountId)) and injected verbatim into the analysis prompt (the LLM interprets + acts)."
+    },
+    {
+      "path": "jobs/analyze_thread/userStyle.js",
+      "Description": "PERMANENT core: distils a short writing-style guide from the user's sent mail (fetched via the injected MailSource; one LLM call, once per session) so suggested replies sound like them; best-effort, returns '' if unavailable."
+    },
+    {
+      "path": "jobs/analyze_thread/roles.js",
+      "Description": "PERMANENT core: tags the user's own addresses as ME (no team/external seeding — the model decides each person's role per project)."
+    },
+    {
+      "path": "jobs/analyze_thread/normalize.js",
+      "Description": "PERMANENT core: turns a source-shaped raw message into the normalized analysis shape (html→text, reply-strip, body_mode, opaque source_ref)."
+    },
+    {
+      "path": "jobs/analyze_thread/htmlToText.js",
+      "Description": "PERMANENT core: HTML email body → readable text (DOMParser with regex fallback)."
+    },
+    {
+      "path": "jobs/analyze_thread/replyStrip.js",
+      "Description": "PERMANENT core: strips quoted history and decides body_mode (stripped / whole). Recognises Outlook header blocks collapsed onto ONE line and divider-then-From: blocks (the shapes that let a 115k-char quoted chain through as original body), plus localized From/Sent/To labels; the interleaved-comments test now needs 40+ chars of post-quote text before promoting a body to 'whole'."
+    },
+    {
+      "path": "jobs/analyze_thread/index.mjs",
+      "Description": "THE BACKGROUND JOB handler(freezr, params). Tasks: newmail | backfill | ping | analyze_message. Runs one time-bounded batch, writes settings.bg_last_run for pages to poll, returns { remaining } so the next run continues. Carries JOB_VERSION — bump it on ANY change in this folder or the deployed copy stays stale."
+    },
+    {
+      "path": "jobs/analyze_thread/ingest.js",
+      "Description": "PERMANENT core: the ONE ingestion driver shared by the browser and the background job. Takes the run lock, plans the batch (task 'newmail' | 'backfill'), and stops cleanly on queue-empty / user stop / lost lock / message cap / time budget, always reporting { remaining }."
+    },
+    {
+      "path": "jobs/analyze_thread/jobSource.js",
+      "Description": "PERMANENT core: live-only MailSource resolver for code that may run outside the browser (deliberately not sourceFactory.js, which would drag postal-mime.js into every job deploy)."
+    },
+    {
+      "path": "jobs/analyze_thread/config.js",
+      "Description": "PERMANENT core: build-time flags, the ingestion-coordination constants (lock staleness, step timeout), the background-job runtime budget (JOB_MAX_RUNTIME / JOB_BUDGET_MS / JOB_MAX_MESSAGES) and the foreground poll defaults."
+    },
+    {
+      "path": "jobs/analyze_thread/modelDefaults.js",
+      "Description": "What 'Recommended default' resolves to per model tier: analysis = sonnet / ChatGPT flagship, clean-up & review = opus / ChatGPT flagship, within the user's own provider."
+    },
+    {
+      "path": "jobs/analyze_thread/persist.js",
+      "Description": "PERMANENT core: durable-storage layer over the app's collections. Takes freezr by injection, so it serves the pages AND the background job. Also owns the atomic run lock, the settings side-writes (stampBackgroundRun / stampNewMailCheck, updateFields only, never a clobbering full save), source provenance (sourceTagFor -> 'email:<address>', stamped onto touched projects/profiles by persistStep) and the two deletes: deleteAllData (global reset) and deleteAccountData (forget ONE source; derived records are deleted only when removing that source leaves them with none). addEvent honours a manual_id on manual_edit events (upsert key for ui.js's coalesced bursts), and eventFromStep carries reconcile's todo_edits — the field-level diff, kept off `changes` so it adds no rows to the Recent/Events feeds."
+    },
+    {
+      "path": "jobs/analyze_thread/lockText.js",
+      "Description": "PERMANENT core, pure: the one wording for a refused start when another run holds the processing lock — who holds it (background / other tab / Inspect / agents lab), its stage, when it started and last renewed, and how long until a DEAD holder frees the lock (expires_at); used by cleanupCore, agentslabRun and mailTools' status note."
+    },
+    {
+      "path": "jobs/analyze_thread/processor.js",
+      "Description": "The ingestion run driver: plans the fetch window from the account cursors, processes the queue oldest-first through the engine, persists after every message, and hosts the Inspect page deferred-persistence (Save/Ignore) mode."
+    },
+    {
+      "path": "jobs/analyze_thread/liveMailSource.js",
+      "Description": "PERMANENT core: the LIVE-MAIL MailSource over freezr.connections.mail. Host-agnostic — detects the connector's token_expired payload structurally rather than via the client's redirect helper, which would throw inside a job sandbox."
+    },
+    {
+      "path": "shared/backgroundMode.js",
+      "Description": "The two processing modes + the shared status poller: capability probe (one place — onboarding.js delegates here), effective-mode resolution (pref + capability), schedule start/stop, and createStatusPoller — polls the run lock + settings.bg_last_run, fires onLanded when a run processed something, and (mode on) keeps requesting job runs on the foreground interval."
+    },
+    {
+      "path": "pages/checkMailPrompt.js",
+      "Description": "Background mode OFF: the 'check for new mail?' modal shown on Dashboard load when mail has gone stale. Requires an explicit button press — never auto-runs; 'Not now' snoozes for the browser session; pitches turning background mode on when the capability exists."
+    },
+    {
+      "path": "shared/mailTools.js",
+      "Description": "The SHARED topbar mail controls mounted on every page: the Check Mail button, the single background poller + status strip, and the ACCOUNT dropdown. The dropdown filters every page, by two different keys because records carry different provenance — events by account_id, and derived records (projects, profiles) by sources ['email:<addr>'] via the exported getAccountFilterTag() + matchesAccountSource(). Records with no sources (analysed before tagging existed) always show. The choice is shared across pages in sessionStorage."
+    },
+    {
+      "path": "jobs/analyze_thread/reprofileTask.js",
+      "Description": "PERMANENT core: the user-requested reprofile task WITH its persistence (history from events/bodies → runReprofile → archive replaced version → save profile → 'reprofile' event). Run by the job (task 'reprofile') and by the People page in-tab when no job capability exists."
+    },
+    {
+      "path": "labs/inspect.js",
+      "Description": "Inspect page entry: wires Run/Save/Ignore, renders captured LLM exchanges, the would-be writes, and per-call token/cost tables."
+    },
+    {
+      "path": "labs/inspectRunner.js",
+      "Description": "Inspect page engine glue: builds the production pipeline with trainer deferPersist mode (commitPending/discardPending), holds+renews the run lock, and reports the run's effective knobs (runKnobs)."
+    },
+    {
+      "path": "labs/inspect.css",
+      "Description": "Inspect page styles: dense monospace blocks for raw exchanges, sticky Save/Ignore decision bar."
+    },
+    {
+      "path": "pages/newNoteModal.js",
+      "Description": "The Add/Edit-note modal: title, when, attendees, body, optional project pre-link; hands the collected note to noteIngest on save."
+    },
+    {
+      "path": "jobs/analyze_thread/noteIngest.js",
+      "Description": "On-save ingestion of manual notes: persists the input pending-first, takes the run lock, analyses via the shared engine, persists results; also the pending-inputs drain used at the end of every mail run."
+    },
+    {
+      "path": "pages/addFlows.js",
+      "Description": "The two make-it-by-hand flows (new project / meeting note), opened from the project board's filter bar."
+    },
+    {
+      "path": "jobs/analyze_thread/chunker.js",
+      "Description": "PURE chunk formation for the messages channel: stream splitting (conversation main flow vs each Slack thread), live check-window chunking with the soft debounce, history (cursor-0) day/char chunking, transcript rendering, Slack-mrkdwn resolution, participant extraction. No provider, no freezr — tested offline by test/verifyMessages.mjs."
+    },
+    {
+      "path": "jobs/analyze_thread/slackSource.js",
+      "Description": "The messages-channel InputSource over freezr.connections.messaging (Slack first): conversation roster with tracked opt-in/out, sync-mode dispatch (socket-fed getChanges vs polling getNewer per conversation), history backfill, thread-reply fetch, user resolution (attested emails), chunk formation via chunker.js, and persistence of every chunk to the `inputs` ledger (status 'pending') before analysis. Same interface as liveMailSource.js."
+    },
+    {
+      "path": "pages/slackChannelsUi.js",
+      "Description": "The ONE Slack channel-preferences UI (connection picker, live-updates pill, conversation roster with tracked checkboxes, Save selection → the messaging account record). Mounted by the setup page (Channels tab + messaging-only welcome) and slacklab."
+    },
+    {
+      "path": "pages/slackChannels.css",
+      "Description": "Styles for the shared Slack channel-preferences UI (slch-*), loaded on the setup page and slacklab."
+    },
+    {
+      "path": "labs/slacklab.html",
+      "Description": "Slack lab page body: a host for the shared channels UI, the window/build controls, and the results panels (chunks as transcripts, user-resolution table, volume & cost report)."
+    },
+    {
+      "path": "labs/slacklab.js",
+      "Description": "Slack lab entry point (dev): mounts the shared channels UI, then runs the formation DRY-RUN via slackSource.formAll over the module's deep-copied account record — chunks/users/volume rendered, nothing persisted."
+    },
+    {
+      "path": "labs/slacklab.css",
+      "Description": "Slack lab page styles: status strip, roster/user tables, chunk transcript blocks."
+    },
+    {
+      "path": "test/verifyMessages.mjs",
+      "Description": "Offline suite for the messages channel: stream splitting, live-chunk determinism and amendment-by-id, the soft debounce and its MAX_HOLD ceiling, previous-chunk adjacency, history day/char chunking, transcript + mrkdwn resolution, participants, the normalize pass-through, the rendered request shape, and the counts.messages profile branch."
+    },
+    {
+      "path": "test/verifyMessagesPlan.mjs",
+      "Description": "Offline end-to-end of the Slack ingestion spine (mocked messaging API + persist): slackSource formation writes pending chunks to the inputs ledger and processor.plan() queues them oldest-first — the regression net for 'Inspect says queue empty'."
+    },
+    {
+      "path": "test/verifyMessagesAmend.mjs",
+      "Description": "Offline verification of provider amendments (live activity index): an edited message patches + re-queues its chunk (revision bump, REVISED flag, transcript re-render), a deleted one is tombstoned, and a changed-but-quiet conversation sweeps revived old threads into new chunks."
+    },
+    {
+      "path": "test/verifyMessagesPlanMixed.mjs",
+      "Description": "Offline end-to-end of the MIXED install (mail + Slack through the composite source, Inspect's exact construction): both channels land in one oldest-first queue, already-analysed mail is not re-queued, the chunk persists pending."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/maintStore.js",
+      "Description": "Best-effort persistence for maintenance run artifacts and proposal statuses (maintenance_runs / maintenance_proposals), plus the fingerprints of earlier decisions."
+    },
+    {
+      "path": "pages/reorgReview.js",
+      "Description": "Maintenance modals: \"Review this project\" (the clean-up core in one-project mode) and the results of a finished clean-up run by id (opened from the results bar); both apply through applyProposals."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/deterministic.js",
+      "Description": "The no-LLM maintenance passes D1-D4 as pure previews (events-pruning scan, interaction_data rebuild diff, dormant-project detection, forgotten-items finder) plus the D1 delete helper and the paged events scanner."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/applyProposals.js",
+      "Description": "Applies ACCEPTED clean-up proposals one operation at a time under the ingestion lock (kind audit): merge/create/move/resolve/cancel/snooze/set/create to-dos, archive, rename/summary, profile fields, auto-process, manual rank, instruction add/disable/rewrite/rescope, event pruning, interaction rebuild; one manual_edit event per change; clears the snapshot pin."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/reorgCall.js",
+      "Description": "renderProjectDetail: one project as the clean-up model sees it on a project_detail need (ids, USER-SET flags, dates, last three evidence-trail notes per to-do)."
+    },
+    {
+      "path": "jobs/analyze_thread/sessionDigest.js",
+      "Description": "PURE parsing of a Claude Code session JSONL into turns (prompt, answer, tools, files changed, plan, checklist), session classification (active/interrupted/quiet/stale + flags), the per-TURN item body (renderTurnBody / splitTurnBody — YOU / CLAUDE CODE dialogue, tool output dropped, secrets scrubbed) plus the whole-session digest used by tests. sessionFromText dispatches Codex rollouts through codexAdapter first; parseDiffStat captures `git diff --stat` output as the effort measure for shell-made edits."
+    },
+    {
+      "path": "jobs/analyze_thread/sessionsSource.js",
+      "Description": "The fs-API reader for the WORK channel (use_file_sys): lists fs connections, detects the layout (~/.claude, ~/.claude/projects, ~/.codex/sessions or ~/.codex), lists repos and session files — Claude by repo folder, Codex by walking the dated rollout tree and reading each rollout's cwd (cached) — reads the live-process registry (Claude only; never the .key files) and file text; slugOfCwd gives both agents the same repo slug."
+    },
+    {
+      "path": "labs/agentslab.html",
+      "Description": "AI agents channel-setup page markup: file store + ME address, repo roster with Save, formation dry-run table and the stored-item viewer."
+    },
+    {
+      "path": "labs/agentslab.css",
+      "Description": "Styles for the AI agents lab."
+    },
+    {
+      "path": "labs/agentslab.js",
+      "Description": "Entry point of the AI agents dev page: mounts the shared channel-setup module (workSessionsUi.js), then the dev tools — formation dry run + item inspection modal, and the zero-write chronological run (step / run all / stop / skip / save)."
+    },
+    {
+      "path": "labs/agentslabUi.js",
+      "Description": "DOM rendering for the AI agents page: status, repo roster table, formation preview table, projection line (the inspection modal is agentslabInspect.js)."
+    },
+    {
+      "path": "test/verifySessions.mjs",
+      "Description": "Offline verification of the WORK channel: session parsing/classification/digest fixtures, turn items (readyTurns, deterministic ids, threading), normalize + assemble rendering of a work item, profile no-op, provenance tag, composite routing; --real digests every session under ~/.claude/projects."
+    },
+    {
+      "path": "jobs/analyze_thread/workSource.js",
+      "Description": "The WORK-channel InputSource (Claude Code sessions; same interface as liveMailSource/slackSource): formation reads sessions touched since the cursor through sessionsSource, turns every finished request-and-answer turn beyond the session's high-water mark into a pending `inputs` record (msg_id <sessionId>|t<n>, thread cc:<repo-slug>:<sessionId>, in_reply_to = previous turn, author ME, participant 'Claude Code'), holds an unfinished last turn until the session is quiet, and serves listEnvelopes/loadThreadRaw/getFullBody off the ledger."
+    },
+    {
+      "path": "labs/agentslabInspect.js",
+      "Description": "The AI agents page's TURN INSPECTION modal: the item exactly as the thread viewer will show it (header + stored dialogue), then the turn's derived facts (duration, models, token usage, tool mix, thinking volume, files) and every raw transcript record behind the turn as collapsible rows with truncated strings — the not-stored layer, for judging what else superlazy should keep."
+    },
+    {
+      "path": "labs/agentslabRun.js",
+      "Description": "The AI agents page's ZERO-WRITE chronological run: forms the turn items in memory (work source dry run), serves them from an in-memory InputSource, wraps the real persistence in a capture layer (events / persistStep / cursors recorded, never written), hydrates the real project+profile stores in memory and drives the REAL processor (inspectNext + commitPending through the capture layer) oldest-first, one item (stepOnce) or all (runAll) — the training run, without saving; catalog 'empty' (bootstrap, default) or 'real' (link to existing tasks). Also hands the real viewer an in-memory getThreadBodies."
+    },
+    {
+      "path": "labs/agentslabRunUi.js",
+      "Description": "The dry run painted with the app's REAL components: eventsUi.renderEventCard for each turn's event (newest first, plus a lab-only model-output / LLM-exchange details row), expandableProjectView's renderExpandableProject for the projects with their task rows (touched this run first, NEW-this-run outlined), and the real thread viewer (emailViewer + viewerContext) configured over the run's in-memory items and captured events. Live-card edits mutate the run's memory only."
+    },
+    {
+      "path": "labs/promptVariants.js",
+      "Description": "LAB ONLY: system-prompt ARMS for the agents-lab A/B, each expressed as exact search/replace edits against the shipped SYSTEM_PROMPT (never a copy of it) so control and variant differ by precisely those edits; buildVariant throws if an anchor stops matching, and returns null for the control so it stays the literal shipped path. No production path imports it."
+    },
+    {
+      "path": "pages/workSessionsUi.js",
+      "Description": "The SHARED setup UI for the WORK channel (sibling of slackChannelsUi.js), mounted on the Setup page's Channels tab, the sessions-only welcome and the agentslab page: ONE BLOCK PER use_file_sys STORE (Claude Code and Codex side by side — each detects its layout/agent, lists its repos, offers the first-read window and its own Save, seeding that store's channel:'work' account record), a shared ME address; the normal checks do the rest."
+    },
+    {
+      "path": "pages/workSessions.css",
+      "Description": "Styles for the shared AI agents setup UI."
+    },
+    {
+      "path": "jobs/analyze_thread/codexAdapter.js",
+      "Description": "PURE translator from Codex (OpenAI coding agent) rollouts (~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl: session_meta, event_msg, response_item, token_usage_record…) into the record shape sessionDigest.buildSession consumes — typed prompts from user_message events, assistant text with final_answer → end_turn, exec/shell → Bash tool calls (command unwrapped), apply_patch → Edit/Write with line counts, outputs unwrapped, usage attached, a title synthesised from the first prompt — so the work channel runs Codex sessions unchanged with provider 'codex' / agent 'Codex'."
+    },
+    {
+      "path": "labs/requestauditlab.html",
+      "Description": "Request Audit Lab markup: recording toggle, retention and window controls, totals, system prompt block, request list."
+    },
+    {
+      "path": "labs/requestauditlab.js",
+      "Description": "Request Audit Lab entry: loads settings and recorded exchanges, wires the recording toggle, retention, refresh and delete-all."
+    },
+    {
+      "path": "labs/requestAuditData.js",
+      "Description": "Request Audit Lab data: recording flag in settings, llm_audit reads, per-exchange cost breakdown (billed or eq equivalent), grouping into runs and request chains."
+    },
+    {
+      "path": "labs/requestAuditUi.js",
+      "Description": "Request Audit Lab rendering: totals, run headers, request-chain cards, per-exchange cost table, sent turns (lazy blob), reply, thinking, raw usage."
+    },
+    {
+      "path": "labs/requestauditlab.css",
+      "Description": "Request Audit Lab styles (bar, chain cards, cost table, eq marker, details blocks)."
+    },
+    {
+      "path": "shared/eqPricing.js",
+      "Description": "Equivalent (eq) pricing for $0 local connectors: builds a price map from freezr.llm.ping() and prices tokens as the same model via the API; used by the audit lab and the events feed."
+    },
+    {
+      "path": "jobs/analyze_thread/llmAudit.js",
+      "Description": "Request-audit sink: when settings.llm_audit is on, persists every engine LLM exchange verbatim into llm_audit (durable turn de-duplicated as a blob); flush() before a run ends."
+    },
+    {
+      "path": "labs/replay.html",
+      "Description": "Demo playback page body: the setup panel (window from/to, pace, channels, kinds, repos, projects, stage shape) and THE STAGE — input strip on top, three capped to-do buckets underneath, counter at the foot."
+    },
+    {
+      "path": "labs/replay.js",
+      "Description": "Demo playback entry point: loads projects + the events log once, builds the step list and the board pool from the criteria, and runs the transport (play / pause / step / scrub / present / export). No LLM, no mail, no writes."
+    },
+    {
+      "path": "labs/replayEngine.js",
+      "Description": "Replay DATA layer: buildSteps (which recorded events are beats in the story), todoAsOf (a to-do as it stood at time T — today's record with every later evidence diff rewound to its `from`, resolved_asof as the backstop), buildPool / boardAt (the three capped cross-project buckets) and changedTodoIds (what the current step moved). Documents at its head which fields are versioned and therefore rewindable, and which show today's value."
+    },
+    {
+      "path": "labs/replayStage.js",
+      "Description": "Replay STAGE rendering: the one-sentence input strip (two lines for an agent turn — the ask and what came back) and the three capped buckets (3 I owe / 3 Team / 3 resolved + \"N more\"), with a flash on rows the current step moved. Text-only."
+    },
+    {
+      "path": "labs/replayExport.js",
+      "Description": "Replay Export button: renders every frame through the page's own paint(), dedupes rows and boards into <template>s, carries over only the CSS rules the frames match (scoped under .slr-root, tokens resolved), and downloads superlazy-replay.html (inner-body fragment) + superlazy-replay.js."
+    },
+    {
+      "path": "labs/replayEmbed.js",
+      "Description": "Player for an exported replay (downloaded as superlazy-replay.js; not loaded by any SuperLazy page): plain script for a host page's script_files — play/pause, scrub, arrow keys, full screen, scales the fixed stage to its column."
+    },
+    {
+      "path": "labs/replay.css",
+      "Description": "Replay demo styles: setup panel, transport, and the fixed-size stage frame (half-slide portrait / full-slide 16:9) incl. the Present mode that scales it to fill the screen."
+    },
+    {
+      "path": "pages/cleanup.html",
+      "Description": "Clean-up page markup: settings (model, windows, accounts, thresholds, sections), run bar, the review surface host, under-the-hood, housekeeping, archived projects, past runs."
+    },
+    {
+      "path": "pages/cleanup.js",
+      "Description": "Clean-up page driver: loads the stores and the mail source, wires the knobs to settings (plus the per-run accounts tick-boxes — which accounts' items go into the input window, default all, not saved), runs cleanupCore with the picked model, mounts cleanupView, under-the-hood texts, housekeeping previews, archive restore, run history."
+    },
+    {
+      "path": "pages/cleanup.css",
+      "Description": "Clean-up page styles: the lab look plus the rail + panel review surface, attention cards, question rows, sticky footer."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/cleanupCore.js",
+      "Description": "The clean-up MEAT, host-agnostic: scan events, grade hand edits, build the state block and the input index (or dump), run the call, validate sections into items, persist proposals with fingerprints, load pending, decide, apply under the audit lock, archive list/restore."
+    },
+    {
+      "path": "pages/cleanupView.js",
+      "Description": "The clean-up review surface, host-agnostic: rail of sections with undecided counts, attention cards with per-to-do quick actions, questions, proposal rows (old vs new per op, Accept/Ignore/Accept all), footer with tally and Apply."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/cleanupPrompt.js",
+      "Description": "The weekly clean-up system prompt (v0.5: operations vocabulary, eleven sections, the OVERTAKEN BY EVENTS check) + builders: the CURRENT STATE block (trail notes for touched projects), the INPUT INDEX and the closing turn (with the one-project focus line)."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/rulesInput.js",
+      "Description": "Deterministic statistics for the rules/learn sections: graded hand edits, per-instruction usage (offered / cited / overridden after), scope overlaps."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/ops.js",
+      "Description": "The operations vocabulary: validate a proposal against the live stores (ids, tmp ids, one-todo-one-proposal, checklist guard), describe each op as old→new, fingerprint."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/cleanupCall.js",
+      "Description": "The streamed clean-up call: explicit cache breakpoint on the state+input turn, JSONL sections as they arrive, need-rounds answered on the same conversation, one continuation, honest cost merging."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/archive.js",
+      "Description": "Archived projects in their own collection (projects_archive): archive (closes open to-dos on the copy, deletes the live record), list, restore."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/cleanupSchedule.js",
+      "Description": "When the weekly clean-up is due: the user's day/hour in their timezone, once per slot, a one-day catch-up window; also the default clean-up model."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/cleanupJob.js",
+      "Description": "Runs the weekly clean-up (or a one-project review) inside the background job: hydrates the stores, stamps the attempt, runs the core under the shared lock and a deadline, stamps the result for the results bar."
+    },
+    {
+      "path": "jobs/analyze_thread/maintenance/sectionParser.js",
+      "Description": "The JSONL section parser shared by the bootstrap and the clean-up (tolerates trailing commas and bracket lines)."
+    },
+    {
+      "path": "test/verifyCleanupJob.mjs",
+      "Description": "Offline checks for the background clean-up: schedule, non-streaming parse, deadline, shared lock, results stamp, in-job runner."
+    },
+    {
+      "path": "shared/mailHtml.js",
+      "Description": "Untrusted email HTML helpers shared by the viewer and composer: sanitize, the Shadow-DOM body renderer + its reset CSS, escape / quote-line helpers."
+    },
+    {
+      "path": "shared/richEditor.js",
+      "Description": "Small formatted-text editor (contenteditable + B/I/U/S, lists, quote, link, clear) with allowlisted HTML, plain-text and Slack-mrkdwn output."
+    },
+    {
+      "path": "shared/replyComposer.js",
+      "Description": "THE reply composer (mail + chat): To/Cc/Subject rows, rich-text body, the thread loaded and quoted below the text; used by the viewer's replies and every suggested-reply edit."
+    },
+    {
+      "path": "shared/mail.css",
+      "Description": "Styles for the email viewer (Mac Mail look), the reply composer, the rich-text editor and the draft block's composer states."
+    },
+    {
+      "path": "pages/threadsView.js",
+      "Description": "Shell view \"Threads\": column 1 = one Mail-style row per conversation (people, count, date, subject, latest summary, open to-dos / draft / project badges), columns 2+3 = the email viewer embedded for the chosen thread."
+    },
+    {
+      "path": "pages/threadsData.js",
+      "Description": "Pure grouping of the events log into threads (messages, senders, projects, open to-dos, live drafts) for the Threads view."
+    },
+    {
+      "path": "pages/threads.css",
+      "Description": "Styles for the Threads view: the thread list, the selection, the pane banner and the embedded viewer."
+    },
+    {
+      "path": "pages/threadsInbox.js",
+      "Description": "Live inbox lookup for the Threads view's Inbox filter: lists each mail connection's inbox (Gmail/IMAP INBOX, Graph inbox) and returns the thread + message ids, cached 2 minutes."
+    },
+    {
+      "path": "pages/maintStore.js",
+      "Description": "Page-side shim over jobs/analyze_thread/maintenance/maintStore.js: binds the maintenance store factory to the page's global freezr for function-style imports."
+    },
+    {
+      "path": "shared/modelInfo.js",
+      "Description": "Which model the analysis will actually use (the user's default model, else freezr's default provider with the app's preferred family), resolved like engine.ensureModel and cached per page."
+    },
+    {
+      "path": "labs/inspect.html",
+      "Description": "Inspect page body: header links, the message cursor and controls, and the panes for the request, LLM rounds, response and cost."
+    },
+    {
+      "path": "jobs/analyze_thread/analysisSchema.js",
+      "Description": "JSON Schema for the analyser's reply, sent as native structured output to ChatGPT only (engine.schemaFor); Claude is never sent one."
+    },
+    {
+      "path": "jobs/analyze_thread/inlineDiff.js",
+      "Description": "Finds a sender's inline additions inside a quoted reply chain by comparing against the thread's earlier messages, not by quote markers."
+    },
+    {
+      "path": "jobs/analyze_thread/pendingScan.js",
+      "Description": "How queue-backed sources (agent turns, Slack chunks) read their pending items from the inputs collection — a deep scan to a watermark, so a burst of other inputs cannot strand them."
+    },
+    {
+      "path": "jobs/analyze_thread/responsibilityInstructions.js",
+      "Description": "Turns a line the user typed on a person's card (\"What they handle\") into a standing instruction, when the user asks for it."
+    },
+    {
+      "path": "jobs/analyze_thread/selection.js",
+      "Description": "Membership formulas for the cached prompt blocks (what goes in the hot vs cold durable turn), kept in one place so the split can be tuned and measured."
+    },
+    {
+      "path": "jobs/analyze_thread/whoMapping.js",
+      "Description": "The one translation between the model's `who` list (prompt 0.53) and the stored owner / owners / counterparty fields: reconcile writes through it, assemble reads through it. Removable only after migrating stored to-dos to a single `who` field."
+    }
+  ],
+  "jobs": [
+    {
+      "name": "analyze_thread",
+      "schedule": "hourly",
+      "maxRuntime": "1800s"
+    }
+  ],
+  "permissions": [
+    {
+      "name": "run_training_job",
+      "type": "run_job",
+      "job_name": "analyze_thread",
+      "description": "Run SuperLazy's mail-analysis job in the background on demand — lets training continue without keeping the browser window open."
+    },
+    {
+      "name": "schedule_training_job",
+      "type": "schedule_job",
+      "job_name": "analyze_thread",
+      "description": "Run SuperLazy's mail-analysis job automatically on a recurring schedule, so new mail keeps being analysed when the browser is closed."
+    },
+    {
+      "name": "read_archive",
+      "type": "read_all",
+      "description": "Read your Email Cabinet archive (message metadata + the stored EML files) so superlazy can analyse your threads.",
+      "table_ids": [
+        "com.salmanff.emailcabinet.messages",
+        "com.salmanff.emailcabinet.files"
+      ]
+    },
+    {
+      "name": "use_ai",
+      "type": "use_llm",
+      "description": "Use your LLM API keys to analyse threads (used from the next step onward; not exercised by the step-0 probe)."
+    },
+    {
+      "name": "read_account_email",
+      "type": "use_mail",
+      "description": "Read your connected mail account(s): the account email address (to pre-fill the 'you' field) and — when you choose 'Live mail' as the source — your messages, so superlazy can analyse them. Read-only; nothing is sent or modified.",
+      "connection_names": [
+        "*"
+      ],
+      "scopes": [
+        "read"
+      ]
+    },
+    {
+      "name": "send_replies",
+      "type": "use_mail",
+      "description": "Send a suggested reply draft from your connected mail account — only when you press Send on it. Nothing is ever sent automatically.",
+      "connection_names": [
+        "*"
+      ],
+      "scopes": [
+        "read",
+        "write"
+      ]
+    },
+    {
+      "name": "messaging_read",
+      "type": "use_messaging",
+      "description": "Read messages from your connected messaging accounts (e.g. Slack) — conversations you choose to track are analysed into the same projects and to-dos as your mail. This permission is read-only; replying from superlazy is the separate send_messages permission.",
+      "connection_names": [
+        "*"
+      ],
+      "scopes": [
+        "read"
+      ]
+    },
+    {
+      "name": "send_messages",
+      "type": "use_messaging",
+      "description": "Reply on Slack from superlazy: post your reply in the conversation or thread you are reading. Nothing is sent unless you press Send.",
+      "connection_names": [
+        "*"
+      ],
+      "scopes": [
+        "read",
+        "write"
+      ]
+    },
+    {
+      "name": "msg_subscribers",
+      "type": "message_records",
+      "table_id": "com.salmanff.superlazy.subscription_deliveries",
+      "description": "Send subscription results (status updates and matching-email deliveries) to apps whose requests YOU approved on the Connected apps tab. Nothing is ever sent for a request you have not approved."
+    },
+    {
+      "name": "share_originals",
+      "type": "share_records",
+      "description": "Share a matched email (and later its attachments) with the app you approved on the Connected apps tab — per-record only, never table-wide.",
+      "table_ids": [
+        "com.salmanff.superlazy.inputs",
+        "com.salmanff.superlazy.email_bodies",
+        "com.salmanff.superlazy.files"
+      ]
+    },
+    {
+      "name": "read_work_sessions",
+      "type": "use_file_sys",
+      "description": "Read the session transcripts your AI coding agent (Claude Code) leaves on this computer, so the work you did — and left unfinished — in those sessions is digested into the same projects and to-dos as your mail. Only prompts, recaps and the names of changed files are read into the analysis; tool output is dropped and token-like strings are scrubbed. Read-only.",
+      "connection_names": [
+        "*"
+      ],
+      "scopes": [
+        "read"
+      ]
+    }
+  ],
+  "app_tables": {
+    "subscriptions": {
+      "description": "Inter-app email subscriptions (specs/interapp-subscriptions.md): one record per request another app sent superlazy, mirrored from the message inbox by subscriptionsData.intakeRequests with a deterministic _id (sub_<hash of requester app + request ref>). The user approves/denies on Setup & Prefs → Connected apps; active records drive the app_subscription workflow's detector lines.",
+      "schema": {
+        "sub_id": {
+          "type": "String",
+          "description": "Deterministic id, equals the record _id; referenced by LLM triggers and delivery records"
+        },
+        "requester_app": {
+          "type": "String",
+          "description": "The requesting app's id — taken from the message's server-verified app_id, never from the payload"
+        },
+        "request_ref": {
+          "type": "String",
+          "description": "The requester's own request record id (its record_id in the request message) — edits and cancellations key on it"
+        },
+        "label": {
+          "type": "String",
+          "description": "Short name the requester chose, shown on the approval card"
+        },
+        "prompt": {
+          "type": "String",
+          "description": "The requester's verbatim request (condition AND return format in one), length-capped; shown to the user and injected wrapped into the analysis prompt"
+        },
+        "include_original": {
+          "type": "String",
+          "description": "true/false — whether approved deliveries also share the original email (and later attachments)"
+        },
+        "requested_hash": {
+          "type": "String",
+          "description": "Hash of prompt+include_original as last requested; a mismatch with approved_hash sends the subscription back to pending"
+        },
+        "approved_hash": {
+          "type": "String",
+          "description": "Hash of what the user actually approved"
+        },
+        "prefilter": {
+          "type": "Object",
+          "description": "Deterministic gate { subject_keywords, attachment_types, from_domains, has_attachments } derived at approval (user-editable) — a hit rescues the message from the autopilot short-circuit so the LLM can judge the real condition"
+        },
+        "status": {
+          "type": "String",
+          "description": "pending | active | paused | denied | revoked | cancelled"
+        },
+        "status_reason": {
+          "type": "String",
+          "description": "Human-readable note for the current status"
+        },
+        "stats": {
+          "type": "Object",
+          "description": "{ delivered, last_delivery_asof }"
+        },
+        "created_asof": {
+          "type": "String",
+          "description": "ms timestamp"
+        }
+      }
+    },
+    "subscription_deliveries": {
+      "description": "One record per matched email per subscription — written idempotently by the app_subscription workflow (deterministic _id del_<sub_id>_<hash(account|msg)>), then sent to the requester as an inter-app message (immediately when possible, else flushed by subscriptionsData.flushDeliveries). The record is the source of truth; the message is the transport.",
+      "schema": {
+        "sub_id": {
+          "type": "String",
+          "description": "The subscription this delivery belongs to"
+        },
+        "requester_app": {
+          "type": "String",
+          "description": "Recipient app id"
+        },
+        "delivery_id": {
+          "type": "String",
+          "description": "Equals the record _id; the requester dedups on it (messages may be re-sent)"
+        },
+        "status": {
+          "type": "String",
+          "description": "pending_send | sent | dropped"
+        },
+        "payload": {
+          "type": "Object",
+          "description": "The LLM's output to the requester's prompt, VERBATIM — opaque to superlazy"
+        },
+        "email_meta": {
+          "type": "Object",
+          "description": "{ from, subject, received_at, msg_id, thread_id, account_id } — provenance only; ids are inert for the requester"
+        },
+        "shared": {
+          "type": "Object",
+          "description": "Refs to app-shared originals { email_body: {table_id, record_id}, files: [] } — set at flush time when include_original was approved (needs the freezr app-grantee change)"
+        },
+        "created_asof": {
+          "type": "String",
+          "description": "ms timestamp (the message's analysis asof)"
+        }
+      }
+    },
+    "projects": {
+      "description": "One record per project — the cross-thread home of the to-do list. To-dos and suggested responses are EMBEDDED (always read/written together with their project). Mirrors the in-memory projectStore record; hydrated at startup via projectStore.hydrate().",
+      "schema": {
+        "project_id": {
+          "type": "String",
+          "description": "Stable short id (p_xx) referenced by the model, todos, and the file_to_project auto-process target on profiles"
+        },
+        "name": {
+          "type": "String",
+          "description": "Short stable project name"
+        },
+        "summary": {
+          "type": "String",
+          "description": "One-line roll-up of where the effort stands"
+        },
+        "llm_name": {
+          "type": "String",
+          "description": "The analyzer's last automated copy of the name — same contract as llm_summary."
+        },
+        "llm_summary": {
+          "type": "String",
+          "description": "The analyzer's LAST AUTOMATED COPY of the summary (stamped by reconcile; manual edits never touch it) — summary !== llm_summary means the user overrode it, and the project editor offers the AI version back."
+        },
+        "keywords": {
+          "type": "Array",
+          "description": "3-7 precise, search-worthy tags maintained by the model (lowercase, deduped, max 10) — for matching future mail to this project (incl. after completion) and finding similar projects"
+        },
+        "importance": {
+          "type": "String",
+          "description": "Effective importance 1-5 (number; user override when locked, else computed)"
+        },
+        "computed_importance": {
+          "type": "String",
+          "description": "Max importance of open to-dos (number; shown even when locked)"
+        },
+        "importance_locked": {
+          "type": "String",
+          "description": "Boolean — user set the importance; the model may not override"
+        },
+        "participants": {
+          "type": "Array",
+          "description": "STORED as an array of { address, role: me|team|external, role_note, last_updated_asof } (field names can't contain dots, and addresses do); persist.js converts to/from the in-memory address-keyed object"
+        },
+        "participant_emails": {
+          "type": "Array",
+          "description": "Flat searchable array of participant addresses (keys of participants)"
+        },
+        "todos": {
+          "type": "Array",
+          "description": "Embedded to-do objects: todo_id, direction (i_owe_them|they_owe_me|team_owes|read_only), short_description, description, sender, owner/owners/counterparty/counterparties (written by whoMapping.js from the model's `who` list — one person or several, lead first; 2026-09-19), importance (+importance_locked), status (open|in_progress|resolved|cancelled), due_hint (+due_earliest/due_latest ISO window), due_demote (USER-ONLY 1–3: hold the priority down by N until the due window opens — dueDates.effImportance; the model never sets it and reconcile carries it forward), change_reason, created/resolved/edited_asof. evidence[] is the task's WHOLE HISTORY and needs no query — one entry per thing that ever happened to it: { type (email|manual), source, thread_id, msg_id, asof, reason, who (the actor: the analysed message's sender, or 'you'), summary (the model's one-sentence read of that message), changed[] ({ field, from, to }) }. Manual edits COALESCE: every field change within 60s of the last one folds into the SAME entry (ui.js recordTodoChange), so ten rephrasings of a description are one line saying what actually changed. llm_importance / llm_short_description / llm_description are the MODEL'S last values for those fields, stamped only when the model itself emits them — a manual edit never touches them, so `importance !== llm_importance` IS 'the user overrode the machine', and they are what a revert-to-the-LLM's-reading would restore."
+        },
+        "responses": {
+          "type": "Array",
+          "description": "Embedded suggested replies: response_id, todo_id, kind (answer|delegate|reminder), to/cc, subject, body, reminder_at, status (new|edited|sent|dismissed). A reply is only SHOWN while its todo_id points at a still-open to-do (expandableProjectView.isLiveResponse) — resolving the task retires its drafts; nothing is deleted, so reopening the task brings them back."
+        },
+        "thread_ids": {
+          "type": "Array",
+          "description": "Threads linked to this project (cached hint, not a rule)"
+        },
+        "partial_threads": {
+          "type": "Array",
+          "description": "Thread ids whose earlier messages fell OUTSIDE the window the project was built from — what was read of them is a fragment, so the app can say 'history incomplete' rather than implying it saw the whole story. The email modal fetches the full thread live."
+        },
+        "sources": {
+          "type": "Array",
+          "description": "Provenance — which source(s) fed this project, as 'email:<mail account address>' (union; a project touched by two accounts carries both). Set on every persisted step; enables the per-account 'Forget this account's data' action (persist.deleteAccountData) which deletes a project only when removing one account leaves it with no source. Records written before tagging existed have an empty array and are never removed by that action."
+        },
+        "status": {
+          "type": "String",
+          "description": "active | archived"
+        },
+        "created_asof": {
+          "type": "String",
+          "description": "Unix ms (number)"
+        },
+        "last_active_asof": {
+          "type": "String",
+          "description": "Unix ms (number) — recency for the catalog"
+        }
+      }
+    },
+    "profiles": {
+      "description": "One record per person (keyed by lowercased email): the STABLE profile plus observed interaction stats. interaction_data is regenerable from the events log / archive (see specs/pipeline-backlog.md).",
+      "schema": {
+        "address": {
+          "type": "String",
+          "description": "Lowercased email — the person's key"
+        },
+        "display_name": {
+          "type": "String",
+          "description": "Best-known display name"
+        },
+        "profile": {
+          "type": "Object",
+          "description": "{ summary, relationship, responsibilities (a LIST of { id, text, source:'user'|'model', locked, asof } — one entry per kind of work; a source:'user' entry is the user's own words and is NEVER rewritten or dropped by the inline analysis, the re-profiler or a clean-up proposal; a legacy STRING is upgraded to one model-owned entry on load by jobs/analyze_thread/responsibilities.js, the only module that reads the shape), user_tone (how the USER writes to this person — learned by the re-profiler, voices suggested replies), llm_importance 1-5, responsiveness_note, auto_processes (array of standing per-sender actions — see jobs/analyze_thread/autoProcess.js: each { type, active, details, locked, suggested, source, asof }; the first type is file_to_project with details { project_id — a standard bucket OR any project of the user's, disposition — the automated-mail category when category-based }; active is THE explicit flag: future mail from this sender is handled without the LLM; locked means the USER set it and the model may never change it, its dissent lands in suggested; legacy records instead carry flat auto_file/auto_file_locked/disposition/auto_file_project_id/suggested_disposition fields, upgraded on load), last_profiled_asof, solidified_asof (set by the graduation re-profile; null = still PROVISIONAL — inline analysis may refine freely), user_edited (the user hand-edited the text; the model may never auto-overwrite it) }"
+        },
+        "manual_rank": {
+          "type": "String",
+          "description": "Number 1-5 or null — user-set; OVERRIDES llm_importance absolutely"
+        },
+        "interaction_data": {
+          "type": "Object",
+          "description": "Observed stats (numbers): messages_from, messages_to, replies_by_user + reply_ms_by_user (user's reply count + total response time to this person), replies_by_them + reply_ms_by_them (their replies to the user), first/last_seen_asof. Averages derived; regenerable."
+        },
+        "sources": {
+          "type": "Array",
+          "description": "Provenance — which source(s) this person was learned from, as 'email:<mail account address>' (union; someone seen on two accounts carries both). Same role as projects.sources: it is what makes the per-account 'Forget this account's data' action possible without touching people the other accounts also know."
+        },
+        "stub": {
+          "type": "String",
+          "description": "Boolean — true until a real profile_update lands"
+        }
+      }
+    },
+    "profile_history": {
+      "description": "Append-only archive of REPLACED profile versions — every time a solidified (or user-edited) profile's text / tone / priority is superseded by a re-profile, a manual edit, or a rank change, the outgoing version is snapshotted here (provisional pre-solidification refinements are NOT archived). One record per replacement; never updated.",
+      "schema": {
+        "address": {
+          "type": "String",
+          "description": "Lowercased email of the person"
+        },
+        "summary": {
+          "type": "String",
+          "description": "The archived profile summary"
+        },
+        "relationship": {
+          "type": "String",
+          "description": "The archived relationship"
+        },
+        "responsibilities": {
+          "type": "String",
+          "description": "The archived responsibilities — the entry LIST as it was (or a legacy string / null on old records)"
+        },
+        "user_tone": {
+          "type": "String",
+          "description": "The archived user_tone (or null)"
+        },
+        "llm_importance": {
+          "type": "String",
+          "description": "Number 1-5 — the archived model-set importance"
+        },
+        "manual_rank": {
+          "type": "String",
+          "description": "Number 1-5 or null — the user-set rank at the time"
+        },
+        "user_edited": {
+          "type": "String",
+          "description": "Boolean — the archived text had been hand-edited"
+        },
+        "profiled_asof": {
+          "type": "String",
+          "description": "Unix ms — when the archived version was written"
+        },
+        "solidified_asof": {
+          "type": "String",
+          "description": "Unix ms — when the profile first solidified (null = it was user-edited pre-solidification)"
+        },
+        "source": {
+          "type": "String",
+          "description": "What replaced it: reprofile:graduation | reprofile:drift | reprofile:user_request | manual_edit | manual_rank"
+        },
+        "reason": {
+          "type": "String",
+          "description": "The replacement's change_note / edit reason"
+        },
+        "replaced_asof": {
+          "type": "String",
+          "description": "Unix ms — when this version stopped being current"
+        }
+      }
+    },
+    "instructions": {
+      "description": "User-authored custom instructions (rules the LLM applies verbatim), scoped to a sender, a domain, one mail account, or all mail. Managed on the Setup & Prefs RULES tab (all scopes) and the person edit modal (sender/domain).",
+      "schema": {
+        "instruction_id": {
+          "type": "String",
+          "description": "Stable short id (i_xx)"
+        },
+        "scope": {
+          "type": "String",
+          "description": "sender | domain | account | all"
+        },
+        "match": {
+          "type": "String",
+          "description": "The email (scope=sender), @domain (scope=domain) or account_id (scope=account); ignored for all"
+        },
+        "text": {
+          "type": "String",
+          "description": "The instruction, injected verbatim into the analysis prompt"
+        },
+        "label": {
+          "type": "String",
+          "description": "Short display label"
+        },
+        "status": {
+          "type": "String",
+          "description": "active | disabled"
+        },
+        "author": {
+          "type": "String",
+          "description": "'user', or 'model' when a clean-up proposal added it and the user accepted"
+        },
+        "created_asof": {
+          "type": "String",
+          "description": "Unix ms (number)"
+        },
+        "history": {
+          "type": "Array",
+          "description": "earlier versions [{ text, scope, match, asof }] when a clean-up rewrote or rescoped the rule"
+        },
+        "edited_asof": {
+          "type": "Number",
+          "description": "ms timestamp of the last rewrite / rescope / disable"
+        },
+        "origin": {
+          "type": "String",
+          "description": "'responsibility' when the instruction was made from a line on a person's card (person editor button); absent for instructions the user wrote"
+        },
+        "origin_address": {
+          "type": "String",
+          "description": "the person whose card line it was made from (origin = responsibility)"
+        },
+        "origin_resp_id": {
+          "type": "String",
+          "description": "the id of that line in the person's profile.responsibilities — editing the line rewrites this instruction, removing it disables it"
+        },
+        "origin_text": {
+          "type": "String",
+          "description": "the card line's text when the instruction was last written from it"
+        }
+      }
+    },
+    "events": {
+      "description": "One record per analysed input (message or mailbox action): the audit log of how each message was dealt with — for debugging, the what-just-changed UI, and future learning jobs (e.g. regenerating interaction_data or profiles). Message events also carry the profile-lifecycle signals (profile_updates / reprofiles, slim), and each dedicated re-profile writes its own kind='reprofile' event ({ address, trigger, outcome, reason, cost }) — but the full REPLACED profile versions live in profile_history, which is never pruned; events are signals, profile_history is the archive. Pruned regularly per the events_retention_days setting. IDEMPOTENT IDS (specs/pipeline-walkthrough.md §2 and §11): analysis events (kind message/workflow_short_circuit/skipped) use the deterministic _id ev_<msgid>_<hash(account|msg)> — exactly one per (account, message), written AFTER analysis so its existence marks the message handled; re-processing (e.g. after a stale-lock takeover) upserts over it rather than duplicating. Concurrency is prevented up front by the single run lock, so there is no pre-LLM claim stub. Phase 2 mail_action events use evact_<msgid>_<action>_<hash incl. provider change id> — many per message, replay-safe. Two AUTO-FILE DECISION kinds exist to keep automation counterable rather than silent: 'autofile_learned' is written ONCE, the first time a sender is put on autopilot (from then on their mail is filed with no LLM read at all), and 'autofile_mismatch' when an already-learned sender's mail carries a label disagreeing with the learned category. Both carry importance 4 so they outrank the importance-1 item the auto-file created, and both are deliberately NOT counted as 'auto' by the Events page's hide-auto filter — they are the events that let the user overrule the automation.",
+      "schema": {
+        "msg_id": {
+          "type": "String",
+          "description": "The analysed message's id (or the acted-on message for mailbox actions)"
+        },
+        "account_id": {
+          "type": "String",
+          "description": "The mail account the message belongs to (part of the event's deterministic identity — msg_ids are only unique per account)"
+        },
+        "channel": {
+          "type": "String",
+          "description": "The input item's channel — mail | messages | notes | calendar (specs/superlazy-inputs.md). Absent on records written before prompt 0.29 = mail."
+        },
+        "action": {
+          "type": "String",
+          "description": "PHASE 2 (mail_action kind): the semantic mailbox action — marked_read | flagged | trashed | deleted | marked_spam | archived | moved_folder"
+        },
+        "effects": {
+          "type": "Array",
+          "description": "PHASE 2 (mail_action kind): [{ todo_id, change }] — what the signal did (e.g. resolved a read-only item)"
+        },
+        "thread_id": {
+          "type": "String",
+          "description": "Its thread"
+        },
+        "source_id": {
+          "type": "String",
+          "description": "Which MailSource produced it (e.g. archive:com.salmanff.emailcabinet)"
+        },
+        "asof": {
+          "type": "String",
+          "description": "Unix ms (number) — the message's date (the analysis clock)"
+        },
+        "kind": {
+          "type": "String",
+          "description": "message | workflow_short_circuit | skipped | manual_edit | mail_action | reprofile | autofile_learned | autofile_mismatch | autofile_off | cache_refresh"
+        },
+        "latest_delta": {
+          "type": "Object",
+          "description": "{ new_for_me, new_for_team, new_todo_ids, resolved } as applied"
+        },
+        "changes": {
+          "type": "Array",
+          "description": "Reconcile change list (created/status/moved/rejected) + role_changes"
+        },
+        "role_changes": {
+          "type": "Array",
+          "description": "Per-project participant role changes applied on this step"
+        },
+        "subject": {
+          "type": "String",
+          "description": "The analysed message's subject (denormalised for the events feed)"
+        },
+        "summary": {
+          "type": "String",
+          "description": "The model's ONE-sentence summary of what this message says/does (message_summary in the analysis output) — shown on the events feed, project activity, and the email modal; null for pre-0.15 events and non-LLM kinds"
+        },
+        "from_address": {
+          "type": "String",
+          "description": "The analysed message's sender address (denormalised for the events feed)"
+        },
+        "to_addresses": {
+          "type": "Array",
+          "description": "Lowercased to+cc addresses of the analysed message — lets per-person views attribute SENT mail to its recipients"
+        },
+        "body_snippet": {
+          "type": "String",
+          "description": "A short (~800 char) plain-text extract of the analysed message's body (clean_text), denormalised onto the event so the reader can show something INSTANTLY from the feed query — before the full body loads from email_bodies. Not the full body; that lives in email_bodies keyed by (account, msg)."
+        },
+        "via_workflow": {
+          "type": "String",
+          "description": "Auto-process action keyword when the message was handled without the LLM, else null"
+        },
+        "autoprocess_blocked": {
+          "type": "String",
+          "description": "When the sender carries an active auto-process yet this message was LLM-analysed: the gate that blocked the short-circuit (pref off / custom instruction / missing target). Older events stored it as autofile_blocked."
+        },
+        "fetch_rounds": {
+          "type": "String",
+          "description": "Number of request_more rounds"
+        },
+        "cost": {
+          "type": "String",
+          "description": "USD cost of this message IN TOTAL (number) — every request_more round plus any re-profile it triggered; see cost_analysis / cost_reprofiles for the split. Before per-message accounting landed this held only the last LLM call's cost."
+        },
+        "duration_ms": {
+          "type": "String",
+          "description": "Number — wall-clock ms this ONE message took end to end (assemble + every LLM call + reconcile + triggers)."
+        },
+        "llm_calls": {
+          "type": "String",
+          "description": "Number — how many LLM calls this message needed (1 normally; more with request_more rounds or a re-profile)."
+        },
+        "tokens": {
+          "type": "Object",
+          "description": "Per-message token usage: { input, output, other (e.g. cache reads), total } summed across every call this message made."
+        },
+        "request_profile": {
+          "type": "Object",
+          "description": "What the analysis REQUEST was made of, measured at assembly: { volatile_chars, sections (chars per section: linked/newMessage/people/updates/…), reduce_level, snapshot_chars, snapshot_projects, prior_turns, rounds } — the record cost diagnosis reads instead of re-guessing"
+        },
+        "cost_analysis": {
+          "type": "String",
+          "description": "Number — the analysis share of `cost` (all request_more rounds)."
+        },
+        "cost_reprofiles": {
+          "type": "String",
+          "description": "Number — the share of `cost` spent on re-profiles this message triggered."
+        },
+        "model": {
+          "type": "String",
+          "description": "The model that analysed this message, as the provider reported it."
+        },
+        "prompt_version": {
+          "type": "String",
+          "description": "PROMPT_VERSION used"
+        },
+        "error": {
+          "type": "String",
+          "description": "Step error message, when the analysis failed"
+        },
+        "importance": {
+          "type": "String",
+          "description": "The EVENT's own priority 1-5 (number). EVERY event ranks, so every event can be dropped by a min-priority filter: mail that was auto-filed WITHOUT being read (workflow_short_circuit) and the standing auto-file DECISIONS about it (autofile_learned / autofile_mismatch) rank with the PROJECT they file into — a newsletter landing in a priority-1 bucket is a 1; SuperLazy's own housekeeping (cache_refresh / reprofile) ranks 1. Both the Recent digest and the Events min-priority filter prefer this over the touched to-do's importance; the Events feed also derives the same rank live (eventsUi.eventImportance), so records written before this stamp still filter correctly. Absent on ordinary analysed messages, which rank by the to-dos they raised."
+        },
+        "address": {
+          "type": "String",
+          "description": "The person this event is ABOUT rather than from (reprofile / autofile_learned / autofile_mismatch): the sender whose profile or auto-process changed."
+        },
+        "category": {
+          "type": "String",
+          "description": "autofile_learned / autofile_mismatch: the automated-email category the sender is filed under (newsletter | admin | admin_actions | social | promotions)."
+        },
+        "by_label": {
+          "type": "String",
+          "description": "autofile_mismatch only: the category the MAIL SYSTEM's own labels imply, which disagrees with the learned one — the free drift signal that a sender straddles categories (e.g. a bank sending both payment alerts and promotions)."
+        },
+        "target_name": {
+          "type": "String",
+          "description": "autofile_learned only: the name of the project/bucket this sender's mail will be filed into from now on."
+        },
+        "project_id": {
+          "type": "String",
+          "description": "The project this event concerns (a manual_edit's target, or the bucket an auto-file decision / auto-processed message filed into — the feed renders it as the row's project pill)."
+        },
+        "trigger": {
+          "type": "String",
+          "description": "reprofile only: what caused it (graduation | drift | user_request)."
+        },
+        "outcome": {
+          "type": "String",
+          "description": "reprofile only: updated | no_change."
+        },
+        "reason": {
+          "type": "String",
+          "description": "reprofile only: the model's explanation of what it changed and why."
+        },
+        "doubt": {
+          "type": "String",
+          "description": "autofile_mismatch only: the standing decision was applied but a guard disagreed (e.g. the sender is not a recognised machine address) — the mail WAS filed and this is the prompt to confirm or stop it; ignoring it is a valid answer."
+        },
+        "direction": {
+          "type": "String",
+          "description": "manual_edit bulk resolves only: the ONE direction bucket that was cleared (i_owe_them | team_owes | they_owe_me | read_only) when the user used a per-bucket “✓ resolve all” instead of the project-wide one. Absent = the whole project was resolved."
+        },
+        "todo_edits": {
+          "type": "Array",
+          "description": "Field-level diffs this message applied to to-dos: [{ project_id, todo_id, field, from, to }] over importance / short_description / description / direction / due_hint / status (text values capped at 300 chars). Deliberately SEPARATE from `changes`, which drives the Recent/Events feeds — a priority nudge belongs in the audit trail, not as its own feed row. Nothing renders this today; it exists so 'what did the LLM set, and what did the user change afterwards' stays answerable when a detailed change view is built."
+        },
+        "manual_id": {
+          "type": "String",
+          "description": "manual_edit events only: the stable id (todo_id + burst seq + field) that persist.addEvent upserts on, so a burst of manual fiddling on ONE field inside the 60s coalesce window (ui.js COALESCE_MS) is one record whose `before` is the value the burst started from and whose `after` tracks the latest — instead of ten rows for one decision."
+        },
+        "rules_offered": {
+          "type": "Array",
+          "description": "Standing-instruction ids that were in this request’s prompt (null when none)."
+        },
+        "rules_applied": {
+          "type": "Array",
+          "description": "Standing-instruction ids the model says actually changed this analysis (null when none)."
+        }
+      }
+    },
+    "email_bodies": {
+      "description": "LEGACY (read-fallback only since Phase 2 of specs/superlazy-inputs.md — new captures write to `inputs`; this table is dropped at the full reset). A stored SNAPSHOT of an analysed message's full body, captured for free during ingestion (the analyser already fetched the bytes). Lets the email reader show the real message from the app's own db — instantly and without hitting the mail provider — so live fetches are reserved for attachments / inline images only. One record per (account, message); _id is body_<msgid>_<hash(account|msg)>, matching the events id scheme (msg_ids are only unique per account). Treated as a PRUNABLE CACHE, not a source of truth: the mail provider remains authoritative, and the thread may have grown since capture (see captured_asof).",
+      "schema": {
+        "msg_id": {
+          "type": "String",
+          "description": "The message's id within its account/source"
+        },
+        "account_id": {
+          "type": "String",
+          "description": "The mail account (part of the record's identity — msg_ids are only unique per account)"
+        },
+        "thread_id": {
+          "type": "String",
+          "description": "Its thread — the reader queries this to rebuild the thread rail from stored bodies"
+        },
+        "from_address": {
+          "type": "String",
+          "description": "Sender address (lowercased)"
+        },
+        "from_name": {
+          "type": "String",
+          "description": "Sender display name"
+        },
+        "to_addresses": {
+          "type": "Array",
+          "description": "[{ address, name }] recipients (To)"
+        },
+        "cc_addresses": {
+          "type": "Array",
+          "description": "[{ address, name }] recipients (Cc)"
+        },
+        "subject": {
+          "type": "String",
+          "description": "Message subject"
+        },
+        "date": {
+          "type": "String",
+          "description": "Unix ms (number) — the message's date"
+        },
+        "body_html": {
+          "type": "String",
+          "description": "The message's HTML body as captured (may be empty; dropped when over the store cap — see html_truncated). Untrusted content: the reader MUST sanitize + Shadow-DOM it, never innerHTML directly. Inline cid: images will be broken until fetched live / from Mail Cabinet."
+        },
+        "body_text": {
+          "type": "String",
+          "description": "The message's plain-text body (or html→text fallback). Always kept even when body_html is dropped, so there is always something readable."
+        },
+        "has_attachments": {
+          "type": "String",
+          "description": "Boolean — whether the message carries attachments / inline images"
+        },
+        "attachments": {
+          "type": "Array",
+          "description": "Attachment MANIFEST only — [{ id, filename, mimeType, sizeBytes }]. The bytes are NOT stored; they are fetched on demand (live provider, or faster from Mail Cabinet when installed) only when the user opens one."
+        },
+        "html_truncated": {
+          "type": "String",
+          "description": "Boolean — body_html exceeded the store cap (~256KB) and was dropped; body_text was kept"
+        },
+        "captured_asof": {
+          "type": "String",
+          "description": "Unix ms (number) — when this snapshot was stored. The reader shows an 'as of' note and can offer a live refresh, since the thread may have grown since."
+        }
+      }
+    },
+    "inputs": {
+      "description": "One record per INPUT ITEM across all channels (specs/superlazy-inputs.md §5) — mail, notes, later messages/calendar. Triple role: (a) CANONICAL store for items that exist nowhere else (typed notes: authority 'canonical' — NEVER pruned, archived instead of deleted), (b) body cache for provider-backed items (mail: authority 'provider' — prunable; supersedes the legacy email_bodies table, which remains read-fallback until the full reset), and (c) the pending-analysis queue (status pending|analysed|error). _id is in_<msgid>_<hash(account|msg)>, the same identity scheme as events. INDEXING CAUTION: thread_id and status queries rely on non-indexed fields — fine on backends without enforced indexing; on an enforcing backend create an index on thread_id manually (the pending-queue read instead scans recent _date_modified, which is always indexed).",
+      "schema": {
+        "channel": {
+          "type": "String",
+          "description": "mail | messages | notes | calendar | work (work = one request-and-answer turn of an agent session; the session is the thread)"
+        },
+        "item_kind": {
+          "type": "String",
+          "description": "Finer read hint within a channel (e.g. 'meeting_notes') or null"
+        },
+        "provider": {
+          "type": "String",
+          "description": "Who supplied it: gmail | manual | granola | slack | … (null for legacy mail captures)"
+        },
+        "account_id": {
+          "type": "String",
+          "description": "The connection it came from, or 'manual' for typed items (part of the record's identity)"
+        },
+        "msg_id": {
+          "type": "String",
+          "description": "The item's id within its account/source"
+        },
+        "thread_id": {
+          "type": "String",
+          "description": "Its conversation; synthetic (note_<id>) for items without one"
+        },
+        "date": {
+          "type": "Number",
+          "description": "When it happened, unix ms (a note: the meeting time; else save/receive time)"
+        },
+        "author_address": {
+          "type": "String",
+          "description": "The author (lowercased address; the user for manual notes)"
+        },
+        "author_name": {
+          "type": "String",
+          "description": "Author display name"
+        },
+        "participants": {
+          "type": "Array",
+          "description": "[{ address, name, kind }] — kind: to | cc | attendee; address may be '' for name-only attendees"
+        },
+        "participants_kind": {
+          "type": "String",
+          "description": "recipients | attendees | channel_members — what the participants MEAN on this channel"
+        },
+        "title": {
+          "type": "String",
+          "description": "Email subject / note title / meeting title"
+        },
+        "body_text": {
+          "type": "String",
+          "description": "Plain-text body"
+        },
+        "body_html": {
+          "type": "String",
+          "description": "HTML body where the channel has one (mail); empty otherwise"
+        },
+        "labels": {
+          "type": "Array",
+          "description": "Provider labels (mail); [] elsewhere"
+        },
+        "attachments": {
+          "type": "Array",
+          "description": "[{ id, filename, mimeType, sizeBytes }] manifests — bytes stay at the provider"
+        },
+        "html_truncated": {
+          "type": "Boolean",
+          "description": "True when an oversized HTML body was dropped (text kept)"
+        },
+        "authority": {
+          "type": "String",
+          "description": "canonical (we hold the ONLY copy — never pruned) | provider (cache — prunable)"
+        },
+        "archived": {
+          "type": "Boolean",
+          "description": "Canonical items are archived, never deleted"
+        },
+        "status": {
+          "type": "String",
+          "description": "pending | analysed | error | skipped — the pending-analysis queue role"
+        },
+        "attempts": {
+          "type": "Number",
+          "description": "Failed-analysis count; the pending-queue drain retries an error item only while attempts < 3."
+        },
+        "last_error": {
+          "type": "String",
+          "description": "The most recent analysis failure (null once analysed) — shown to the user, cleared on success."
+        },
+        "analysis_event_id": {
+          "type": "String",
+          "description": "Back-pointer to the events record once analysed"
+        },
+        "revision": {
+          "type": "Number",
+          "description": "Edit revision, from 1 (specs/superlazy-inputs.md §6.4)"
+        },
+        "content_hash": {
+          "type": "String",
+          "description": "Hash of the analysed content — edit detection for synced sources"
+        },
+        "edited_asof": {
+          "type": "Number",
+          "description": "When the last revision was made (unix ms), null if never edited"
+        },
+        "prior_revisions": {
+          "type": "Array",
+          "description": "Superseded bodies of CANONICAL items: [{ revision, title, body_text, participants, date, edited_asof }] — the retention promise covers what the user wrote"
+        },
+        "linked_project_id": {
+          "type": "String",
+          "description": "Project pre-linked at entry time (the Add-note modal picker), or null"
+        },
+        "captured_asof": {
+          "type": "Number",
+          "description": "Provider items: when the snapshot was taken"
+        },
+        "sources": {
+          "type": "Array",
+          "description": "Per-account removal tags, union-added — e.g. ['note:manual'] (same scheme as projects.sources)"
+        }
+      }
+    },
+    "accounts": {
+      "description": "One record per mail account: identity + where ingestion is up to — makes backfill and live ingestion resumable across restarts and job runs. The index page's is-set-up check reads this collection. Since the Slack slice one record per connection per CHANNEL (channel: mail | messages | work): a channel:'work' record (Claude Code sessions via use_file_sys) additionally carries me_email, repos { <slug>: { tracked, name } } and sessions { <sessionId>: { turns_done, last_ts, bytes, mtime, state } } — the per-session high-water marks (specs/superlazy-sessions.md).",
+      "schema": {
+        "account_id": {
+          "type": "String",
+          "description": "The account's id within its source (archive account_id; later the connectionName)"
+        },
+        "account_email": {
+          "type": "String",
+          "description": "The account's email address"
+        },
+        "provider": {
+          "type": "String",
+          "description": "archive | gmail | … (display + routing)"
+        },
+        "source_id": {
+          "type": "String",
+          "description": "The MailSource id this account is read through"
+        },
+        "status": {
+          "type": "String",
+          "description": "training | trained | live"
+        },
+        "cursor": {
+          "type": "String",
+          "description": "Latest retrieved/handled message date (unix ms number) — the window-refetch watermark; kept as the fallback when sync_token expires"
+        },
+        "sync_token": {
+          "type": "String",
+          "description": "PHASE 2: the provider's getNewer delta token for this account (null until the change-feed ingestion lands)"
+        },
+        "last_processed_msg_id": {
+          "type": "String",
+          "description": "Last message actually analysed"
+        },
+        "last_processed_asof": {
+          "type": "String",
+          "description": "Unix ms (number) of that message"
+        },
+        "backfill_from": {
+          "type": "String",
+          "description": "Unix ms (number) — start of the initial training window"
+        },
+        "backfill_done": {
+          "type": "String",
+          "description": "Boolean — initial training pass completed"
+        },
+        "history_days": {
+          "type": "String",
+          "description": "Number — the history window used for this account's training"
+        },
+        "thread_context_days": {
+          "type": "String",
+          "description": "Number — full-thread context depth used"
+        },
+        "messages_processed": {
+          "type": "String",
+          "description": "Number — messages analysed for this account"
+        },
+        "messages_skipped": {
+          "type": "String",
+          "description": "Number — messages the user skipped"
+        },
+        "messages_failed": {
+          "type": "String",
+          "description": "Number — messages whose analysis errored (recorded as error events; the cursor moves past them)"
+        },
+        "sync_paused": {
+          "type": "String",
+          "description": "Boolean — the user paused syncing for this account (Setup page → Status → Pause syncing). While true, ingest.js resolveAccounts drops the account before the source is built and before planning, so no check (in-tab, background job, Inspect) reads it; the cursor stands still and resuming continues from it."
+        },
+        "sync_paused_at": {
+          "type": "String",
+          "description": "Unix ms (number) when syncing was paused; null once resumed"
+        }
+      }
+    },
+    "locks": {
+      "description": "ONE record ('ingestion_lock') gating ALL mail processing — training and new-mail, any tab, later the background job. Acquired ATOMICALLY (create-with-fixed-id fails if it exists), renewed by each processed message (timer-free), stale after ~5 untouched minutes, deleted on release. See specs/pipeline-walkthrough.md §2 and §11.",
+      "schema": {
+        "owner": {
+          "type": "String",
+          "description": "Who holds it: 'tab:<random>' (later 'job:analyze_thread'). Renewal verifies ownership — a taken-over holder stops before its next message."
+        },
+        "kind": {
+          "type": "String",
+          "description": "training | newmail"
+        },
+        "started_at": {
+          "type": "String",
+          "description": "Unix ms (number)"
+        },
+        "expires_at": {
+          "type": "String",
+          "description": "Unix ms (number) — past this, the holder is presumed dead and the lock may be deleted + re-acquired"
+        },
+        "progress": {
+          "type": "Object",
+          "description": "{ done, total, cost, latest: { subject, from_address } } — feeds the cross-page processing notice"
+        }
+      }
+    },
+    "settings": {
+      "description": "A single settings record (the user's app preferences). See specs/pipeline-backlog.md.",
+      "schema": {
+        "your_addresses": {
+          "type": "Array",
+          "description": "The user's own email addresses (ME)"
+        },
+        "training_wip": {
+          "type": "String",
+          "description": "Boolean — the initial history build is still in progress (all other pages redirect to the setup page while true; the setup page resumes it)"
+        },
+        "training_mode": {
+          "type": "String",
+          "description": "live | background — how the user chose to train (background is stored as a preference; the job runner lands later)"
+        },
+        "newmail_last_check": {
+          "type": "String",
+          "description": "Unix ms (number) — when new mail was last checked (any tab); informational"
+        },
+        "mail_action_policy": {
+          "type": "Object",
+          "description": "PHASE 2 — boolean switches for mailbox signals: { marked_read_resolves, flagged_bumps, trashed_resolves, spam_learns_sender, archive_means_done } (all default true)"
+        },
+        "history_days": {
+          "type": "String",
+          "description": "Number — how many days back the initial history build goes"
+        },
+        "thread_context_days": {
+          "type": "String",
+          "description": "Number — messages this recent get their COMPLETE thread as context; older ones see only the window"
+        },
+        "automated_autopilot": {
+          "type": "String",
+          "description": "Boolean — let learned automated senders auto-process (file) without the LLM"
+        },
+        "analysis_context_chars": {
+          "type": "String",
+          "description": "Number — INPUT budget in characters for one analysis request (assemble.js reduces by relevance to fit). Unset = 70000 (DEFAULT_CONTEXT_CHARS). The quality/cost dial on the Preferences tab."
+        },
+        "events_retention_days": {
+          "type": "String",
+          "description": "Number — keep events for this many days (0 = keep forever); a maintenance job prunes older ones"
+        },
+        "suggest_replies": {
+          "type": "String",
+          "description": "Boolean — whether to draft suggested replies at all (default true)"
+        },
+        "style_guide": {
+          "type": "String",
+          "description": "The persisted writing-style guide + regenerated every style_guide_refresh_days"
+        },
+        "style_guide_asof": {
+          "type": "String",
+          "description": "Unix ms (number) — when style_guide was last distilled; re-built once older than style_guide_refresh_days (the cache that keeps job runs from paying a style LLM call each run)"
+        },
+        "style_guide_refresh_days": {
+          "type": "String",
+          "description": "Number — how often to regenerate the style guide"
+        },
+        "background_mode": {
+          "type": "String",
+          "description": "on | off — whether SuperLazy checks mail via the background job. 'on' additionally requires the job permissions AND somewhere to run (admin-trusted, or the user's serverless cloud); the UI degrades to 'off' when that is missing."
+        },
+        "foreground_poll_minutes": {
+          "type": "String",
+          "description": "Number — background mode ON: how often an OPEN page asks for an extra on-demand run, on top of the hourly schedule (the schedule cannot go finer than hourly)."
+        },
+        "bg_last_run": {
+          "type": "Object",
+          "description": "How the last background run went: { at, finished_at, task, version, ok, planned, processed, remaining, cost, skipped, more_pending, token_expired, error, message }. Written by the job; polled by every page — the ONLY way a page learns the outcome of a run it did not watch, because POST /jobs/run blocks for the whole run and is never awaited."
+        },
+        "bg_last_reprofile": {
+          "type": "Object",
+          "description": "How the last background 'Update with AI' reprofile went: { at, finished_at, task, version, address, ok, outcome, reason, cost, token_expired }. Its own field (not bg_last_run) so it never clobbers an ingestion summary whose more_pending flag pages still need. The People page polls it after firing the job."
+        },
+        "default_model": {
+          "type": "Object",
+          "description": "{ provider, family } for analysis calls; null = user's freezr default"
+        },
+        "analysis_thinking": {
+          "type": "Boolean",
+          "description": "Whether per-message analysis lets the model reason step-by-step before answering (thinking bills as output — measured ~1,900 tokens/email when on). Default false; the bootstrap and future weekly review think regardless."
+        },
+        "snapshot_pin": {
+          "type": "Object",
+          "description": "The PINNED catalog snapshot (cross-run provider-cache reuse): { text (the exact rendered bytes — byte-identity is what makes a cache hit possible), chars, count, ids, touched (project_ids updated since render — their current rows override the snapshot), msgs_since_render (refresh counter, ~25 triggers a re-render), rendered_asof, prompt_version (pin discarded on mismatch), pinned_asof }. One cache WRITE per refresh cycle instead of one per run."
+        },
+        "analysis_effort": {
+          "type": "String",
+          "description": "low | medium | high — the provider effort dial for per-message analysis (scales all output incl. reasoning). Default low. Held constant per run; changing it invalidates the cached prefix once."
+        },
+        "business_context": {
+          "type": "String",
+          "description": "The briefing written by the one-pass setup (and edited by the user): who the user is, their team, counterparties, rhythms and vocabulary — attached to later analysis so a model reading ONE email judges it in context"
+        },
+        "business_context_asof": {
+          "type": "String",
+          "description": "Unix ms (number) — when the business context was last written or edited"
+        },
+        "bootstrap_asof": {
+          "type": "String",
+          "description": "Unix ms (number) — when the one-pass setup was adopted"
+        },
+        "bootstrap_cost": {
+          "type": "String",
+          "description": "Number — USD the one-pass setup cost, including its correction rounds"
+        },
+        "cleanup_window_days": {
+          "type": "Number",
+          "description": "Clean-up: days of input to review (default 7)"
+        },
+        "cleanup_edits_window_days": {
+          "type": "Number",
+          "description": "Clean-up: days of the user's hand edits the rules/learn sections read (default 30)"
+        },
+        "cleanup_input_mode": {
+          "type": "String",
+          "description": "Clean-up: 'index' (one line per analysed item, all channels, bodies on request — default) or 'full' (full mail threads)"
+        },
+        "cleanup_last_run_asof": {
+          "type": "Number",
+          "description": "ms timestamp of the last clean-up run"
+        },
+        "cleanup_focus_days": {
+          "type": "Number",
+          "description": "Clean-up: days ahead the Focus section plans for (default 7)"
+        }
+      }
+    },
+    "maintenance_runs": {
+      "description": "One record per clean-up run (or R1 re-org) — the run-is-an-artifact principle: prompt version, knobs, input mode and window, dump/index stats, model, cost and tokens (incl. cache reads), per-section counts, suppressed count, need rounds, whether the reply was cut off.",
+      "schema": {
+        "run_id": {
+          "type": "String",
+          "description": "stable run id (mr_...)"
+        },
+        "passes": {
+          "type": "Array",
+          "description": "which passes ran, e.g. ['D1','D2'] / ['L1'..'L5'] / ['R1']"
+        },
+        "prompt_version": {
+          "type": "String",
+          "description": "MAINT_PROMPT_VERSION or REORG_PROMPT_VERSION for LLM runs"
+        },
+        "window": {
+          "type": "Object",
+          "description": "AI review window: { days, from, to }"
+        },
+        "dump_stats": {
+          "type": "Object",
+          "description": "{ messages, threads, chars } of the dump sent"
+        },
+        "knobs": {
+          "type": "Object",
+          "description": "the run's settings"
+        },
+        "model": {
+          "type": "Object",
+          "description": "{ provider, family } or {} for the user default"
+        },
+        "cost": {
+          "type": "String",
+          "description": "total USD cost of the run (0 for deterministic runs)"
+        },
+        "proposal_counts": {
+          "type": "Object",
+          "description": "proposals produced per pass"
+        },
+        "project_id": {
+          "type": "String",
+          "description": "R1 runs only: the project reviewed"
+        },
+        "incomplete": {
+          "type": "String",
+          "description": "true when the LLM reply stopped before its done marker"
+        },
+        "started_at": {
+          "type": "String",
+          "description": "ms timestamp"
+        },
+        "finished_at": {
+          "type": "String",
+          "description": "ms timestamp"
+        },
+        "call": {
+          "type": "String",
+          "description": "cleanup | R1"
+        },
+        "input_mode": {
+          "type": "String",
+          "description": "index | full"
+        },
+        "sections": {
+          "type": "Object",
+          "description": "per-group item counts"
+        },
+        "suppressed": {
+          "type": "Number",
+          "description": "items dropped because the user ignored the same fingerprint earlier"
+        },
+        "need_rounds": {
+          "type": "Number",
+          "description": "follow-up material rounds answered"
+        },
+        "tokens": {
+          "type": "Object",
+          "description": "{ input, output, cache_read }"
+        },
+        "cost_split": {
+          "type": "Object",
+          "description": "{ input, output, other } USD — other = cache reads/writes"
+        },
+        "sizes": {
+          "type": "Object",
+          "description": "chars per block (system, state, input, closing) + estTokens — what was sent"
+        }
+      }
+    },
+    "maintenance_proposals": {
+      "description": "One record per clean-up ITEM — a proposal (with its ops), an attention card or a question — so decisions outlive the run: ignored is a permanent valid answer (its fingerprint suppresses the same proposal in later runs), attention cards are 'seen', questions 'dismissed', applied changes keep their audit pointer (specs/superlazy-weekly-cleanup.md §6). Housekeeping previews are NOT stored. Status is filtered client-side (only _date_modified/_id are reliably indexed).",
+      "schema": {
+        "proposal_key": {
+          "type": "String",
+          "description": "stable key (mp_...)"
+        },
+        "run_id": {
+          "type": "String",
+          "description": "the maintenance run that produced it"
+        },
+        "kind": {
+          "type": "String",
+          "description": "the first operation's op (proposals) or the section name"
+        },
+        "data": {
+          "type": "Object",
+          "description": "the raw section payload (real ids; evidence msg ids translated)"
+        },
+        "flags": {
+          "type": "Array",
+          "description": "e.g. ['USER-EDITED profile'] - render prominently, never auto-apply"
+        },
+        "status": {
+          "type": "String",
+          "description": "proposed | accepted | ignored | seen | dismissed | answered | applied"
+        },
+        "status_asof": {
+          "type": "String",
+          "description": "ms timestamp of the last status change"
+        },
+        "applied_asof": {
+          "type": "String",
+          "description": "ms timestamp when the accepted change was written"
+        },
+        "apply_note": {
+          "type": "String",
+          "description": "what the apply actually did"
+        },
+        "apply_error": {
+          "type": "String",
+          "description": "why an accepted apply failed, when it did"
+        },
+        "created_asof": {
+          "type": "String",
+          "description": "ms timestamp"
+        },
+        "section": {
+          "type": "String",
+          "description": "proposal | attention | question | summary | focus"
+        },
+        "group": {
+          "type": "String",
+          "description": "period | focus | attention | stale | archive | merge | split | people | rules | learn | questions"
+        },
+        "title": {
+          "type": "String",
+          "description": "the model's short title / headline / question"
+        },
+        "description": {
+          "type": "String",
+          "description": "the model's description for the user (capped)"
+        },
+        "question": {
+          "type": "String",
+          "description": "questions: the question text"
+        },
+        "headline": {
+          "type": "String",
+          "description": "attention cards: the headline"
+        },
+        "fingerprint": {
+          "type": "String",
+          "description": "group + the sorted ids the ops act on — an ignored fingerprint is never shown again"
+        },
+        "evidence": {
+          "type": "Array",
+          "description": "real item ids (or hand-edit ids) the model cited"
+        },
+        "prompt_version": {
+          "type": "String",
+          "description": "CLEANUP_PROMPT_VERSION that produced it; pending items are only re-shown at the current version"
+        },
+        "answer": {
+          "type": "Object",
+          "description": "questions: { label, index, asof } of the option chosen"
+        }
+      }
+    },
+    "llm_audit": {
+      "description": "DEV request audit (temporary, pruned after settings.llm_audit_days): one record per LLM exchange the per-message engine made while recording was on, plus blob records holding the cached durable turn once per distinct content. Read by the requestauditlab page; written by jobs/analyze_thread/llmAudit.js.",
+      "schema": {
+        "kind": {
+          "type": "String",
+          "description": "'exchange' (one LLM call) or 'blob' (a cached durable turn, id blob_<hash>)"
+        },
+        "run_id": {
+          "type": "String",
+          "description": "the run lock owner id of the run that made the call"
+        },
+        "driver": {
+          "type": "String",
+          "description": "'job' | 'tab' | 'inspect'"
+        },
+        "chain_id": {
+          "type": "String",
+          "description": "groups the analysis call with its request_more / repair rounds"
+        },
+        "round": {
+          "type": "Number",
+          "description": "1 for the analysis call, +1 per follow-on round"
+        },
+        "exchange_kind": {
+          "type": "String",
+          "description": "'analysis' | 'detail' (a request_more round)"
+        },
+        "phase": {
+          "type": "String",
+          "description": "'analysis' | 'repair' (an invalid-reply retry)"
+        },
+        "at": {
+          "type": "Number",
+          "description": "ms when the request was sent"
+        },
+        "duration_ms": {
+          "type": "Number",
+          "description": "request round-trip"
+        },
+        "msg_ids": {
+          "type": "Array",
+          "description": "message ids in the request"
+        },
+        "subject": {
+          "type": "String",
+          "description": "first message subject"
+        },
+        "batch": {
+          "type": "Number",
+          "description": "messages in the request"
+        },
+        "prompt_version": {
+          "type": "String",
+          "description": "SYSTEM_PROMPT version used"
+        },
+        "model": {
+          "type": "String",
+          "description": "model the provider reported"
+        },
+        "provider": {
+          "type": "String",
+          "description": "connector name (Claude, ChatGPT, ClaudeLocal, CodexLocal…)"
+        },
+        "opts": {
+          "type": "Object",
+          "description": "ask options minus the system prompt text (max_tokens, thinking, effort, cache, responseType)"
+        },
+        "turns": {
+          "type": "Array",
+          "description": "[{ role, chars, cached, text | blob }] — cached turns reference a blob by hash"
+        },
+        "response": {
+          "type": "String",
+          "description": "reply text"
+        },
+        "thinking": {
+          "type": "String",
+          "description": "thinking text if any"
+        },
+        "error": {
+          "type": "String",
+          "description": "error message when the call failed"
+        },
+        "meta": {
+          "type": "Object",
+          "description": "{ tokensUsed, rawUsage, pricing, cost } as the server reported"
+        },
+        "hash": {
+          "type": "String",
+          "description": "blob only: content hash"
+        },
+        "text": {
+          "type": "String",
+          "description": "blob only: the durable turn text"
+        }
+      }
+    },
+    "projects_archive": {
+      "description": "Archived projects — their OWN collection (user decision 2026-09-20), never loaded by the working set. Same shape as a projects record plus the archive stamps; open to-dos are cancelled on the copy at archive time. Restorable from the clean-up page.",
+      "schema": {
+        "project_id": {
+          "type": "String",
+          "description": "the project's id, unchanged"
+        },
+        "name": {
+          "type": "String",
+          "description": "project name at archive time"
+        },
+        "todos": {
+          "type": "Array",
+          "description": "the project's to-dos; those open at archive time carry status cancelled with change_reason 'archived with project'"
+        },
+        "status": {
+          "type": "String",
+          "description": "always 'archived' here"
+        },
+        "archived_asof": {
+          "type": "Number",
+          "description": "ms timestamp"
+        },
+        "archived_reason": {
+          "type": "String",
+          "description": "the accepted proposal's description (capped) or null"
+        },
+        "archived_by": {
+          "type": "String",
+          "description": "cleanup | merge-cleanup | user"
+        },
+        "archived_run_id": {
+          "type": "String",
+          "description": "the clean-up run whose proposal was accepted, or null"
+        }
+      }
+    }
+  },
+  "authorship": {
+    "last_modified": {
+      "id": "saladmin",
+      "host": "http://localhost:3000",
+      "date": 1788500249942
+    },
+    "contributors": [],
+    "history": [
+      {
+        "event": "edited_by",
+        "by": {
+          "id": "saladmin",
+          "host": "http://localhost:3000",
+          "date": 1788500249942
+        },
+        "date": 1788500249942
+      }
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+/* requestauditlab.css — the Request Audit Lab page (requestauditlab.html). Same muted test-page
+   look as maintlab/inspect: one card per REQUEST CHAIN (an analysis call + its follow-on rounds),
+   expandable rows per exchange, cost lines per part of the request. */
+
+.ra-page { max-width: 1200px; margin: 0 auto; padding: 12px 16px 80px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #222; }
+.ra-muted { color: #777; font-size: 12px; }
+.ra-note { margin: 6px 0 12px; line-height: 1.45; }
+.ra-note code { background: #f2f4f7; padding: 0 4px; border-radius: 3px; }
+
+.ra-status { padding: 8px 10px; border-radius: 6px; background: #f2f4f7; font-size: 13px; margin: 8px 0; }
+.ra-status.ok { background: #e8f5ec; color: #1d6b35; }
+.ra-status.warn { background: #fdf3dc; color: #7a5b12; }
+.ra-status.error { background: #fbe9e7; color: #b3362a; }
+.ra-status.busy { background: #e8effc; color: #274f9e; }
+
+.ra-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 10px 0 4px; }
+.ra-lbl { font-size: 13px; }
+.ra-lbl input[type="number"] { width: 52px; padding: 2px 4px; }
+.ra-btn { border: 1px solid #c8cfd9; background: #fff; border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+.ra-btn:hover { background: #f3f6fa; }
+.ra-btn:disabled { opacity: .5; cursor: default; }
+.ra-btn-primary { background: #2f6df0; border-color: #2f6df0; color: #fff; }
+.ra-btn-primary:hover { background: #2558c8; }
+.ra-btn-primary.recording { background: #b3362a; border-color: #b3362a; }
+.ra-btn-danger { color: #b3362a; border-color: #e5b7b1; margin-left: auto; }
+
+.ra-totals { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; padding: 8px 10px; border: 1px solid #e2e6ec; border-radius: 8px; margin: 8px 0; }
+.ra-totals b { color: #274f9e; }
+.ra-eq { color: #7a5b12; font-weight: 600; font-size: 11px; margin-left: 3px; }
+
+.ra-run { margin: 18px 0 6px; font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; border-bottom: 1px solid #e2e6ec; padding-bottom: 4px; }
+.ra-run-id { font-family: ui-monospace, Menlo, monospace; color: #667; font-size: 12px; }
+.ra-run-total { margin-left: auto; font-weight: 600; color: #274f9e; }
+
+.ra-list { display: flex; flex-direction: column; gap: 10px; }
+.ra-chain { border: 1px solid #e2e6ec; border-left: 3px solid #c8cfd9; border-radius: 8px; padding: 8px 12px; }
+.ra-chain.error { border-left-color: #b3362a; }
+.ra-chain.multi { border-left-color: #7a5b12; }
+.ra-chain-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; cursor: pointer; }
+.ra-chain-title { font-weight: 600; font-size: 13px; }
+.ra-chain-meta { font-size: 12px; color: #667; }
+.ra-chain-cost { margin-left: auto; font-weight: 600; color: #274f9e; font-size: 13px; white-space: nowrap; }
+.ra-chain-body { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+
+.ra-ex { border: 1px solid #e8ebf0; border-radius: 6px; padding: 6px 10px; background: #fafbfc; }
+.ra-ex-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 12px; }
+.ra-ex-round { font-weight: 700; color: #fff; background: #8a94a6; border-radius: 4px; padding: 1px 6px; font-size: 11px; }
+.ra-ex-round.repair { background: #b3362a; }
+.ra-ex-round.detail { background: #7a5b12; }
+.ra-ex-cost { margin-left: auto; font-weight: 600; color: #274f9e; }
+.ra-ex-err { color: #b3362a; font-size: 12px; margin: 4px 0; white-space: pre-wrap; }
+
+.ra-cost { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+.ra-cost td { padding: 2px 8px 2px 0; border-bottom: 1px dotted #e2e6ec; }
+.ra-cost td.n { text-align: right; font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
+.ra-cost tr.total td { font-weight: 600; border-bottom: none; }
+.ra-cost tr.zero td { color: #aab; }
+.ra-cost .ra-rate { color: #889; }
+
+.ra-block { margin: 4px 0; font-size: 12px; }
+.ra-block > summary { cursor: pointer; color: #345; }
+.ra-block pre { margin: 4px 0 0; white-space: pre-wrap; word-break: break-word; font-size: 11.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: #fff; border: 1px solid #e8ebf0; border-radius: 6px; padding: 8px; max-height: 480px; overflow: auto; }
+.ra-block.cached > summary { color: #1d6b35; }
+.ra-block.volatile > summary { color: #7a5b12; }
+.ra-empty { padding: 18px; text-align: center; color: #889; font-size: 13px; }

@@ -1,0 +1,53 @@
+/* tokens.css — the app-wide design tokens, loaded FIRST on every page (before any other
+   stylesheet). Pure :root custom properties, no rules — component classes live in entities.css,
+   page styles in their own files. The importance scale (--imp-1..5) is MIRRORED in
+   renderUtils.js IMP_COLORS: change BOTH together. */
+
+:root {
+  /* neutrals */
+  --ink: #1c2430;           /* headings / primary text */
+  --text: #44515f;          /* body text */
+  --text-2: #5a6675;        /* secondary text */
+  --muted: #768295;         /* labels */
+  --faint: #9aa6b5;         /* de-emphasised / dates */
+  --border: #e6ebf2;        /* standard card border */
+  --border-2: #d8e0ea;      /* inputs / controls border */
+  --hairline: #eef1f6;      /* row separators */
+  --surface: #fff;
+  --surface-alt: #f4f7fb;   /* control / hover background */
+  --surface-tint: #fbfcfe;  /* very light panel background */
+
+  /* brand + status */
+  --accent: #2f6df0;
+  --ok: #1f6f3d;    --ok-bg: #e7f6ec;
+  --done: #23a558;  /* the feel-good resolve green: done = green check in a white box with a
+                       green border (counterpart of the open ☑️ white box + dark check) */
+  --err: #a3262a;   --err-2: #d9534f;  --err-bg: #fcebeb;
+  --warn: #e0922f;  --warn-ink: #9a6a1a;  --warn-bg: #fff3d6;
+
+  /* importance 1-5 (salience rises: 1 recedes, 5 pops) — mirror of renderUtils.js IMP_COLORS */
+  --imp-1: #9aa6b5;
+  --imp-2: #6b7686;
+  --imp-3: #2f6df0;
+  --imp-4: #7a5cc0;
+  --imp-5: #d9534f;
+
+  /* task direction — carried by EMOJI (☑️ I owe · 📥 owed me · 👥 team · 📖 read), NOT colour:
+     direction colours collided with importance (a low-priority "I owe" item is not red).
+     The legacy direction hues remain ONLY for old page styles awaiting migration. */
+  --dir-iowe: #a3401a;  --dir-iowe-bg: #ffe9df;  --dir-iowe-line: #f3b79d;
+  --dir-owed: #1f5bb5;  --dir-owed-bg: #e3f0ff;  --dir-owed-line: #9ec4f2;
+  --dir-team: #6442b8;  --dir-team-bg: #ece6fb;  --dir-team-line: #c8b8ee;
+  --dir-read: #5a6675;  --dir-read-bg: #eef1f5;  --dir-read-line: #d5dbe3;
+
+  /* EVENT kind — carried by the EMOJI in the glyph disc (✉ ⚙ ✋), not colour.
+     Only failure keeps a tint (status, not decoration). */
+  --ev-error: #d9534f;  --ev-error-bg: #fcebeb;
+
+  /* PROJECT chrome — neutral slate, the container's frame + band (not a colour signal).
+     The RESTING gray band belongs to projects EXCLUSIVELY — hovers elsewhere stay fainter.
+     People/events add NO colour of their own: importance owns colour (rings, borders, badges). */
+  --ent-project: #5b6b8c;       /* project name ink + pentagon mark */
+  --ent-project-band: #e9eef6;  /* project header band (deliberate, ownable gray) */
+  --ent-project-line: #c9d3e2;  /* project frame border */
+}

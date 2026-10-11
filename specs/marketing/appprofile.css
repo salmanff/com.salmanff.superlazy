@@ -1,0 +1,148 @@
+/* ============================================================
+   appprofile.css — styles for /appprofile/<app> pages
+   Load after common.css, subpage.css and discover.css
+   (the header card reuses .app-card / .app-card-icon from discover.css).
+   ============================================================ */
+
+/* ── Profile header ───────────────────────────────────────── */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.profile-header .app-card-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+}
+.profile-header .app-card-icon img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+.profile-header .docs-page-title { margin-bottom: 2px; }
+.profile-tagline {
+  font-size: 15px;
+  color: var(--c-ink-3);
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 4px 0 36px;
+}
+.btn-install,
+.btn-secondary {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 9px 18px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-install {
+  background: var(--c-blue-deep);
+  color: #fff;
+  border: 1px solid var(--c-blue-deep);
+}
+.btn-install:hover { background: #155a99; text-decoration: none; }
+.btn-secondary {
+  background: transparent;
+  color: var(--c-ink);
+  border: 1px solid var(--c-border-2);
+}
+.btn-secondary:hover { background: var(--c-surface-2); text-decoration: none; }
+
+/* ── Body text helpers ────────────────────────────────────── */
+.docs-section-body + .docs-section-body { margin-top: -12px; }
+.docs-section-body code,
+.step-body code,
+.docs-list code {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  background: var(--c-surface-3);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.docs-section-body strong,
+.step-body strong,
+.docs-list strong { color: var(--c-ink-2); font-weight: 500; }
+
+.docs-list {
+  font-size: 14px;
+  color: var(--c-ink-3);
+  line-height: 1.75;
+  margin: -12px 0 24px 20px;
+}
+.docs-list li { margin-bottom: 4px; }
+
+/* ── Story embed (specs/marketing/superlazy-story.html) ──── */
+.story-frame {
+  background: #f4f6f9;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  margin: 8px 0 24px;
+  overflow: hidden;
+}
+
+/* ── Numbered install steps ───────────────────────────────── */
+.steps {
+  list-style: none;
+  counter-reset: step;
+  margin: 8px 0 24px;
+}
+.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 22px 44px;
+  border-left: 1px solid var(--c-border);
+  margin-left: 13px;
+}
+.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: -14px;
+  top: -2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-2);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--c-ink);
+  margin-bottom: 4px;
+}
+.step-body {
+  font-size: 14px;
+  color: var(--c-ink-3);
+  line-height: 1.75;
+}
+.step-body p + p { margin-top: 8px; }
+.step-body ul { margin: 6px 0 0 18px; }
+
+/* ── Permission table tweak ───────────────────────────────── */
+.ref-table .td-key { white-space: normal; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .profile-header { gap: 14px; }
+  .profile-header .app-card-icon { width: 52px; height: 52px; }
+  .profile-header .app-card-icon img { width: 36px; height: 36px; }
+  .steps > li { padding-left: 32px; }
+  .ref-table { display: block; overflow-x: auto; }
+}

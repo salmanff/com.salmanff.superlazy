@@ -1,0 +1,235 @@
+/* bootstrap.css — the bulk-bootstrap (first-run) page. Uses the app's tokens + entity components
+   (tokens.css / entities.css via the sl-v2 container); only page-specific layout lives here.
+   Design intent: ONE run bar that always says what is happening, then a top-to-bottom REVIEW —
+   each section explains itself in plain language and offers the one correction the user can make. */
+
+/* ---- setup (collapses once a run starts) ---- */
+.bs-setup { border: 1px solid var(--border); border-radius: 8px; background: var(--surface-tint); margin: 10px 0 14px; }
+.bs-setup > summary, .bs-setup-sum { padding: 9px 12px; cursor: pointer; font-weight: 650; color: var(--ink); }
+.bs-setup[open] > summary { border-bottom: 1px solid var(--hairline); margin-bottom: 6px; }
+.bs-setup .config { padding: 0 12px 6px; }
+.bs-accounts { display: flex; gap: 14px; flex-wrap: wrap; padding: 4px 0; }
+.bs-acclabel { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+
+/* ---- the run bar ---- */
+.bs-runbar {
+  position: sticky; top: 0; z-index: 20;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface);
+  box-shadow: 0 1px 3px rgba(28, 36, 48, 0.05); padding: 10px 12px; margin-bottom: 16px;
+}
+.bs-runbar-main { display: flex; align-items: center; gap: 12px; }
+.bs-spinner { flex: 0 0 auto; color: var(--accent); }
+/* freezr_style.css sets .freezr-spinner{display:inline-block}, which BEATS the browser's
+   [hidden]{display:none} — without this the spinner turns even when idle. */
+.bs-spinner[hidden] { display: none; }
+.bs-runbar-text { flex: 1 1 auto; min-width: 0; }
+.bs-phase { font-size: 14px; font-weight: 650; color: var(--ink); }
+.bs-phase-ok { color: var(--ok); }
+.bs-phase-error { color: var(--err); }
+.bs-phase-sub { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+.bs-runbar-actions { display: flex; gap: 7px; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; }
+.bs-runbar-meta {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--hairline);
+  font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.bs-meta-item:empty { display: none; }
+.bs-pending { color: var(--warn-ink); background: var(--warn-bg); border-radius: 999px; padding: 1px 9px; font-weight: 650; }
+.bs-linkbtn { border: none; background: none; color: var(--accent); cursor: pointer; font: inherit; font-size: 11.5px; padding: 0; margin-left: auto; }
+.bs-linkbtn:hover { text-decoration: underline; }
+.bs-diagwrap { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--hairline); }
+.bs-diag { font-size: 11.5px; color: var(--text-2); }
+.bs-diagline { font-family: ui-monospace, monospace; font-size: 11px; margin: 2px 0; }
+.bs-diagraw { color: var(--faint); white-space: pre-wrap; }
+.bs-thinkwrap, .bs-diagwrap details { margin-top: 7px; font-size: 12px; color: var(--text-2); }
+
+/* ---- the banner: the one thing to do next, and the way out of the page ---- */
+.bs-banner {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 11px 14px; margin-bottom: 12px; border-radius: 8px;
+  border: 1px solid var(--warn); background: var(--warn-bg);
+}
+.bs-banner-msg { flex: 1 1 260px; font-size: 13px; line-height: 1.5; color: var(--warn-ink); font-weight: 600; }
+.bs-ghostbtn {
+  font: inherit; font-size: 12.5px; padding: 7px 14px; cursor: pointer;
+  border: 1px solid var(--border-2); border-radius: 9px; background: var(--surface); color: var(--text-2);
+}
+.bs-ghostbtn:hover { background: var(--surface-alt); color: var(--text); }
+.bs-ghostbtn[hidden] { display: none; }
+.bs-banner-ok { border-color: var(--ok); background: var(--ok-bg); }
+.bs-banner-ok .bs-banner-msg { color: var(--ok); }
+
+/* ---- saving: one line per store, ticked as it lands ---- */
+.bs-saveprog { margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-tint); }
+.bs-saveprog[hidden] { display: none; }
+.bs-saveprog-bar { height: 5px; border-radius: 999px; background: var(--surface-alt); overflow: hidden; }
+.bs-saveprog-bar > div {
+  height: 100%; width: 0%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--imp-4)); transition: width 0.25s ease;
+}
+.bs-savesteps { list-style: none; margin: 9px 0 0; padding: 0; font-size: 12.5px; color: var(--text-2); }
+.bs-savestep { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.bs-savestep-mark { width: 14px; text-align: center; color: var(--faint); }
+.bs-savestep-doing { color: var(--ink); font-weight: 600; }
+.bs-savestep-done .bs-savestep-mark { color: var(--done); }
+
+/* ---- tabs: one per section, dead until its first result arrives ---- */
+.bs-tabs {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-2); margin-bottom: 14px;
+}
+.bs-tab {
+  border: 1px solid transparent; border-bottom: none; background: none;
+  border-radius: 7px 7px 0 0; padding: 8px 13px; margin-bottom: -1px;
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer;
+}
+.bs-tab:disabled { color: var(--faint); cursor: default; }
+.bs-tab:not(:disabled):hover { background: var(--surface-alt); color: var(--text); }
+.bs-tab-on, .bs-tab-on:not(:disabled):hover {
+  background: var(--surface); color: var(--ink);
+  border-color: var(--border-2); border-bottom: 1px solid var(--surface);
+}
+.bs-tabcount { color: var(--faint); font-weight: 500; font-variant-numeric: tabular-nums; }
+.bs-tabnew {
+  margin-left: 6px; padding: 1px 6px; border-radius: 999px;
+  background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; text-transform: uppercase;
+}
+.bs-tab-q.bs-tab:not(:disabled) { color: var(--warn-ink); }
+.bs-tab-q.bs-tab-on { color: var(--ink); }
+.bs-tab-raw { margin-left: auto; font-weight: 500; }
+
+/* sub-tabs inside the under-the-hood panel */
+.bs-subtabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.bs-subtab {
+  font: inherit; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer;
+  padding: 4px 12px; border: 1px solid var(--border-2); border-radius: 999px; background: var(--surface);
+}
+.bs-subtab:hover { background: var(--surface-alt); color: var(--text); }
+.bs-subtab-on, .bs-subtab-on:hover { background: var(--ent-project-band); border-color: var(--ent-project-line); color: var(--ink); }
+.bs-subpanel[hidden] { display: none; }
+.bs-subpanel .hint { display: block; margin-bottom: 8px; line-height: 1.55; }
+
+/* ---- the panels behind the tabs (exactly one visible; the idle note before any run) ---- */
+.bs-panels { min-height: 200px; }
+.bs-panel-tab[hidden], .bs-idle[hidden] { display: none; }
+.bs-idle {
+  margin: 0; padding: 22px 16px; font-size: 12.5px; line-height: 1.6; color: var(--muted);
+  text-align: center; border: 1px dashed var(--border-2); border-radius: 8px; background: var(--surface-tint);
+}
+
+/* ---- the guidance copy that makes each panel self-explaining ---- */
+.bs-guide {
+  margin: 0 0 12px; padding: 9px 12px; font-size: 12.5px; line-height: 1.55; color: var(--text);
+  background: var(--surface-alt); border-left: 3px solid var(--border-2); border-radius: 0 6px 6px 0;
+}
+.bs-guide-warn { background: var(--warn-bg); border-left-color: var(--warn); color: var(--warn-ink); }
+
+/* ---- business context ---- */
+.bs-panel-tab .run-controls { align-items: center; gap: 12px; padding: 6px 2px 2px; margin-top: 4px; }
+.bs-panel-tab .run-controls .hint { flex: 1 1 auto; }
+
+/* the up-front context box: people write a paragraph here, not a phrase */
+#seed {
+  display: block; width: 100%; box-sizing: border-box; margin-top: 6px;
+  min-height: 120px; resize: vertical; font: inherit; font-size: 13px; line-height: 1.55;
+  padding: 10px 12px; border: 1px solid var(--border-2); border-radius: 8px; background: var(--surface);
+}
+
+/* what the user has ALREADY sent back, kept as a record once it is on its way */
+.bs-sent { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--hairline); }
+.bs-sent[hidden] { display: none; }
+.bs-sent-h { font-size: 11.5px; font-weight: 650; color: var(--muted); margin-bottom: 5px; }
+.bs-sent-line { font-size: 12px; color: var(--text-2); padding: 3px 0 3px 12px; border-left: 2px solid var(--border-2); margin-bottom: 3px; }
+
+.bs-context {
+  width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; line-height: 1.6;
+  padding: 11px 13px; border: 1px solid var(--border-2); border-radius: 8px; background: var(--surface);
+}
+
+/* ---- projects (the app's framed-container identity) ---- */
+.bs-cards { display: flex; flex-direction: column; gap: 10px; }
+.bs-proj { border: 1px solid var(--ent-project-line); border-radius: 5px; overflow: hidden; background: var(--surface); }
+.bs-proj-head {
+  display: flex; align-items: center; gap: 9px; padding: 10px 13px;
+  background: var(--ent-project-band); border-bottom: 1px solid var(--ent-project-line);
+}
+.bs-proj-name { flex: 1 1 auto; min-width: 0; font-weight: 650; color: var(--ent-project); }
+.bs-statechip { background: var(--surface); }
+.bs-proj-body { padding: 9px 13px 11px; }
+.bs-proj-sum { font-size: 12.5px; line-height: 1.55; color: var(--text); margin-bottom: 7px; }
+.bs-tdrow { border-top: 1px solid var(--hairline); }
+.bs-tdrow:first-of-type { border-top: none; }
+.bs-proj-foot { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-top: 9px; padding-top: 7px; border-top: 1px solid var(--hairline); }
+.bs-avrow { display: inline-flex; gap: 3px; }
+
+/* ---- people ---- */
+.bs-person { border: 1px solid var(--border); border-radius: 8px; padding: 10px 13px; background: var(--surface); }
+.bs-person-head { display: flex; align-items: center; gap: 9px; }
+.bs-person-who { flex: 1 1 auto; min-width: 0; }
+.bs-person-name { font-weight: 650; color: var(--ink); }
+.bs-person-addr { font-size: 11px; color: var(--faint); }
+.bs-relchip { background: var(--surface-alt); }
+.bs-person-sum { font-size: 12.5px; line-height: 1.55; margin: 6px 0 2px; color: var(--text); }
+
+/* ---- auto-file ---- */
+.bs-auto {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--surface-tint);
+}
+.bs-auto-left { display: flex; align-items: center; gap: 9px; flex: 1 1 auto; min-width: 0; }
+.bs-auto-glyph {
+  display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+  border-radius: 50%; background: var(--surface-alt); border: 1px solid var(--border-2);
+  color: var(--muted); font-size: 12px; flex: 0 0 auto;
+}
+.bs-auto-who { min-width: 0; }
+.bs-auto-sender { font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.bs-auto-btn { font: inherit; font-size: 11.5px; padding: 3px 10px; border: 1px solid var(--border-2); background: var(--surface); color: var(--text); cursor: pointer; flex: 0 0 auto; }
+.bs-auto-btn:hover { background: var(--surface-alt); }
+.bs-auto-off { opacity: 0.6; }
+
+/* ---- questions + corrections ---- */
+.bs-questions { display: flex; flex-direction: column; gap: 9px; }
+.bs-q { border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; background: var(--surface); }
+.bs-q-text { font-weight: 620; color: var(--ink); font-size: 13px; }
+.bs-q-answer {
+  width: 100%; box-sizing: border-box; margin-top: 7px; font: inherit; font-size: 12.5px;
+  padding: 6px 9px; border: 1px solid var(--border-2); border-radius: 7px;
+}
+.bs-fix { margin-top: 7px; }
+.bs-fixbtn { font: inherit; font-size: 11.5px; padding: 2px 10px; border: 1px solid var(--border-2); background: var(--surface-alt); color: var(--text-2); cursor: pointer; }
+.bs-fixbtn:hover { background: var(--surface); border-color: var(--faint); }
+.bs-fixbox textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 12.5px; padding: 7px 9px; border: 1px solid var(--border-2); border-radius: 7px; margin-bottom: 6px; }
+.bs-fixdone { font-size: 11.5px; color: var(--ok); }
+
+/* ---- primary button ---- */
+/* Same treatment as the setup page's .su-primary (that file is not loaded here; this page is
+   meant to REPLACE that flow, so the style is restated in the app's tokens rather than dragging
+   in an unrelated stylesheet). Sized down for the run bar. */
+.su-primary {
+  padding: 7px 16px; font: inherit; font-size: 13px; font-weight: 600; color: #fff;
+  background: linear-gradient(90deg, var(--accent), var(--imp-4)); border: none; border-radius: 9px;
+  cursor: pointer; box-shadow: 0 3px 10px rgba(47, 109, 240, 0.3);
+}
+.su-primary:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
+.su-primary:not(:disabled):hover { filter: brightness(1.06); }
+.bs-fixbox .su-primary { padding: 5px 14px; font-size: 12px; }
+
+/* ---- shared ---- */
+.bs-evwrap { margin-left: 6px; display: inline-flex; gap: 3px; vertical-align: middle; }
+.bs-evchip { font-family: ui-monospace, monospace; font-size: 10px; padding: 0 6px; border-radius: 4px; }
+.bs-pre {
+  max-height: 380px; overflow: auto; background: var(--surface-tint); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px; font-size: 11px; line-height: 1.45;
+  white-space: pre-wrap; word-break: break-word; color: var(--text-2);
+}
+.bs-think { max-height: 300px; }
+.bs-raw { margin-top: 26px; font-size: 12px; color: var(--muted); }
+.bs-foot { margin: 26px 0 40px; }
+#resumePanel { margin: 14px 0; }
+
+/* multiple-choice answers (offered whenever the model supplies options) */
+.bs-choices { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 7px; }
+.bs-choice { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text); cursor: pointer; }
+.bs-q-other { margin-top: 6px; }
+.bs-meline { margin-top: 5px; }

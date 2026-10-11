@@ -1,0 +1,51 @@
+<div class="in-page">
+  <div class="in-header">
+    <h1>Inspect — one message at a time</h1>
+    <div class="in-header-links">
+      <a href="/apps/com.salmanff.superlazy/index">Dashboard</a>
+      <a href="/apps/com.salmanff.superlazy/setup">Setup &amp; Prefs</a>
+    </div>
+  </div>
+
+  <div id="inStatus" class="in-status">Loading…</div>
+
+  <div class="in-muted" style="margin: 4px 0;">Note: this page does NOT take the mail lock — avoid running Check Mail or the background job while inspecting the same messages.</div>
+
+  <div id="inKnobs" class="in-knobs" hidden>
+    <h2>This run's settings <span class="in-muted">(change them in Preferences, then reload this page)</span></h2>
+    <div id="inKnobsBody" class="in-knobs-body"></div>
+  </div>
+
+  <div id="inNext" class="in-next" hidden>
+    <h2>Next message</h2>
+    <div id="inNextMeta" class="in-next-meta"></div>
+    <div class="in-actions">
+      <button id="inRunBtn" type="button" class="in-btn in-btn-primary">Analyse</button>
+      <label class="in-count">next
+        <select id="inCountSel">
+          <option value="1" selected>1 message</option>
+          <option value="2">2 messages</option>
+          <option value="3">3 messages</option>
+          <option value="5">5 messages</option>
+          <option value="8">8 messages</option>
+          <option value="10">10 messages</option>
+        <option value="15">15 messages</option>
+        <option value="20">20 messages</option>
+        </select>
+      </label>
+      <span class="in-muted">more than 1 = they go into ONE batched AI call (same account, oldest first) — nothing is saved until you press Save</span>
+    </div>
+  </div>
+
+  <div id="inProgress" class="in-progress" hidden></div>
+
+  <div id="inResults" class="in-results"></div>
+
+  <div id="inDecision" class="in-decision" hidden>
+    <div class="in-decision-inner">
+      <span id="inDecisionNote">Nothing has been written. Save persists every analysed message exactly as a normal run would (and advances the cursor past all of them); Ignore discards the whole run (the results stay on screen).</span>
+      <button id="inSaveBtn" type="button" class="in-btn in-btn-primary">Save</button>
+      <button id="inIgnoreBtn" type="button" class="in-btn">Ignore (don't save)</button>
+    </div>
+  </div>
+</div>

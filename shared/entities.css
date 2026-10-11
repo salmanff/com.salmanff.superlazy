@@ -1,0 +1,536 @@
+/* entities.css — the per-entity visual identity components (rendered by renderUtils.js;
+   refined on the styleguide test page). Loaded on every page, right after tokens.css.
+
+   The identity contract — COLOUR MEANS IMPORTANCE, nothing else; entities are told apart by
+   SHAPE + GLYPH (rings, wherever they appear, always mean importance):
+     PROJECT = framed container: small radius, neutral slate header band, ▣ glyph
+     TASK    = checkbox-first row; 3px importance LEFT BORDER — tasks own that device exclusively;
+               direction = emoji disc (list mark I owe · 📥 owed me · 👥 team · 📖 read) + importance ring;
+               state: open ☑️ (white box, dark check) vs done (green check, white box, green border)
+     EVENT   = flat ruled row (mail-list) with a NEUTRAL circular glyph disc (emoji = kind;
+               only failure keeps a red tint)
+     PERSON  = neutral initials avatar; thin border ring tinted by the person's importance
+
+   Two layers in this file:
+   1. Global component classes (.chip*, .task-*, .avatar, .ev-disc, .imp-badge) — NEW names,
+      unused by the old page styles, so they change nothing until a renderer emits them.
+   2. ".sl-v2 …" rules — restyle EXISTING classes (epv-*, ev-*, pp-*) to the new identity.
+      A page opts in by putting class "sl-v2" on its container; only the styleguide does so
+      far. Once the design is approved the live pages adopt it (and these may be flattened). */
+
+/* =============================== 0. global refinement =============================== */
+/* (design_handoff_refinement, 2026-07: type scale / spacing / alignment polish only) */
+
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+/* numerals that line up wherever counts / dates / badges live */
+.epv-date, .epv-rowdate, .task-date, .task-due, .ev-time, .ev-day-meta,
+.pp-row-sub, .pp-proj-meta, .imp-badge, .epv-rowimp, .badge, .epv-count { font-variant-numeric: tabular-nums; }
+
+/* shared control radius (specific control classes repeat 7px in their own rules) */
+button { border-radius: 7px; }
+
+/* =============================== 1. components =============================== */
+
+/* ---- cross-link chips (the connective tissue between entities) ---- */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; max-width: 200px;
+  font-size: 11px; font-weight: 600; line-height: 1.55; padding: 2px 9px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-2);
+  white-space: nowrap; vertical-align: middle; flex: 0 0 auto; min-width: 0;
+}
+button.chip { font-family: inherit; cursor: pointer; }
+button.chip:hover { filter: brightness(0.96); }
+.chip-glyph { flex: 0 0 auto; font-size: 10px; opacity: 0.9; }
+.chip-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* project reference — squared corners, slate, carrying the logo pentagon */
+.chip-project { border-radius: 4px; background: var(--ent-project-band); border-color: var(--ent-project-line); color: var(--ent-project); }
+
+/* the PROJECT mark: superlazy's inverted pentagon (logo geometry, slate — never red: red is
+   importance-5's colour). Drawn with clip-path so it needs no image. */
+.proj-mark {
+  display: inline-block; width: 10px; height: 9px; flex: 0 0 auto;
+  background: var(--ent-project);
+  clip-path: polygon(50% 100%, 0% 38%, 18% 0%, 82% 0%, 100% 38%);
+}
+/* hollow (no-fill) variant = a BUTTON that opens the project (chips with a click handler) */
+.proj-mark-hollow { display: inline-flex; align-items: center; justify-content: center; }
+.proj-mark-core {
+  display: block; width: 58%; height: 52%; margin-top: -6%;
+  background: var(--surface);
+  clip-path: polygon(50% 100%, 0% 38%, 18% 0%, 82% 0%, 100% 38%);
+}
+.chip-project .proj-mark-core { background: var(--ent-project-band); }
+
+/* the pentagon IS the project card's expand/collapse control: points right when collapsed
+   (like ▸), inverts to point down when expanded — no separate arrow needed */
+button.epv-toggle { border: none; background: transparent; padding: 3px 5px; cursor: pointer; }
+/* inert variant (project modal): the pentagon is a fixed mark, collapsing is page-only */
+span.epv-toggle-fixed { display: inline-block; padding: 3px 5px; cursor: default; border: none; background: transparent; }
+.proj-mark-toggle { width: 14px; height: 13px; display: block; transform: rotate(-90deg); transition: transform 0.12s ease; }
+.epv-card.expanded .proj-mark-toggle { transform: none; }
+
+/* ✉ event / source-email reference — round pill; the GLYPH is the signal, no kind tint
+   (error keeps red — that's a status, not decoration) */
+.chip-event { border-radius: 999px; background: var(--surface); border-color: var(--border-2); color: var(--text-2); }
+.chip-event-error { border-color: #f0d2d2; color: var(--ev-error); }
+
+/* person reference — round pill with a mini neutral initials disc (people add no colour) */
+.chip-person { border-radius: 999px; background: var(--surface); border-color: var(--border-2); color: var(--text-2); padding-left: 3px; }
+
+/* ☑ task REFERENCE (not an actionable row) — thin importance rule inside */
+.chip-task { border-radius: 6px; background: var(--surface-tint); color: var(--text); font-weight: 500; border-left: 3px solid var(--faint); }
+.chip-task .chip-glyph { color: var(--muted); }
+
+/* ---- importance badge (the one badge) ---- */
+.imp-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10.5px; font-weight: 800; min-width: 18px; height: 18px; box-sizing: border-box;
+  border: 1px solid; border-radius: 7px; padding: 0 5px; flex: 0 0 auto; background: var(--surface);
+}
+/* the anchor for the corner marks (.epv-imp-lock, .epv-imp-timer) — see index.css */
+.imp-badge { position: relative; }
+.imp-badge-locked { position: relative; }
+
+/* ---- TASK row ---- */
+.task-row {
+  display: flex; align-items: center; gap: 9px; padding: 5px 4px; min-width: 0;
+}
+/* the leading state control (checkbox / cancelled ✕ / direction disc) is pinned to the TITLE
+   line, not centred over the row: when the description slides open the row grows downward and
+   a centred checkbox slides away from the cursor mid-click (user, 2026-08-27) */
+.task-row > .epv-check, .task-row > .cancel-mark, .task-row > .dir-disc { align-self: flex-start; }
+.task-row > .epv-check { margin-top: 4px; }   /* optically centred on the title line (user, 2026-08-27) */
+.task-row > .cancel-mark { margin-top: 3px; }
+/* a row leaving the list (resolved / reopened / cancelled / re-prioritised) WIPES shut instead
+   of vanishing on the repaint — an instant swap put the NEXT task under the cursor, so a quick
+   second click landed on the wrong row (user, 2026-08-27). pointer-events off: mid-wipe clicks
+   hit nothing at all. Driven by taskRowEl's wipeThen (inline height px → 0). */
+.task-row-wiping {
+  overflow: hidden; box-sizing: border-box; opacity: 0; pointer-events: none;
+  padding-top: 0 !important; padding-bottom: 0 !important;
+  transition: height 0.22s ease, padding 0.22s ease, opacity 0.16s ease;
+}
+.task-short {
+  flex: 1 1 auto; min-width: 0; font-size: 13px; color: var(--ink); line-height: 1.4;
+  padding-left: 9px; border-left: 3px solid var(--border-2);
+}
+.task-short.clickable { cursor: pointer; }
+.task-short.clickable:hover { text-decoration: underline; }
+.task-row.done .task-short { color: var(--faint); text-decoration: line-through; text-decoration-color: #cfd6df; }
+.task-due { font-size: 10.5px; color: var(--warn-ink); white-space: nowrap; flex: 0 0 auto; }
+/* the text + its "from Bob · 2h ago" meta line, stacked and left-aligned with each other */
+.task-mid { flex: 1 1 0%; min-width: 0; }
+/* flex-basis 0, NOT auto. With basis auto the column's starting size is its MAX-CONTENT width —
+   and once the description panel has been built (hover / click) that is the longest line of the
+   description, far wider than the row. Flex then shares the deficit across every shrinkable
+   sibling in proportion to size, so the .projbox got squeezed too; the project chip inside it
+   cannot shrink (it is sized by its own text) and spilled right over the priority number. The
+   collapsed panel (0fr) still contributes its WIDTH, which is why closing it never undid the
+   shift. Basis 0 gives the column only the free space, so the tail is never asked to shrink.
+   (user, 2026-10-04) */
+.task-meta {
+  display: block; font-size: 10.5px; color: var(--faint); margin-top: 1px;
+  padding-left: 11px; /* the short text's border (3px) + padding (8px) — aligns under it */
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.task-meta.clickable { cursor: pointer; }
+.task-meta.clickable:hover { color: var(--accent); text-decoration: underline; }
+
+/* ---- the task row's HISTORY strip: first evidence · "… N more" · last evidence. Each item
+   backed by an email is a button that opens THAT message in the thread viewer; manual edits
+   are plain text. Sits in the .task-meta slot, so it inherits its size/alignment. ---- */
+/* ONE left-aligned line, comma-separated — NOT a flex row: a flex item stretches, and a <button>
+   centres its own text, which floated the last entry into the middle of the row. Inline items
+   inherit .task-meta's nowrap + ellipsis, so a long trail truncates at the right edge. */
+.task-hist { display: block; }
+.task-hist-item, .task-hist-gap, .task-hist-sep {
+  display: inline; font: inherit; color: inherit; background: none; border: 0;
+  padding: 0; margin: 0; text-align: left; white-space: nowrap;
+}
+.task-hist-gap { opacity: 0.7; }
+.task-hist-item.manual { font-style: italic; }
+.task-hist .clickable { cursor: pointer; }
+.task-hist .clickable:hover { color: var(--accent); text-decoration: underline; }
+
+/* the task NAME is a button now (it opens the task modal) — strip the chrome, keep the look */
+button.epv-short {
+  font: inherit; font-size: 13px; background: none; border: 0; border-left: 3px solid #c3ccd8;
+  text-align: left; cursor: pointer; display: block; width: 100%;
+}
+button.epv-short:hover { color: var(--accent); }
+/* keyboard focus only, and shaped to the text rather than the full row width */
+button.epv-short:focus { outline: none; }
+button.epv-short:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+/* ---- sub-tasks (subTasks.js): checklist lines in the description. The row's hover slides the
+   description open under the title (grid-rows 0fr→1fr, so no fixed max-height). Checkboxes are
+   hover-revealed per line; checked ones stay visible so unticking is discoverable. (The n/N
+   count pill was removed — the hover shows the list itself; user, 2026-08-25.) ---- */
+.task-desc { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.22s ease; }
+.task-desc.open { grid-template-rows: 1fr; }
+.task-desc-in { overflow: hidden; min-height: 0; }
+.subd { margin: 3px 0 2px; padding-left: 11px; /* aligns under the title, like .task-meta */ font-size: 12px; color: var(--ink); }
+.subd-text { padding: 1px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+/* overflow-wrap + min-width: a long URL / token in a description must wrap, not run out of the
+   text column and under the row's tail controls */
+.subd-itemtext { min-width: 0; overflow-wrap: anywhere; }
+.subd-item { display: flex; align-items: baseline; gap: 6px; padding: 1px 0; }
+/* drawn by hand like .task-check (same two-border tick technique) but QUIET: white box, grey
+   border, GREY tick — a done sub-item is a struck grey line, not a green/blue event
+   (user, 2026-08-24: no accent-coloured fill here) */
+.subd-check {
+  appearance: none; -webkit-appearance: none;
+  width: 13px; height: 13px; flex: 0 0 auto; margin: 0; align-self: center; box-sizing: border-box;
+  cursor: pointer; position: relative; visibility: hidden;
+  border: 1.5px solid var(--border-2); border-radius: 4px; background: var(--surface);
+}
+.subd-item:hover .subd-check, .subd-check:checked { visibility: visible; }
+.subd-check:hover:not(:disabled) { border-color: var(--faint); }
+.subd-check:checked::after {
+  content: ''; position: absolute; left: 50%; top: 46%;
+  width: 3px; height: 7px; margin: -4.5px 0 0 -1.5px;
+  border: solid var(--faint); border-width: 0 2px 2px 0;
+  transform: rotate(42deg);
+}
+.subd-check:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.subd-check:disabled { cursor: default; }
+.subd-item.done .subd-itemtext { color: var(--faint); text-decoration: line-through; text-decoration-color: #cfd6df; }
+
+/* ---- PERSON avatar — NEUTRAL initials disc; the thin border is tinted by importance rank
+   (set by avatarEl) — rings always mean importance, people add no colour of their own ---- */
+.avatar {
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: var(--surface-alt); color: var(--text-2); border: 1.5px solid var(--border-2);
+  font-weight: 700; letter-spacing: 0.02em; box-sizing: border-box;
+  flex: 0 0 auto; user-select: none;
+}
+.avatar-xs { width: 16px; height: 16px; font-size: 7px; }
+.avatar-sm { width: 28px; height: 28px; font-size: 10.5px; }
+.avatar-lg { width: 40px; height: 40px; font-size: 14px; }
+/* a clickable avatar (opens the person modal) */
+.avatar-btn { cursor: pointer; }
+.avatar-btn:hover { border-color: var(--faint); background: var(--surface-tint); }
+
+/* ---- EVENT kind disc — the EMOJI is the signal; no kind tints (error keeps red) ---- */
+.ev-disc {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 50%; font-size: 12px; line-height: 1;
+  flex: 0 0 auto; background: var(--surface-alt); color: var(--text-2);
+}
+.ev-disc-error { background: var(--ev-error-bg); color: var(--ev-error); }
+
+/* the epv tab bar hosts a dir-disc before its label */
+.epv-tab { display: inline-flex; align-items: center; gap: 4px; }
+
+/* ---- suggested-reply DRAFT block (renderUtils.renderDraft) — events feed + email viewer ---- */
+.ev-draft { background: var(--surface-alt); border-radius: 7px; padding: 8px 11px; }
+.ev-draft-head { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.ev-draft-kind { font-size: 11.5px; font-weight: 650; color: var(--text-2); white-space: nowrap; }
+.ev-draft-to { font-size: 11px; color: var(--faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev-draft-body { margin-top: 5px; font-size: 12.5px; color: var(--text); white-space: pre-wrap; line-height: 1.5; overflow-wrap: anywhere; }
+/* the in-place editor the "Edit" button swaps in (recipients + body) — this block IS the full
+   view now, so editing happens here rather than in a second composer modal */
+.ev-draft-edit { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.ev-draft-actions { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.ev-draft-send { font: inherit; font-size: 12px; padding: 3px 14px; border-radius: 14px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+.ev-draft-send:hover:not(:disabled) { filter: brightness(1.07); }
+.ev-draft-send:disabled { background: var(--surface); color: var(--faint); border-color: var(--border-2); cursor: not-allowed; }
+.ev-draft-btn { font: inherit; font-size: 12px; padding: 3px 12px; border-radius: 14px; border: 1px solid var(--border-2); background: var(--surface); color: var(--text-2); cursor: pointer; }
+.ev-draft-btn:hover { color: var(--text); border-color: var(--faint); }
+
+/* My to-dos: a green tick, an empty box and a light grey tick beside handwritten strokes.
+   Shared by direction discs, filter buttons and standalone labels. */
+.my-todos-icon {
+  display: inline-flex; flex-direction: column; justify-content: space-between;
+  width: 1.15em; height: 1em; flex: 0 0 auto; vertical-align: -0.08em;
+  color: currentColor; pointer-events: none;
+}
+.my-todos-icon-row { display: flex; align-items: center; gap: 0.18em; height: 0.22em; }
+.my-todos-icon-row::before {
+  content: ''; width: 0.22em; height: 0.12em; flex: 0 0 auto;
+  border-left: 0.09em solid currentColor; border-bottom: 0.09em solid currentColor;
+  transform: rotate(-45deg); margin-top: -0.08em;
+}
+.my-todos-icon-row::after {
+  content: ''; flex: 1; height: 0.15em;
+  border-top: 0.1em solid currentColor; border-radius: 50%; transform: rotate(-7deg);
+}
+.my-todos-icon-row:first-child::before { color: var(--done); }
+.my-todos-icon-row:nth-child(3)::before { color: var(--faint); }
+.my-todos-icon-row:nth-child(2)::before {
+  width: 0.31em; height: 0.31em; box-sizing: border-box;
+  border: 0.08em solid currentColor; border-radius: 0.04em;
+  transform: none; margin-top: 0;
+}
+.my-todos-icon-row:nth-child(2)::after { transform: rotate(5deg); margin-right: 0.12em; }
+.my-todos-icon-row:nth-child(3)::after { margin-right: 0.24em; }
+.dir-disc .my-todos-icon { color: var(--ink); }
+
+/* ---- TASK direction disc — emoji = direction; thin circular border tinted by the bucket's
+   top importance via imp-fg-N (rings always mean importance) ---- */
+.dir-disc {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%; font-size: 9.5px; line-height: 1;
+  border: 1.5px solid var(--border-2); background: var(--surface); box-sizing: border-box;
+  flex: 0 0 auto;
+}
+/* Inside a LIST of rows the mark is a column, so every direction is the same size — the tab
+   bar's deliberate "I owe is bigger" emphasis would step the checkboxes out of line, which is
+   exactly the alignment problem the priority dot had. (user, 2026-08-21) */
+.task-row > .dir-disc, .epv-row > .dir-disc { width: 18px; height: 18px; font-size: 9.5px; }
+
+/* "I owe" — YOUR to-do list, the bucket that matters most — renders larger */
+.dir-disc-major { width: 22px; height: 22px; font-size: 12.5px; }
+
+/* ---- TASK state marks:
+   open tasks use an unticked row checkbox;
+   done = GREEN check in a white box with a green border (the feel-good resolve reward) ---- */
+.done-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 4px; flex: 0 0 auto; box-sizing: border-box;
+  background: var(--surface); color: var(--done); border: 1.5px solid var(--done);
+  font-size: 11px; font-weight: 800; line-height: 1;
+}
+/* CANCELLED counterpart: red ✕ in a white, red-bordered box (task rows show it instead of the
+   green resolved check; clicking reopens) */
+.cancel-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 4px; flex: 0 0 auto; box-sizing: border-box;
+  background: var(--surface); color: var(--err-2); border: 1.5px solid var(--err-2);
+  font-size: 10px; font-weight: 800; line-height: 1; padding: 0; font-family: inherit;
+}
+button.cancel-mark { cursor: pointer; }
+button.cancel-mark:hover { background: var(--err-bg); }
+/* ============================================================================================
+   TASK CHECKBOX — EXPERIMENT (user, 2026-08-21). Delete this whole fenced block (down to the
+   END marker) to go straight back to the native control on the line below it.
+
+   WHY: `accent-color` paints the browser's native tick as a SOLID filled box — which reads as
+   the ✅ emoji, the thing being replaced. This draws the checkbox by hand so a resolved task
+   gets the same white-box / coloured-border / coloured-check as the .done-mark used everywhere
+   else in the app — one visual idea for "done", not two.
+
+   TO SWITCH GREEN <-> BLUE: change --task-check-on below. Nothing else.
+   ------------------------------------------------------------------------------------------ */
+:root {
+  --task-check-on: var(--done);      /* the resolved colour — swap for var(--accent) to go blue */
+  --task-check-size: 15px;
+}
+.task-check, .epv-check, .pp-todo-check {
+  appearance: none; -webkit-appearance: none;
+  width: var(--task-check-size); height: var(--task-check-size);
+  margin: 0; flex: 0 0 auto; box-sizing: border-box; cursor: pointer; position: relative;
+  border: 1.5px solid var(--border-2); border-radius: 4px; background: var(--surface);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.task-check:hover:not(:disabled), .epv-check:hover:not(:disabled), .pp-todo-check:hover:not(:disabled) {
+  border-color: var(--task-check-on);
+}
+.task-check:checked, .epv-check:checked, .pp-todo-check:checked {
+  border-color: var(--task-check-on); background: var(--surface);
+}
+/* the tick itself: two borders of a rotated box — crisper at this size than any glyph, and it
+   inherits the colour token rather than a font's idea of one */
+.task-check:checked::after, .epv-check:checked::after, .pp-todo-check:checked::after {
+  content: ''; position: absolute; left: 50%; top: 46%;
+  width: 4px; height: 8px; margin: -5px 0 0 -2px;
+  border: solid var(--task-check-on); border-width: 0 2px 2px 0;
+  transform: rotate(42deg);
+}
+.task-check:focus-visible, .epv-check:focus-visible, .pp-todo-check:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.task-check:disabled, .epv-check:disabled, .pp-todo-check:disabled { opacity: 0.55; cursor: default; }
+/* ---- END of the task-checkbox experiment ------------------------------------------------- */
+
+/* ticking a row checkbox flips it to the same green-box-white-check, live */
+.task-check, .epv-check, .pp-todo-check { accent-color: var(--done); }
+
+/* a due date whose window has passed */
+.task-due-overdue { color: var(--err); font-weight: 650; }
+
+/* the ✏️ change button on task rows — opens the task editor. Plain glyph, no chrome (a boxed
+   version was unreadable at row size). Was △ until 2026-08-25 — nobody but nerds read that. */
+.task-editbtn { font: inherit; font-size: 12px; line-height: 1; color: var(--muted); background: none; border: none; border-radius: 0; cursor: pointer; padding: 0 3px; flex: 0 0 auto; }
+.task-editbtn:hover { color: var(--accent); }
+/* task name + its ✏️ on one line — the name shrinks to its text so the ✏️ hugs the end of it */
+.task-shortline { display: flex; align-items: baseline; gap: 2px; min-width: 0; }
+.task-shortline .epv-short { flex: 0 1 auto; width: auto; min-width: 0; }
+/* The ✏️ hugs the END OF THE NAME on a normal-width row, and only jumps to the right end of the
+   line on the NARROW layout (the auto margin lives in the max-width:640px block below).
+   Right-aligning it at every width pushed it to the right edge of .task-mid — which on a wide row
+   is immediately left of the tail's own right-aligned cluster (due · project · priority · ✕), so
+   the ✏️ read as one more of those controls and crowded them (user, 2026-09-13). It only has a
+   line of its own to sit at the end of once .task-shortline spans the full width, which is
+   exactly what the narrow grid does. */
+/* the disclosure caret inside the title button: the row's only standing sign that it has a
+   description or a checklist to open. Rotates when the panel is out. */
+.task-disc { display: inline-block; margin-left: 6px; font-size: 10px; line-height: 1; color: var(--faint);
+  transform: translateY(-2px); transition: transform 0.18s ease; }
+.epv-short[aria-expanded="true"] .task-disc { transform: translateY(-2px) rotate(180deg); }
+.epv-short:hover .task-disc { color: var(--accent); }
+
+/* =============================== 2. .sl-v2 restyles =============================== */
+/* Applied only inside a container carrying class "sl-v2" (the styleguide for now). */
+
+/* PROJECT chrome on the epv card: frame + graphite header band + ▣ */
+.sl-v2 .epv-card { border-radius: 5px; border-color: var(--ent-project-line); padding: 0; overflow: hidden; }
+.sl-v2 .epv-headrow { background: var(--ent-project-band); border-bottom: 1px solid var(--ent-project-line); padding: 12px 14px; align-items: center; gap: 9px; }
+.sl-v2 .epv-card:not(.expanded) .epv-headrow { border-bottom: none; } /* collapsed: band fills the card */
+/* (no pentagon before the name — the toggle pentagon on the left IS the project mark) */
+/* shared 36px left edge aligns summary / tabs / content under the project name */
+.sl-v2 .epv-summary { margin: 11px 14px 0 36px; font-size: 12.5px; line-height: 1.55; }
+.sl-v2 .epv-tabs { margin: 12px 14px 0 36px; gap: 5px; }
+.sl-v2 .epv-tabcontent { margin: 0 14px 12px 36px; padding: 9px 11px; gap: 3px; border-radius: 0 8px 8px 8px; }
+
+/* PROJECT de-clutter: keep the signal, hide the manipulation chrome until it's wanted.
+   1. Expanded cards: the tabs already carry per-direction counts — drop the header pills. */
+.sl-v2 .epv-card.expanded .epv-counts { display: none; }
+/* collapsed count pills: neutral chrome (the dir-disc ring carries the priority colour) */
+.sl-v2 .epv-count { display: inline-flex; align-items: center; gap: 4px; border-color: var(--border-2); color: var(--text-2); padding: 2px 9px 2px 3px; }
+/* 2. The dots already say 4/5 — drop the text label. */
+.sl-v2 .epv-dots-lbl { display: none; }
+/* 3. Destructive / secondary row controls (cancel ✕, resolve-all, project edit) appear on hover.
+      The PRIORITY arrows no longer do: they are the row's main dial, and hiding them until
+      hover was the other half of "the arrows are hardly visible" (user, 2026-08-21). Content
+      (checkbox, text, chips, badge) stays put. */
+.sl-v2 .epv-row .epv-cancel { visibility: hidden; }
+.sl-v2 .epv-row:hover .epv-cancel { visibility: visible; }
+.sl-v2 .epv-headrow .epv-projedit { visibility: hidden; }
+.sl-v2 .epv-headrow:hover .epv-projedit { visibility: visible; }
+/* the task name's ✏️ joins the hover-revealed controls — always-on it doubled every title */
+.sl-v2 .task-row .task-editbtn { visibility: hidden; }
+.sl-v2 .task-row:hover .task-editbtn { visibility: visible; }
+
+/* ✉ chips wherever a host still renders one next to a row (the task row itself no longer does) */
+.task-row .chip-event, .epv-row .chip-event { padding: 2px 7px; }
+.task-row .chip-event .chip-glyph, .epv-row .chip-event .chip-glyph { font-size: 13px; }
+
+/* small screens: the date also lives in the from-meta tooltip — drop the column */
+@media (max-width: 760px) {
+  .task-date, .epv-rowdate { display: none; }
+}
+
+/* ---- responsive task row. The trailing controls (due · project pill · priority · date · ✕)
+   sit in .task-tail: display:contents on wide screens, so the one-line layout is unchanged.
+   Medium width → the text (+ its from-meta) drops to its own full line; very small → the
+   controls drop to their own right-aligned line under it. ---- */
+.task-tail { display: contents; }
+/* ---- the narrow-screen task row -------------------------------------------------------------
+   Three lines, and only three:
+       ☐  Send the revised schedule to the contractor            ✏️
+          Needs the lift booking confirmed first.   (the description, when open)
+          created by Bob, 4d               due Fri  ▾ 4 ▴  ✕
+   The CHECKBOX belongs to the title and stays beside it — every to-do list on earth reads "☐ do
+   this thing". The TAIL shares the history line rather than taking one of its own: alone at the
+   foot of the row it read as if it belonged to the NEXT task (user, 2026-09-12). The strip is
+   10.5px text, so the controls set that line's height and no information is lost.
+
+   GRID, not flex-wrap. .task-mid stops being a box (display:contents) so the title line, the
+   description and the history strip become items of the ROW itself, and each one is then PLACED:
+   flex could not do it, because a row with no description had nothing to force the break and the
+   whole thing collapsed back onto one line. Placement also means the lines under the title need
+   no indent arithmetic — they simply live in the same columns the title does.
+   Columns: [direction disc?] [checkbox] [content] [tail]. A leading item that is absent leaves a
+   zero-width column, and the gap travels with the item (margin-right, not column-gap), so nothing
+   is indented by a control that is not there. row-gap is 0 for the same reason: an absent
+   description must not leave a gap behind it. */
+@media (max-width: 640px) {
+  .epv-row.task-row {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    column-gap: 0; row-gap: 0; align-items: start;
+  }
+  .task-row .task-mid { display: contents; }
+  .task-row > .dir-disc { grid-area: 1 / 1; margin-right: 7px; }
+  .task-row > .epv-check, .task-row > .cancel-mark { grid-area: 1 / 2; margin-right: 7px; }
+  .task-row .task-shortline { grid-area: 1 / 3 / auto / -1; }
+  /* HERE the title line owns the full width and the controls are on row 3, so the ✏️ has a line
+     end to sit at: one fixed place to aim for, rather than chasing the last word of a title that
+     wraps to two or three lines (user, 2026-09-12). */
+  .task-shortline .task-editbtn { margin-left: auto; }
+  .task-row .task-desc { grid-area: 2 / 3 / auto / -1; }
+  /* MARGIN-right, not padding: an overflowing line is clipped at the PADDING box, so padding on
+     the side it overflows reserves nothing at all — the strip rendered straight into it and came
+     out as "created by Bob, 4ddue Fri". Margin takes the width off the box itself. */
+  .task-row .task-meta { grid-area: 3 / 3; margin-top: 3px; margin-right: 10px; align-self: center; }
+  .task-row .task-tail {
+    grid-area: 3 / 4; justify-self: end; margin-top: 3px;
+    display: flex; align-items: center; gap: 7px;
+  }
+}
+
+/* EVENT rows: flat ruled mail-list; kind colour moves off the card edge onto the glyph disc */
+.sl-v2 .ev-day { gap: 0; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.sl-v2 .ev-card { border: none; border-bottom: 1px solid var(--hairline); border-radius: 0; background: transparent; padding: 10px 12px; }
+.sl-v2 .ev-card:last-child { border-bottom: none; }
+.sl-v2 .ev-card:hover { background: var(--surface-tint); } /* barely-there: static gray belongs to projects */
+.sl-v2 .ev-kind-auto, .sl-v2 .ev-kind-manual, .sl-v2 .ev-card-error { background: transparent; }
+/* (the old .ev-glyph gutter disc is gone — event rows now use the shared .ev-disc, top-right) */
+
+/* PERSON rows: circle language */
+.sl-v2 .pp-row { border-radius: 12px; }
+.sl-v2 .pp-row.active { background: var(--surface-tint); border-color: var(--faint); }
+
+/* =============================== importance utilities =============================== */
+/* ---- the shared thread-grouped MESSAGE HISTORY (messageHistory.js) ------------------------
+   The People page's "Message history" language, also rendered by the project card's Messages
+   tab — so these rules live here (loaded on every page), moved from people.css. Thread groups;
+   rows are events (kind disc + direction mark ← → ·), clickable to open the full email. */
+.pp-thread { border-top: 1px solid var(--hairline); padding: 2px 0; }
+.pp-thread:first-of-type { border-top: none; }
+.pp-thread-rest { margin-left: 20px; }
+.pp-thread-rest > summary { cursor: pointer; font-size: 10.5px; color: var(--faint); padding: 1px 0; }
+.pp-thread-rest > summary:hover { color: var(--text-2); }
+.pp-msg { display: flex; align-items: center; gap: 8px; padding: 3px 2px; width: 100%; text-align: left; font: inherit; border: none; background: none; border-radius: 5px; }
+.pp-msg .ev-disc { width: 18px; height: 18px; font-size: 9px; }
+button.pp-msg { cursor: pointer; }
+button.pp-msg:hover { background: var(--surface-tint); }
+.pp-msg-dir { flex: 0 0 14px; text-align: center; font-size: 12px; font-weight: 700; color: var(--text-2); }
+.pp-msg-sent .pp-msg-subj { color: #7a6a5a; font-style: italic; }
+.pp-msg-date { flex: 0 0 88px; font-size: 10.5px; color: var(--faint); white-space: nowrap; }
+.pp-msg-subj { flex: 1 1 auto; min-width: 0; font-size: 12px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-msg-what { flex: 0 0 auto; font-size: 10.5px; color: var(--accent); white-space: nowrap; }
+.pp-history .pp-empty { font-size: 12px; color: var(--faint); padding: 8px 4px; }
+
+/* Kept LAST so they win over component defaults at equal specificity. JS sets these via
+   impClassFg()/impClassBl() (renderUtils.js) instead of inline colours. */
+.imp-fg-1 { color: var(--imp-1); border-color: var(--imp-1); }
+.imp-fg-2 { color: var(--imp-2); border-color: var(--imp-2); }
+.imp-fg-3 { color: var(--imp-3); border-color: var(--imp-3); }
+.imp-fg-4 { color: var(--imp-4); border-color: var(--imp-4); }
+.imp-fg-5 { color: var(--imp-5); border-color: var(--imp-5); }
+.imp-bl-1 { border-left-color: var(--imp-1); }
+.imp-bl-2 { border-left-color: var(--imp-2); }
+.imp-bl-3 { border-left-color: var(--imp-3); }
+.imp-bl-4 { border-left-color: var(--imp-4); }
+.imp-bl-5 { border-left-color: var(--imp-5); }
+
+/* ---- repo chips on a project card (a repo is a PLACE the work happens, never a project) ---- */
+/* on the SUB-LINE, directly under the project name and BEFORE the people (who move to its
+   right). Fixed size: it must never squeeze the people list, and it never grows to fill. */
+.sl-v2 .epv-subline > .epv-repos { display: flex; flex-wrap: wrap; gap: 5px; flex: 0 0 auto; max-width: 45%; align-self: center; }
+.sl-v2 .epv-card.expanded .epv-subline > .epv-repos { align-self: flex-start; }
+.sl-v2 .epv-repos { display: flex; flex-wrap: wrap; gap: 5px; min-width: 0; }
+.sl-v2 .epv-repos .chip-txt { max-width: 13ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-v2 .epv-repos-more { align-self: center; font-size: 10.5px; color: var(--muted); cursor: default; }
+
+/* the project pillbox with its repo STACKED UNDER it — on task rows and event cards, so the row
+   says both which effort and which place while using vertical space, not width */
+.projbox { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; vertical-align: top; flex: 0 0 auto; }
+/* flex 0 0 auto: the box is sized by its chips, which cannot shrink — a squeezed box only lets
+   the chip overflow it (onto the priority control on task rows). See .task-mid above. */
+.projbox-repos { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.projbox-repos .chip-repo { padding: 0 5px; font-size: 9.5px; }
+.projbox-repos .chip-txt { max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projbox-more { font-size: 9.5px; color: var(--muted); align-self: center; cursor: default; }
+/* repo chip — UNSCOPED like .chip-project / .chip-event, because it also appears on the events
+   row, which is not inside .sl-v2. A place, so it reads quietly: monospace, no fill of its own. */
+.chip-repo {
+  border-radius: 4px; background: var(--surface-tint); border-color: var(--border-2);
+  color: var(--text-2); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px;
+}
+.chip-repo .chip-glyph { opacity: 0.55; }
+/* on an events row it sits in the same slot mail folders use — match their weight */
+.ev-folders .chip-repo { padding: 1px 6px; font-size: 10px; }

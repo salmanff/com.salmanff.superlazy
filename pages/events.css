@@ -1,0 +1,108 @@
+/* events.css — styles unique to the MESSAGE EVENTS page: a mail-client-like ruled list.
+   The flat-row card treatment + kind glyph discs live in entities.css (.sl-v2 …); this file
+   holds the page layout and the row anatomy (sender · folders/time/icon · subject · summary).
+   Shares index.css for the status line / badges / email-viewer modal, topbar.css, filterbar.css,
+   tokens.css for all colours. */
+
+/* ---- day groups ---- */
+.ev-feed { max-width: 860px; }
+.ev-day-head { display: flex; align-items: baseline; gap: 10px; position: sticky; top: 0; z-index: 5;
+  background: linear-gradient(#fff, #ffffffee); padding: 10px 12px 8px; margin-top: 10px;
+  font-size: 12.5px; font-weight: 700; color: var(--text); border-bottom: 1px solid var(--border); }
+.ev-day-meta { font-size: 11px; font-weight: 500; color: var(--faint); }
+.ev-day { display: flex; flex-direction: column; padding: 0; margin-top: 8px; }
+
+/* ---- event rows (flat; ruling/hover come from entities.css .sl-v2 rules) ----
+   Mac-Mail anatomy: line 1 = bold sender · (folders · time · kind icon) right-aligned;
+   line 2 = subject; line 3 = summary / "auto-filed"; then the live task rows. */
+.ev-card { display: block; }
+.ev-main { min-width: 0; }
+
+.ev-topline { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ev-from { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 12.5px; font-weight: 650; color: var(--ink); }
+.ev-topright { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: 0 0 auto; min-width: 0; max-width: 60%; }
+.ev-time { font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* the MAIL CLIENT's folders/labels — quiet text, deliberately NOT the project chip */
+.ev-folders { display: flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; }
+.ev-folder { font-size: 10.5px; color: var(--faint); white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 140px; }
+.ev-cost { font-size: 10.5px; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* auto-filed mail: the ⚙ sits in the cost slot (no LLM ran, so there is no cost to show) */
+.ev-auto-mark { font-size: 11px; color: var(--faint); line-height: 1; }
+
+/* the rightmost kind icon (✉ / ✋ disc from entities.css) — smaller in the topline */
+.ev-topline .ev-disc { width: 20px; height: 20px; font-size: 10px; }
+.ev-disc-btn { cursor: pointer; }
+.ev-disc-btn:hover { filter: brightness(0.94); }
+
+.ev-subjline { display: flex; align-items: baseline; gap: 8px; margin-top: 2px; }
+.ev-subj { flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: var(--text); }
+.badge-error { background: #f6dcdb; color: var(--err); }
+/* a standing instruction the model says shaped this analysis — see rules_applied (prompt 0.54) */
+.badge-rule { background: #e7eefb; color: #2d4e8f; white-space: nowrap; }
+
+/* subjects / summaries / manual lines: max ONE line with … — pressing the line expands it */
+.ev-clamp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.ev-clamp.ev-open { white-space: normal; overflow-wrap: anywhere; }
+
+.ev-summary { font-size: 12px; color: var(--text-2); font-style: italic; margin-top: 5px; line-height: 1.5; }
+
+/* task changes raised by this event — the live task rows / typed chips, in a thin frame
+   (same framing language as Recent's task lists) so they align as one object */
+.ev-changes { margin: 7px 0 0; padding: 4px 10px; list-style: none; display: flex; flex-direction: column; gap: 5px;
+  border: 1px solid var(--hairline); border-radius: 8px; }
+.ev-change { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 12px; color: var(--text-2); line-height: 1.4; }
+.ev-change-created { color: var(--ok); }
+.ev-change-rejected { color: var(--faint); }
+/* a still-relevant suggested-reply draft renders inline in the change frame — the .ev-draft
+   block itself is a shared component (entities.css; also used by the email viewer) */
+.ev-change-draft { display: block; }
+.ev-none { font-size: 11.5px; color: var(--faint); font-style: italic; margin-top: 4px; }
+/* the change list shows 3 tasks up front — this reveals the rest */
+.ev-more-changes { font: inherit; font-size: 11.5px; color: var(--accent); background: none; border: none; padding: 2px 0; cursor: pointer; }
+.ev-more-changes:hover { text-decoration: underline; }
+.ev-error-line { font-size: 12px; color: var(--err); margin-top: 4px; }
+.ev-roles { font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+
+.ev-manual-line { font-size: 12.5px; color: var(--text); margin-top: 2px; }
+/* "· now open" — the value changed AGAIN after this edit; the line stays the historic record */
+.ev-since { font-size: 11.5px; color: var(--faint); font-style: italic; }
+/* a project-target manual edit's chip line (rename / priority / merge) — opens the project modal */
+.ev-manual-target { margin-top: 6px; }
+/* a manual edit just made on this page: one-off flash so the eye finds the card (its row = undo) */
+.ev-card-fresh { animation: ev-fresh-flash 1.8s ease-out; border-radius: 8px; }
+@keyframes ev-fresh-flash {
+  0% { background: var(--ok-bg); }
+  100% { background: transparent; }
+}
+
+.ev-empty { font-size: 12.5px; color: var(--muted); background: var(--surface); border: 1px dashed var(--border-2); border-radius: 9px; padding: 18px; text-align: center; margin-top: 10px; }
+.ev-more-wrap { text-align: center; padding: 16px 0 30px; }
+.ev-more { font: inherit; font-size: 12.5px; padding: 6px 18px; border-radius: 20px; border: 1px solid var(--border-2); background: var(--surface); color: var(--accent); cursor: pointer; }
+.ev-more:hover { background: #eef4ff; }
+
+/* a change line hosting the LIVE standard task row (resolvable right here) */
+.ev-change-live { display: block; }
+.ev-change-live .epv-row { padding: 2px 0; }
+
+/* auto-file observability: the sender is flagged yet this message went to the AI — say why */
+.ev-afblocked { font-size: 11.5px; color: var(--warn-ink); background: var(--warn-bg); border-radius: 6px; padding: 3px 8px; margin-top: 5px; display: inline-block; }
+
+/* auto-processed rows: WHERE the mail was filed + the △ that changes it — the same pill-and-
+   triangle pair a task row carries, so an auto-processed row reads like a regular one. A sender
+   going on autopilot is a standing decision the user never asked for, so overruling it stays one
+   tap away (the △ opens the person card, which owns both counters). */
+.ev-filed { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 6px; }
+.ev-filed-lbl { font-size: 10.5px; color: var(--faint); }
+/* the △ is hover-revealed like every other row control under the v2 identity */
+.sl-v2 .ev-filed .task-editbtn { visibility: hidden; }
+.sl-v2 .ev-card:hover .ev-filed .task-editbtn { visibility: visible; }
+
+/* very small screens: the mail folders crowd the topline — time + icons carry the row */
+@media (max-width: 440px) {
+  .ev-folders { display: none; }
+}
+
+.ev-cost-eq { color: #7a5b12; }

@@ -1,0 +1,101 @@
+<div id="app" class="sl-v2 wl-page">
+  <div id="topbar"></div>
+
+  <h2 class="wl-h">AI agents <span class="wl-muted">— Claude Code and Codex sessions as an input channel: choose the repos to read, save, then step the turns on the Inspect page.</span></h2>
+
+  <div id="wlStatus" class="wl-status">Loading…</div>
+
+  <div class="wl-panel">
+    <div class="wl-panel-head"><span class="wl-panel-tag">1</span><span class="wl-panel-title">Channel setup</span><span class="wl-muted">— the SAME module the Setup page's Channels tab mounts (workSessionsUi.js); saving here is saving there</span></div>
+    <div id="wlSetupHost"></div>
+    <div class="wl-runbar">
+      <a id="wlInspect" class="wl-btn wl-btn-link" href="inspect" hidden title="The Inspect page analyses the queued turns one at a time and SAVES on your say-so (Save / Ignore per item).">Inspect page (saves per item) →</a>
+      <a class="wl-btn wl-btn-link" href="setup" title="Production path: Setup & Prefs → Channels → AI agents">Setup page →</a>
+    </div>
+    <div class="wl-muted wl-runnote">Production path: save the repos here or on the Setup page, then every mail check (button, background job or schedule) reads the sessions along with mail. The steps below are the dev tools: a formation preview and a zero-write run-through.</div>
+  </div>
+
+  <div class="wl-panel">
+    <div class="wl-panel-head"><span class="wl-panel-tag">2</span><span class="wl-panel-title">Preview what a run would queue</span><span class="wl-muted">(dry run — nothing is written; click a row to open it as the viewer will show it, plus the raw records behind it)</span></div>
+    <div class="wl-runbar">
+      <button id="wlPreview" type="button" class="wl-btn" disabled>Preview formation</button>
+      <label title="A finished turn (the agent's closing answer arrived) is queued at once. A turn WITHOUT a closing answer — you have not answered, or the run stopped mid-tool — might still complete, so it is not queued while the session file changed within this many minutes. After that the session counts as abandoned and the unfinished turn is queued as-is.">Treat a session as still live if its file changed in the last <input id="wlQuiet" type="number" value="30" min="1" max="1440"> min <span class="wl-muted">(an unfinished last turn waits until then)</span></label>
+      <span id="wlElapsed" class="wl-muted"></span>
+    </div>
+    <div id="wlProjection" class="wl-muted wl-runnote"></div>
+    <div id="wlTableWrap" class="wl-tablewrap" hidden>
+      <table class="wl-table">
+        <thead>
+          <tr><th>When</th><th>Session</th><th class="wl-num">Turn</th><th>State</th><th>You asked</th><th>Agent's recap ends with</th><th>Effort</th></tr>
+        </thead>
+        <tbody id="wlRows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="wl-panel wl-panel-run">
+    <div class="wl-panel-head"><span class="wl-panel-tag">3</span><span class="wl-panel-title">Run through the sessions chronologically</span><span class="wl-muted">(the real analysis — events, tasks, projects — in memory only: NOTHING is saved)</span></div>
+    <div class="wl-knobs">
+      <div class="wl-knob-group">
+        <label>Model <select id="wlModel"><option id="wl-model-default" value="default">User default</option></select></label>
+        <div id="wlModelHint" class="wl-muted"></div>
+      </div>
+      <div class="wl-knob-group">
+        <div class="wl-knob-label">Stores in this run</div>
+        <div id="wlStores" class="wl-stores"><span class="wl-muted">loading the file stores…</span></div>
+        <div class="wl-muted">Each file store is one agent (<code>~/.claude/projects</code> = Claude Code, <code>~/.codex/sessions</code> = Codex). Every ticked store is formed with <em>its own</em> repo ticks and days from the setup above, exactly as shown there and whether or not you saved; the turns are then ordered by time so a project both agents worked on is matched as in production.</div>
+      </div>
+      <div class="wl-knob-group">
+        <label>Catalog
+          <select id="wlCatalog">
+            <option value="empty" selected>empty — bootstrap from the sessions alone</option>
+            <option value="real">my real projects &amp; people — link turns to existing to-dos</option>
+          </select>
+        </label>
+        <div class="wl-muted">Empty (the default): the model sees no existing projects, so every project and task on the board is born from the sessions — whatever is already in your database is ignored, and the run still mints ids beyond it so a later save cannot collide. Real: your current catalog is loaded in memory (never written), and turns update the tasks they serve.</div>
+      </div>
+      <div class="wl-knob-group">
+        <label title="Sessions are picked by when their FILE was last touched (the per-store days above), and by default EVERY turn of a touched session is analysed — so a session that started weeks ago brings all its turns. Set a number here to analyse only the turns from the last N days: the earlier turns of those sessions are still read and given to the model as thread context, but not analysed. This is what the live checks do.">Analyse only turns from the last <input id="wlAnalyseDays" type="number" min="1" max="120" placeholder="all"> days <span class="wl-muted">(blank = every turn of every touched session)</span></label>
+        <div id="wlAnalyseHint" class="wl-muted"></div>
+      </div>
+      <div class="wl-knob-group">
+        <label>System prompt
+          <select id="wlPrompt"></select>
+        </label>
+        <div id="wlPromptHint" class="wl-muted"></div>
+      </div>
+      <div class="wl-knob-group">
+        <label title="Batching: how many consecutive turn items are sent to the model in ONE request. 1 = one turn per call (the most faithful). Higher values are cheaper per turn because the request prefix is shared, but the model juggles several turns at once — the same knob the mail pipeline calls batch_max.">Turn items per LLM request <input id="wlBatch" type="number" value="1" min="1" max="10"> <span class="wl-muted">(1 = one turn per call)</span></label>
+        <label><input id="wlShowAll" type="checkbox"> show untouched projects on the board too</label>
+      </div>
+    </div>
+    <div class="wl-runbar">
+      <button id="wlNext" type="button" class="wl-btn wl-btn-primary" disabled>Analyse next turn</button>
+      <button id="wlRun" type="button" class="wl-btn" disabled>Run all (LLM, nothing saved)</button>
+      <button id="wlStop" type="button" class="wl-btn" hidden>Stop after this turn</button>
+      <button id="wlSkip" type="button" class="wl-btn" hidden title="The run stopped on this turn. Skip it (a 'skipped' event is captured, nothing saved) and carry on with the next one.">Skip this turn</button>
+      <button id="wlCommit" type="button" class="wl-btn wl-btn-primary wl-btn-commit" hidden title="Write this run to the database: the analysed turn items, their events, the projects and to-dos as they stand on the board, and the account's high-water marks (so the live checks continue from here). Turns the run did not reach are left for the next check.">Save this run to the database</button>
+      <button id="wlCopy" type="button" class="wl-btn" hidden title="Copy the board as JSON — every project with its goal/summary and its to-dos, plus the run's counts. Nothing is written to the database; this is just so the result can be read or shared.">Copy board JSON</button>
+      <button id="wlReset" type="button" class="wl-btn" hidden>Reset run</button>
+      <span id="wlRunProgress" class="wl-muted"></span>
+      <span id="wlRunCost" class="wl-cost"></span>
+    </div>
+    <div class="wl-muted wl-runnote">One turn item at a time, oldest first, through the real analysis: after each one the Events feed gets its card, the projects board shows the cards and task rows as they now stand, and the 🤖 icon opens the real thread viewer on the turn. Nothing is written until you press "Save this run to the database" — then the items, events, projects/tasks and the account's progress are committed exactly as they stand (edits you made on the cards included), and the live checks take over from the last analysed turn.</div>
+    <div id="wlRunSummary" class="wl-run-summary"></div>
+    <div id="wlRunStop" class="wl-status error" hidden></div>
+    <details id="wlRunLogBox" class="wl-run-details" hidden><summary>Run log <span id="wlRunLogCount" class="wl-muted"></span></summary><div id="wlRunLog" class="wl-run-log"></div></details>
+    <div id="wlRunOut" hidden>
+      <div class="wl-run-cols">
+        <div class="wl-run-col">
+          <h3 class="wl-run-h">Events <span class="wl-muted">(newest first — the real Events rows)</span></h3>
+          <div id="wlFeed" class="ev-feed"></div>
+        </div>
+        <div class="wl-run-col">
+          <h3 class="wl-run-h">Projects &amp; tasks <span class="wl-muted">(the real project cards; touched this run first)</span></h3>
+          <div id="wlBoard" class="epv-board"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,32 @@
+/* workSessions.css — the shared Work sessions setup UI (workSessionsUi.js), mounted on the Setup
+   page's Channels tab, the agents-only welcome and the agentslab page. Sibling of slackChannels.css. */
+
+.wks-status { font-size: 13px; color: #445; padding: 6px 0; }
+.wks-status.wks-bad { color: #b3362a; }
+.wks-body { display: flex; flex-direction: column; gap: 8px; }
+.wks-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 13px; }
+.wks-row label { display: inline-flex; align-items: center; gap: 6px; }
+.wks-row input[type="number"] { width: 64px; padding: 2px 4px; }
+.wks-muted { color: #777; font-size: 12px; }
+.wks-help { font-size: 13px; background: #fdf6e3; border-radius: 6px; padding: 8px 12px; max-width: 620px; }
+.wks-help ol { margin: 6px 0 0 18px; padding: 0; }
+.wks-help code { font-size: 12px; }
+.wks-tablewrap { overflow-x: auto; border: 1px solid #e2e6ec; border-radius: 8px; }
+.wks-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.wks-table th { text-align: left; font-weight: 600; background: #f6f8fb; padding: 6px 8px; border-bottom: 1px solid #e2e6ec; white-space: nowrap; }
+.wks-table td { padding: 5px 8px; border-bottom: 1px solid #eef1f5; vertical-align: top; }
+.wks-num { text-align: right !important; white-space: nowrap; }
+.wks-repo { font-family: ui-monospace, Menlo, monospace; }
+.wks-saverow { margin-top: 4px; }
+.wks-btn { border: 1px solid #c8cfd9; background: #fff; border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+.wks-btn:disabled { opacity: .5; cursor: default; }
+.wks-btn-primary { background: #2f6df0; border-color: #2f6df0; color: #fff; }
+.wks-btn-primary:hover { background: #2558c8; }
+.wks-window { border: 1px solid #dbe3f0; background: #f6f9ff; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+.wks-window-lab { font-weight: 600; }
+.wks-window input[type="number"] { width: 64px; padding: 2px 4px; margin: 0 4px; }
+.wks-blocks { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+.wks-block { border: 1px solid #e2e6ec; border-radius: 8px; padding: 10px 12px; }
+.wks-block-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.wks-block-title { font-weight: 700; font-size: 14px; }
+.wks-pill { font-size: 11px; font-weight: 700; color: #274f9e; background: #e8effc; border-radius: 999px; padding: 2px 8px; }

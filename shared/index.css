@@ -1,0 +1,692 @@
+#app {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1c2430;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2px 16px 64px;
+  padding-right: 56px; /* clear the freezr button top-right */
+}
+
+/* config bar */
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #768295; }
+.field .hint { text-transform: none; letter-spacing: 0; color: #9aa6b5; }
+.field input[type=text], .field select { min-width: 220px; }
+input[type=text], input[type=number], select {
+  font: inherit; padding: 6px 8px; border: 1px solid #c3ccd8; border-radius: 6px; background: #fff;
+}
+
+button {
+  font: inherit; cursor: pointer; border: 1px solid #c3ccd8; background: #f4f7fb;
+  border-radius: 7px; padding: 7px 14px;
+}
+button:hover:not(:disabled) { background: #e9eff7; }
+button:disabled { opacity: 0.45; cursor: default; }
+
+.status { font-size: 13px; padding: 8px 10px; border-radius: 7px; margin-bottom: 14px; white-space: pre-wrap; }
+.status.info  { background: #eef2f7; color: #44515f; }
+.status.ok    { background: #e7f6ec; color: #1f6f3d; }
+.status.error { background: #fcebeb; color: #a3262a; }
+
+.cost { font-size: 12px; color: #2f6df0; font-weight: 600; text-transform: none; letter-spacing: 0; }
+
+.run-controls { display: flex; gap: 8px; margin-bottom: 10px; }
+
+/* live log */
+.log { display: flex; flex-direction: column; gap: 8px; }
+.badges { display: flex; gap: 6px; margin: 5px 0; flex-wrap: wrap; }
+.badge { font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em; padding: 2px 7px; border-radius: 20px; background: #e4ebf6; color: #345; }
+
+/* shared bits: instruction text, change lists, pre blocks, the run-log lines */
+.changes { margin: 5px 0 0; padding-left: 16px; }
+.change { font-size: 12px; line-height: 1.4; }
+.change-created { color: #1f6f3d; }
+.change-status { color: #2f6df0; }
+.change-rejected { color: #a3262a; }
+.block { white-space: pre-wrap; word-break: break-word; background: #fafbfd; border: 1px solid #eef1f6; border-radius: 6px; padding: 8px; max-height: 380px; overflow: auto; margin: 4px 0 0; font-size: 11.5px; line-height: 1.4; }
+.log-line { font-size: 12px; }
+.log-line.muted { color: #9aa6b5; }
+.log-pending { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: #2f6df0; padding: 6px 2px; }
+
+/* an empty list's note */
+.tb-empty { font-size: 12px; color: #9aa6b5; padding: 4px 0; }
+
+/* ---- expandableProjectView -------------------------------------------------------- */
+#board { display: flex; flex-direction: column; gap: 10px; }
+.epv-card { border: 1px solid #e0e6ef; border-radius: 9px; padding: 9px 11px; background: #fff; }
+.epv-headrow { display: flex; align-items: flex-start; gap: 8px; }
+.epv-toggle { font: inherit; line-height: 1; padding: 0 6px; border: 1px solid #d8e0ea; border-radius: 6px; background: #f6f8fc; color: #5a6675; cursor: pointer; margin-top: 0; }
+/* min-width:0 lets the base SHRINK inside the headrow — without it a long people/name line
+   forces the card wider than its border and pushes the importance dots out of view */
+.epv-base { cursor: pointer; min-width: 0; }
+.epv-top { display: flex; align-items: center; gap: 9px; min-width: 0; flex-wrap: wrap; row-gap: 7px; }
+/* The title band is TWO flex items: the title group and the tail (counts + priority dial).
+   The title group's natural width is its whole name, so as soon as the name and the tail cannot
+   share a line the TAIL drops to a right-aligned line of its own and the name gets the full width
+   — the same collapse the page title makes in the top bar, but driven by the text rather than by a
+   breakpoint, so it happens on a phone and on a squeezed desktop card alike (user, 2026-09-12). */
+.epv-titlewrap { flex: 1 1 auto; min-width: 0; line-height: 1.35; }
+/* INLINE flow inside it, deliberately: the name wraps like a paragraph and the ✏️ / draft pill
+   trail the last word instead of being stranded on a line of their own. */
+.epv-name { font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; color: #2b3442; overflow-wrap: anywhere; }
+/* The tail wraps INSIDE itself too, and everything in it stays hard against the right edge: on a
+   phone that reads as counts on one row, the priority dial on the row under it — never a ragged
+   left-aligned block of pills with the dial floating beside it. */
+.epv-tail { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 9px; row-gap: 6px; flex: 0 1 auto; min-width: 0; }
+.epv-top > .epv-tail { margin-left: auto; } /* right-aligned on its own line as well as beside the name */
+.epv-tail > .epv-counts { min-width: 0; flex: 0 1 auto; }
+.epv-draft-pill { font-size: 9.5px; font-weight: 800; letter-spacing: 0.03em; padding: 1px 7px; border-radius: 20px; background: #e6efff; color: #1f5bb5; white-space: nowrap; vertical-align: 2px; margin-left: 7px; }
+.epv-row-today .epv-short { box-shadow: -3px 0 0 #e0922f; }
+.epv-counts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.epv-count { font-size: 11px; font-weight: 700; padding: 1px 7px; border: 1px solid; border-radius: 20px; }
+.epv-count-none { color: #9aa6b5; border-color: #e2e7ef; font-weight: 400; }
+.epv-dots { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.epv-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid; box-sizing: border-box; }
+.epv-dots-lbl { font-size: 10.5px; font-weight: 700; color: #5a6675; margin-left: 3px; }
+.epv-subline { display: flex; align-items: center; gap: 9px; margin-top: 5px; }
+/* People: ONE line while the card is a grey bar (the bar must stay a bar), but the full list
+   once it is open — an expanded card has the room, and truncating the people of the project you
+   just opened is exactly when you wanted to see them (user, 2026-08-21). */
+.epv-card.expanded .epv-subline { align-items: flex-start; }
+.epv-card.expanded .epv-people { white-space: normal; overflow: visible; text-overflow: clip; }
+.epv-people { font-size: 11.5px; color: #6b7686; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; min-width: 0; }
+/* each name on the title bar IS the person button — but it must read as PLAIN TEXT: no box, no
+   underline at rest. Only on hover does it become a link (blue + underlined), nothing louder.
+   Scoped under .epv-people so it beats the global `button` / `button:hover` box styling. */
+.epv-people .epv-person-link {
+  font: inherit; font-size: inherit; color: inherit; cursor: pointer;
+  background: none; border: none; border-radius: 0; padding: 0; margin: 0;
+  text-decoration: none; text-underline-offset: 2px;
+}
+.epv-people .epv-person-link:hover,
+.epv-people .epv-person-link:focus-visible {
+  background: none; color: #2f6df0; text-decoration: underline;
+}
+.epv-date { font-size: 11px; color: #9aa6b5; white-space: nowrap; }
+.epv-summary { font-size: 11.5px; color: #6b7686; margin: 5px 0 0 26px; }
+
+/* ONE ROW, ALWAYS — the tabs scroll sideways instead of wrapping to a second row (user,
+   2026-09-12). A wrapped tab bar moved the content down by a row and broke the tab-to-content
+   join; scrolling keeps the bar a bar at every width. The bar is its own scroll container, so the
+   half-cut tab at the edge is the affordance and paint()'s scrollIntoView keeps the ACTIVE tab in
+   view. The scrollbar itself is hidden: a classic (non-overlay) one would take 8-11px out of the
+   bar's box and open a gap between the active tab and the panel below it. */
+.epv-tabs {
+  display: flex; flex-wrap: nowrap; gap: 5px; margin: 8px 0 0 26px; padding-bottom: 2px;
+  overflow-x: auto; overflow-y: hidden;
+  overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+  scroll-padding-inline: 6px; scrollbar-width: none; -ms-overflow-style: none;
+}
+.epv-tabs::-webkit-scrollbar { display: none; }
+/* flex: 0 0 auto is what makes it SCROLL: without it the tabs would shrink and clip their text */
+.epv-tab { flex: 0 0 auto; font: inherit; font-size: 12px; white-space: nowrap; padding: 5px 11px; border: 1px solid #d8e0ea; border-radius: 8px 8px 0 0; background: #f4f7fb; color: #5a6675; cursor: pointer; }
+.epv-tab:hover { background: #e9eff7; }
+/* INSET outline: the bar clips vertically now that it scrolls, so an outside ring would be cut */
+.epv-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.epv-tab.active { background: #fff; border-bottom-color: #fff; color: #1c2430; font-weight: 700; }
+.epv-tab.empty { opacity: 0.45; }
+.epv-tab-all { margin-left: auto; }
+.epv-tabcontent { border: 1px solid #e6ebf2; border-radius: 0 7px 7px 7px; padding: 7px 9px; margin-left: 26px; display: flex; flex-direction: column; gap: 4px; }
+
+/* ---- narrow screens: the project card ------------------------------------------------------
+   The title band needs no breakpoint (the tail wraps when the name wants the width), but the
+   tabs and the panel below them do: on a phone the 36px indent that lines them up under the
+   project name is width the content cannot spare, and a 26px-tall tab is a poor thumb target. */
+@media (max-width: 700px) {
+  /* the head is several rows tall here (wrapped title, then the tail), so the pentagon belongs
+     beside the FIRST line of the name rather than floating in the middle of the whole band */
+  .epv-headrow, .sl-v2 .epv-headrow { align-items: flex-start; }
+  .epv-headrow .epv-toggle { margin-top: 3px; }
+  .epv-tabs, .sl-v2 .epv-tabs { margin-left: 14px; gap: 4px; }
+  .epv-summary, .sl-v2 .epv-summary { margin-left: 14px; }
+  .epv-tab { padding: 8px 12px; font-size: 12.5px; }
+  /* EVERY px of the left gutter is width the task text does not get. The panel pulls in to the
+     card edge and its own padding halves; what is left in front of a task is the checkbox, one
+     gap and the priority bar — about 40px, roughly where the project name starts above it. */
+  .epv-tabcontent, .sl-v2 .epv-tabcontent { margin-left: 4px; margin-right: 4px; padding: 8px 5px; }
+  /* NB no `gap` here: below 640px the task row is a GRID (entities.css) and a shorthand gap set
+     from this file would win on order and re-introduce a column gap the grid does not want. The
+     7px between the checkbox and the text is a margin on the checkbox there. */
+  .epv-tabcontent .epv-row { padding-left: 1px; padding-right: 1px; }
+  .epv-tabcontent .epv-short { padding-left: 7px; }
+}
+
+.epv-row { display: flex; align-items: center; gap: 9px; padding: 5px 4px; border-radius: 6px; }
+.epv-row-done .epv-short { color: #9aa6b5; text-decoration: line-through; text-decoration-color: #cfd6df; }
+.epv-check { width: 15px; height: 15px; flex: 0 0 auto; }
+.epv-short { flex: 1 1 auto; min-width: 0; font-size: 13px; color: #1c2430; padding-left: 9px; border-left: 3px solid #c3ccd8; line-height: 1.4; }
+.epv-rowimp { display: inline-flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 800; min-width: 18px; height: 18px; box-sizing: border-box; border: 1px solid; border-radius: 7px; padding: 0 5px; flex: 0 0 auto; }
+.epv-impctl { display: inline-flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+/* a project card leaving the board: fade first, then collapse — the neighbours slide up into
+   the space so it clearly DEPARTS rather than being swapped for the next card */
+.epv-card-leaving { overflow: hidden; pointer-events: none;
+  transition: opacity 0.35s ease, max-height 0.4s ease 0.15s, margin 0.4s ease 0.15s, padding 0.4s ease 0.15s, border-width 0.4s ease 0.15s; }
+.epv-card-leaving.epv-card-gone { opacity: 0; max-height: 0 !important; margin: 0 !important; padding: 0 !important; border-width: 0 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .epv-card-leaving { transition: opacity 0.15s ease; }
+}
+
+/* the expand-all / collapse-all text button between the filters and the board */
+.su-board-tools { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: 4px 0 0; }
+.su-expandall { font: inherit; font-size: 11.5px; color: var(--muted); background: none; border: none; padding: 2px 4px; cursor: pointer; }
+.su-expandall:hover { color: var(--accent); }
+
+/* "✓ resolve all" + the △ project-edit button sit in the right cluster, left of the priority
+   control; whichever comes first takes the auto margin */
+/* The ✏️ sits AGAINST the project name (it edits that text), so it must NOT be pushed right — it
+   lives in the title group's inline flow and trails the last word. The band's one auto-margin is
+   .epv-tail's; everything reads left to right: name ✏️ · draft pill … counts · priority. */
+.epv-titlewrap > .epv-projedit { margin-left: 1px; vertical-align: 1px; }
+/* The arrows were 9px inside a bordered pill — all chrome, no glyph. Now the triangle IS the
+   button: 28px, no pill (at this size any circle or rounded-rect around it looks enormous), and
+   HIDDEN until the row is hovered — big enough to hit easily, quiet enough to live on every row
+   (user, 2026-08-21). The box stays badge-height so the 28px glyph never changes row height, and
+   `visibility` (not `display`) keeps the badge from shifting as they appear. */
+.epv-imp-arrow {
+  font: inherit; font-size: 28px; line-height: 1; padding: 0; border: 0; border-radius: 0;
+  background: none; color: #8b95a3; cursor: pointer; flex: 0 0 auto; visibility: hidden;
+  display: inline-flex; align-items: center; justify-content: center;
+  /* 28px box for the hover circle to live in, pulled back to an 18px LAYOUT footprint by the
+     negative margin — the badge's height, so the big glyph never grows the row. The box grows
+     symmetrically, so the glyph itself does not move. */
+  width: 28px; height: 28px; margin: -5px;
+  transform: translateY(-4px); /* optical: the glyph's ink sits low in its em box */
+}
+.epv-row:hover .epv-imp-arrow,
+.task-row:hover .epv-imp-arrow,
+.epv-headrow:hover .epv-imp-arrow,
+.epv-top:hover .epv-imp-arrow { visibility: visible; }
+/* keyboard users never hover — a focused arrow must show itself. Same painted circle as the
+   hover state (an outline can't be placed off-centre to match the lifted glyph), in accent tint
+   so focus stays distinguishable from hover. */
+.epv-imp-arrow:focus-visible {
+  visibility: visible; outline: none; color: var(--accent);
+  background: radial-gradient(circle 10px at 50% calc(50% + 3px), #d8e6ff 99%, transparent 100%);
+}
+/* HOVER SHAPE. The global `button:hover:not(:disabled)` (top of this file) is 0,2,1 and so beats
+   a plain `.epv-imp-arrow:hover` (0,2,0) — the arrow was inheriting the generic button blob,
+   shaped to its box and therefore sitting high of the optically-lifted triangle. `:not(:disabled)`
+   here takes us to 0,3,0 so we win, and the circle is PAINTED rather than borrowed: a radial
+   gradient we can place exactly, nudged down to sit concentric with the glyph's ink. Adjust the
+   `+ 3px` if the arrow ever drifts off centre again. (user, 2026-08-21) */
+.epv-imp-arrow:hover:not(:disabled) {
+  color: var(--accent);
+  background: radial-gradient(circle 10px at 50% calc(50% + 3px), #e9eff7 99%, transparent 100%);
+}
+/* "set by you", pinned to the badge's own top-right corner — absolute, so it adds NO width and
+   a column of rows keeps its arrows in line whether or not the user has touched the priority. */
+.epv-imp-lock {
+  position: absolute; top: -3px; right: -3px; width: 6px; height: 6px; border-radius: 50%;
+  background: #e0922f; box-shadow: 0 0 0 1.5px var(--surface); pointer-events: none;
+}
+/* on TASK badges the corners split (user, 2026-08-27): ⏲ "held down until due" owns the
+   top-right, and the manual dot moves to the BOTTOM edge — right when the user raised the
+   priority above the model's reading, left when they lowered it. (Project badges keep the
+   plain top-right dot above.) All explanation is in the badge number's tooltip. */
+.epv-imp-timer {
+  position: absolute; top: -7px; right: -6px; font-size: 9px; line-height: 1;
+  pointer-events: none; filter: grayscale(1) contrast(1.4);
+}
+.epv-imp-lock.imp-lock-br { top: auto; bottom: -3px; right: -3px; }
+.epv-imp-lock.imp-lock-bl { top: auto; bottom: -3px; left: -3px; right: auto; }
+.epv-allres { font: inherit; font-size: 10.5px; white-space: nowrap; line-height: 1.4; padding: 1px 8px; border: 1px solid #d2ecdb; border-radius: 20px; background: #f2fbf5; color: #1f6f3d; cursor: pointer; flex: 0 0 auto; }
+.epv-allres:hover { filter: brightness(0.97); }
+.epv-rowdate { font-size: 10.5px; color: #9aa6b5; white-space: nowrap; flex: 0 0 auto; }
+.epv-resolved-head { font-size: 10.5px; font-weight: 700; color: #aab3c0; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 12px; }
+.epv-more-btn { font: inherit; font-size: 11px; color: #5a6675; background: #f4f7fb; border: 1px solid #d8e0ea; border-radius: 7px; padding: 2px 8px; cursor: pointer; align-self: flex-start; }
+.epv-more-btn:hover { background: #e9eff7; }
+
+/* suggested replies */
+.epv-resp-headline { font-size: 10.5px; font-weight: 700; color: #5a6675; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 12px; }
+.epv-resp { border: 1px solid #dfe6f2; border-left: 3px solid #2f6df0; border-radius: 8px; background: #f7faff; padding: 10px 11px; margin-top: 6px; }
+.epv-resp.kind-delegate { border-left-color: #6442b8; background: #faf8ff; }
+.epv-resp.kind-reminder { border-left-color: #e0922f; background: #fffaf2; }
+.epv-resp.sent { opacity: 0.6; }
+.epv-resp-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11px; }
+.epv-resp-kind { font-weight: 700; color: #2b3442; }
+.epv-resp-to { color: #768295; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
+.epv-resp-when { color: #9a6a1a; font-weight: 600; }
+.epv-resp-body { width: 100%; box-sizing: border-box; margin-top: 7px; font: inherit; font-size: 12px; line-height: 1.5; border: 1px solid #e6ebf2; border-radius: 6px; padding: 8px 10px; background: #fff; color: #1c2430; resize: vertical; }
+.epv-resp-body[readonly] { background: #fbfcfe; color: #2b3442; }
+.epv-resp-actions { display: flex; gap: 6px; margin-top: 8px; }
+.epv-resp-btn { font: inherit; font-size: 11px; padding: 4px 12px; border-radius: 7px; border: 1px solid #c3ccd8; background: #f4f7fb; color: #44515f; cursor: pointer; }
+.epv-resp-btn.send { background: #2f6df0; border-color: #2f6df0; color: #fff; }
+.epv-resp-btn.send:disabled { background: #cfe0ff; border-color: #cfe0ff; cursor: default; }
+.epv-resp-btn.remove { color: #b3403f; border-color: #f0d2d2; background: #fdf4f4; }
+.epv-resp-btn:hover:not(:disabled) { filter: brightness(0.97); }
+.epv-cancel { font: inherit; font-size: 11px; line-height: 1; padding: 2px 6px; border: 1px solid #f0d2d2; border-radius: 7px; background: #fdf4f4; color: #b3403f; cursor: pointer; flex: 0 0 auto; }
+.epv-more, .epv-resolved-count, .epv-empty { font-size: 11px; color: #9aa6b5; padding: 2px 0; }
+/* the Events tab's activity lines — everything bounded so long text never escapes the card */
+.epv-act { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-size: 12px; color: #44515f; padding: 2px 0; min-width: 0; }
+.epv-act .ev-disc { width: 18px; height: 18px; font-size: 9px; }
+.epv-act-when { flex: 0 0 auto; font-size: 10.5px; color: #9aa6b5; white-space: nowrap; }
+.epv-act-who { flex: 0 0 auto; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: #1c2430; }
+.epv-act-what { flex: 1 1 60px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 7px; border-left: 3px solid #c3ccd8; }
+.epv-act-reason { flex: 0 1 auto; min-width: 0; max-width: 35%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; color: #768295; font-style: italic; }
+.epv-act-sum { flex-basis: 100%; min-width: 0; margin-left: 25px; font-size: 11px; color: #6b7686; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.epv-act-sum:hover { color: #44515f; }
+/* click-expanded: wraps to as many lines as it needs (expandableProjectView, Events tab) */
+.epv-act-sum.epv-act-sum--open { white-space: normal; overflow: visible; text-overflow: clip; }
+.epv-all-head { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: #768295; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 6px; }
+
+/* per-bucket "✓ resolve all N" — the same pill as the title-bar one, right-aligned in its
+   section head (All tab) or on its own thin bar above a direction tab's rows */
+.epv-bucket-bar { display: flex; justify-content: flex-end; gap: 6px; padding: 2px 0 4px; }
+.epv-all-head > .epv-bucket-bar { margin-left: auto; padding: 0; }
+.epv-allres-bucket { text-transform: none; letter-spacing: 0; }
+/* "cancel all" — the write-off counterpart of "resolve all"; red so it never reads as done */
+.epv-allcancel { border-color: #f0d2d2; background: #fdf4f4; color: #b3403f; }
+/* the date/priority sort toggle riding on the bar's right — neutral, set slightly apart */
+.epv-sortbtn { border-color: #d8e0ea; background: #f7f9fc; color: #5b6878; margin-left: 8px; }
+/* the order is being HELD where it was while the user re-prices rows (taskSort.js) — say so,
+   so nobody reads a knowingly-stale order as the sort being broken (user, 2026-08-31) */
+.epv-sortbtn-held { border-color: #efd9a0; background: #fff7e0; color: #7a5205; font-weight: 600; }
+.sl-v2 .epv-card .epv-bucket-bar:has(.epv-sortbtn-held) { visibility: visible; }
+.sl-v2 .epv-bucket-bar { visibility: hidden; }
+.sl-v2 .epv-card:hover .epv-bucket-bar, .sl-v2 .epv-bucket-bar:focus-within { visibility: visible; }
+
+/* email modal */
+.epv-modal-overlay { position: fixed; inset: 0; background: rgba(20,28,40,0.45); display: flex; align-items: center; justify-content: center; z-index: 9000; padding: 20px; }
+.epv-modal { background: #fff; border-radius: 11px; max-width: 560px; width: 100%; max-height: 82vh; overflow: auto; padding: 18px 20px; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+/* a guarded modal (text entry) acknowledging a stray outside click: brief pulse, nothing closes */
+.epv-modal-attn { animation: slModalAttn 0.35s ease; }
+@keyframes slModalAttn {
+  0% { transform: scale(1); box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+  40% { transform: scale(1.015); box-shadow: 0 0 0 4px rgba(47,109,240,0.35), 0 12px 40px rgba(0,0,0,0.25); }
+  100% { transform: scale(1); box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+}
+.epv-modal-wide { max-width: 760px; }
+.epv-modal-x { position: absolute; top: 10px; right: 10px; font: inherit; border: 1px solid #d8e0ea; border-radius: 6px; background: #f4f7fb; cursor: pointer; padding: 2px 7px; }
+.epv-modal-title { font-size: 15px; font-weight: 700; color: #1c2430; padding-right: 28px; }
+.epv-modal-meta { font-size: 11.5px; color: #768295; margin-top: 3px; }
+.epv-modal-desc { font-size: 12.5px; color: #44515f; margin-top: 8px; line-height: 1.45; }
+.epv-modal-head { font-size: 11px; font-weight: 700; color: #768295; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 6px; }
+.epv-modal-foot { font-size: 11px; color: #9aa6b5; font-style: italic; margin-top: 10px; border-top: 1px dashed #e2e7ef; padding-top: 6px; }
+.epv-modal-body { display: flex; gap: 12px; margin-top: 14px; align-items: stretch; }
+.epv-modal-events { flex: 0 0 200px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid #eef1f6; padding-right: 10px; }
+.epv-modal-event { display: flex; align-items: center; gap: 7px; text-align: left; font: inherit; border: 1px solid #e6ebf2; border-radius: 6px; background: #fafbfd; padding: 5px 7px; cursor: pointer; }
+.epv-modal-event .ev-disc { width: 20px; height: 20px; font-size: 10px; }
+.epv-modal-event.active { border-color: #aac3f0; background: #eef4ff; }
+.epv-ev-body { min-width: 0; }
+.epv-ev-date { font-size: 10.5px; color: #9aa6b5; }
+.epv-ev-what { font-size: 11.5px; color: #44515f; line-height: 1.3; }
+.epv-modal-meta .chip { margin-left: 8px; }
+.epv-modal-detail { flex: 1 1 auto; min-width: 0; }
+.epv-eml-sum { font-size: 12px; color: #44515f; font-style: italic; background: #f6f8fc; border: 1px solid #eef1f6; border-radius: 6px; padding: 6px 8px; margin-bottom: 8px; line-height: 1.4; }
+.epv-eml-head { font-size: 12px; color: #44515f; line-height: 1.5; }
+.epv-eml-head b { color: #768295; font-weight: 600; }
+.epv-eml-body { white-space: pre-wrap; word-break: break-word; background: #fafbfd; border: 1px solid #eef1f6; border-radius: 6px; padding: 8px; max-height: 320px; overflow: auto; margin-top: 8px; font-size: 11.5px; line-height: 1.45; }
+/* (.epv-compose* went with responseFullView — drafts are now edited in place inside the standard
+   email viewer: .ev-draft-edit in entities.css) */
+.epv-loader { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #2f6df0; padding: 10px 2px; }
+
+.tb-btn { font: inherit; line-height: 1; padding: 2px 6px; border: 1px solid #d8e0ea; border-radius: 6px; background: #f6f8fc; color: #5a6675; font-size: 11px; cursor: pointer; }
+.tb-btn:hover { background: #eef2f8; }
+
+/* the Events-tab kind disc doubles as the email button */
+.epv-act-disc-btn { cursor: pointer; }
+.epv-act-disc-btn:hover { background: #e6edf7; }
+/* the shared full-email viewer (emailViewer.js) and the reply composer are styled in mail.css */
+
+/* ---- project modal (ui.js openProjectModal — the LIVE interactive card, near full-screen,
+   centered; the email viewer / task modal / reply view stack ON TOP via modalStack.js) ---- */
+/* CONSTANT size like the email modal: a fixed 86vh frame whatever the project holds — the
+   card scrolls inside it instead of the box growing/shrinking per tab */
+.epv-modal-proj { max-width: 940px; width: 100%; height: 86vh; max-height: 86vh; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface-tint); padding: 26px 22px 18px; }
+.epv-modal-proj-host { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+/* The card must keep its NATURAL height and let the host scroll. Without this it is a flex item
+   in a fixed-height column and .epv-card carries overflow:hidden, which zeroes its automatic
+   minimum size — so a project with many tasks got SQUASHED AND CLIPPED instead of scrolling
+   (user, 2026-08-31). */
+.epv-modal-proj-host > * { flex: 0 0 auto; }
+
+/* ---- cross-page processing notice (processingNotice.js — observer of the run lock) ---- */
+/* the background-status strip (processingNotice.js): one bar, five moods — and a sixth state,
+   BLANK, which is the one it is in most of the time. The strip never leaves the flow: it used to
+   be display:none until it had something to say, so a background run starting or finishing shoved
+   the page down and yanked it back while you were reading (user, 2026-09-16). It now always holds
+   one line's worth of height and merely turns invisible, so appearing and disappearing costs no
+   layout at all. min-height is ONE LINE OF THE TALLEST MOOD — several notices carry an inline
+   button or a spinner, which set the line height rather than the 13px text; measured, not
+   guessed (a 35px guess left a 3px jolt on exactly those). */
+.su-processing-notice {
+  box-sizing: border-box; min-height: 38px;
+  margin: 6px 0 4px; padding: 7px 12px; font-size: 13px; color: #7a5205;
+  background: #fff7e0; border: 1px solid #efd9a0; border-radius: 10px;
+}
+/* invisible, but still taking up its line. (A two-line notice on a narrow screen still moves the
+   page a little — reserving one line fixes the common nothing-to-one-line case, which is the one
+   that was happening every run.) */
+.su-notice-blank { visibility: hidden; }
+/* On a phone the longest notice ("Background checking is off — mail was last checked 2h ago" plus
+   its button) wraps to TWO lines, so one line's worth of reserved space still jolted by 15px
+   there — measured at 360px. Below 700px the strip reserves two. */
+@media (max-width: 700px) {
+  .su-processing-notice { min-height: 56px; }
+}
+.su-processing-notice a { color: inherit; font-weight: 600; }
+.su-processing-notice .sl-mailbtn { margin-left: 6px; }
+.su-notice-busy { color: var(--warn-ink); background: var(--warn-bg); border-color: #efd9a0; } /* processing */
+.su-notice-warn { color: var(--err); background: var(--err-bg); border-color: #f2c8bf; }       /* stalled / failed / expired */
+.su-notice-ok   { color: var(--ok); background: var(--ok-bg); border-color: #bfe3cb; }         /* a run just landed */
+.su-notice-idle { color: var(--text-2); background: var(--surface-alt); border-color: var(--border); } /* mode off — standing reminder */
+.su-processing-notice .su-notice-spinner { width: 13px; height: 13px; margin-right: 7px; vertical-align: -2px; border-width: 2px; }
+/* the clean-up results bar — above the strip, until clicked (processingNotice.renderCleanup) */
+.su-cleanup-bar { cursor: pointer; padding: 8px 14px; font-size: 13px; color: #1f3d7a; background: #e9f0fd; border-bottom: 1px solid #c9d8f5; }
+.su-cleanup-bar:hover { background: #dde8fc; }
+.su-cleanup-bar .sl-mailbtn { margin-left: 6px; }
+.su-cleanup-bar-fail { color: var(--err); background: var(--err-bg); border-color: #f2c8bf; }
+
+/* ---- expanded-card edit row + people row (expandableProjectView) ----
+   left margin 11px = the band's padding, so the ✏️ lines up under the pentagon toggle */
+.epv-editrow { display: flex; align-items: flex-start; gap: 10px; margin: 8px 12px 0 11px; }
+.epv-editrow .epv-summary { margin: 2px 0 0; flex: 1 1 auto; min-width: 0; }
+/* (.epv-peoplerow / .epv-people-more removed with the duplicate person-chip row) */
+
+/* ---- project editor modal (projectEditor.js) ---- */
+.pe-body { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.pe-row { display: flex; align-items: center; gap: 10px; }
+.pe-lbl { flex: 0 0 62px; font-size: 11px; font-weight: 700; color: #768295; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; }
+.pe-name { flex: 1 1 auto; font: inherit; font-size: 13px; padding: 5px 9px; border: 1px solid #d8e0ea; border-radius: 6px; }
+.pe-prio { display: flex; gap: 4px; }
+.pe-prio-btn { width: 17px; height: 17px; padding: 0; border: 1px solid #c3ccd8; border-radius: 50%; background: #f4f7fb; cursor: pointer; }
+.pe-prio-btn.on { border-color: transparent; }
+/* a circle held back by the until-due hold: still "on" (it IS the set priority) but half-tone,
+   so a 4 acting as a 3 shows three solid dots and one pale one (user, 2026-08-27) */
+.pe-prio-btn.pe-prio-half { opacity: 0.3; }
+/* the "⏲ lower until due" cycle button beside the priority dots (taskEditor) */
+.te-demote {
+  font: inherit; font-size: 11px; padding: 3px 9px; white-space: nowrap; flex: 0 0 auto;
+  border: 1px solid #d8e0ea; border-radius: 999px; background: #fff; color: #768295; cursor: pointer;
+}
+.te-demote:hover { border-color: #2f6df0; color: #2f6df0; }
+.te-demote.on { border-color: #b7a6e3; background: #faf8ff; color: #6442b8; }
+.te-demote.inert { opacity: 0.55; } /* set, but no future due date to act on */
+/* the "+ Add" tab's clickable 1…5 priority numbers (expandableProjectView renderAddTab) */
+.epv-prio-num { width: 22px; height: 22px; padding: 0; border: 1px solid #c3ccd8; border-radius: 50%; background: #f4f7fb; cursor: pointer; font: inherit; font-size: 11px; font-weight: 600; color: #768295; line-height: 1; }
+.epv-prio-num.on { border-color: transparent; color: #fff; }
+/* same half-tone language as the editor's dots: a number held back by the ⏲ until-due hold */
+.epv-prio-num.pe-prio-half { opacity: 0.3; }
+.pe-note { font-size: 10.5px; color: #9aa6b5; }
+.pe-err { color: #d9534f; }
+.pe-tbtn { font: inherit; font-size: 11.5px; padding: 3px 10px; border-radius: 6px; border: 1px solid #c3ccd8; background: #fff; color: #44515f; cursor: pointer; }
+.pe-tbtn:hover:not(:disabled) { background: #eef2f8; }
+.pe-tbtn:disabled { opacity: 0.45; cursor: default; }
+.pe-tbtn-save { background: #2f6df0; border-color: #2f6df0; color: #fff; }
+.pe-movesel { font: inherit; font-size: 11.5px; padding: 3px 8px; border: 1px solid #d8e0ea; border-radius: 6px; background: #fff; }
+/* the SELECTION checkbox: right side, BLUE — deliberately distinct from the green done-boxes */
+.pe-editform { display: flex; flex-direction: column; gap: 6px; margin: 2px 4px 8px 16px; padding: 9px 11px; background: #f7f9fc; border: 1px solid #e6ebf2; border-radius: 8px; }
+.pe-frow { display: flex; align-items: flex-start; gap: 10px; }
+.pe-frow input, .pe-frow textarea, .pe-frow select { flex: 1 1 auto; font: inherit; font-size: 12.5px; padding: 4px 8px; border: 1px solid #d8e0ea; border-radius: 6px; background: #fff; resize: vertical; }
+.pe-frow .pe-lbl { margin-top: 5px; }
+.pe-factions { display: flex; gap: 6px; justify-content: flex-end; }
+/* the "+ Add" tab's task box: multi-line (one task per line), grows to fit what is pasted in,
+   with the batch warning sitting immediately left of the Add button */
+.epv-addform .pe-factions { align-items: center; }
+.epv-addshort { min-height: 30px; max-height: 420px; overflow-y: auto; line-height: 1.45; }
+.epv-addwarn { flex: 1 1 auto; text-align: right; font-size: 10.5px; color: #b06b12; }
+.pe-foot { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eef1f6; }
+/* the destructive corner of the project editor's footer: pushed hard left, away from Done, and
+   two-step — the button ARMS first and only the armed one deletes (user, 2026-08-31) */
+.pe-danger { margin-right: auto; display: flex; align-items: center; gap: 8px; }
+.pe-tbtn-danger { border-color: #f0cfcd; background: #fdf5f4; color: #a33b36; }
+.pe-tbtn-danger:hover:not(:disabled) { border-color: #d9534f; color: #8f2f2b; }
+.pe-tbtn-danger.armed { border-color: #d9534f; background: #d9534f; color: #fff; font-weight: 600; }
+.pe-danger-err { color: #a33b36; }
+
+/* ---- person editor modal (personEditor.js) ---- */
+.prs-body { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.prs-head { display: flex; align-items: center; gap: 12px; }
+.prs-head-mid { min-width: 0; }
+.prs-name { font-size: 15px; font-weight: 700; color: #1c2430; }
+.prs-addr { font-size: 11.5px; color: #768295; }
+.prs-desc, .prs-instr-new { width: 100%; box-sizing: border-box; font: inherit; font-size: 12.5px; line-height: 1.45; padding: 7px 9px; border: 1px solid #d8e0ea; border-radius: 6px; resize: vertical; }
+.prs-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.prs-hint { font-size: 11px; color: #768295; line-height: 1.45; font-style: italic; }
+/* what they handle — one row per responsibility entry; a "yours" tag marks the ones the AI may not touch */
+.prs-resp-list { display: flex; flex-direction: column; gap: 6px; }
+.prs-resp-row { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; background: #fbfcfe; border: 1px solid #eef1f6; border-radius: 6px; }
+.prs-resp-meta { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.prs-resp-tag { margin-right: auto; font-size: 10.5px; color: #768295; text-transform: uppercase; letter-spacing: 0.03em; }
+.prs-resp-tag-user { color: #7a5cc0; font-weight: 700; }
+.prs-resp-tag-instr { color: #2f7a4f; font-weight: 700; }
+.prs-instr-list { display: flex; flex-direction: column; gap: 4px; }
+.prs-instr { display: flex; align-items: flex-start; gap: 8px; padding: 6px 9px; background: #fbfcfe; border: 1px solid #eef1f6; border-radius: 6px; }
+.prs-instr-txt { flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: #44515f; line-height: 1.4; overflow-wrap: anywhere; }
+
+/* project editor: people row, clickable who-names, the searchable move picker */
+.pe-people { display: flex; align-items: flex-start; gap: 10px; }
+.pe-people .pe-lbl { margin-top: 3px; }
+.pe-people-chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+/* ---- task editor modal (taskEditor.js — reuses the pe- form/picker language) ---- */
+.te-modal { max-width: 520px; }
+.te-body { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
+.te-desc { font: inherit; font-size: 12.5px; padding: 6px 9px; border: 1px solid var(--border-2); border-radius: 7px; flex: 1 1 auto; resize: vertical; }
+.te-dir { font: inherit; font-size: 12.5px; padding: 5px 9px; border: 1px solid var(--border-2); border-radius: 7px; background: var(--surface); flex: 0 1 auto; }
+/* Due row: the text box takes ~half the width, quick-fill buttons (asap / tomorrow / next wk)
+   ride to its right */
+.te-due-wrap { display: flex; align-items: center; gap: 6px; flex: 1 1 auto; min-width: 0; }
+.te-due-wrap .te-due-in { flex: 0 1 50%; min-width: 0; }
+.te-due-quick {
+  font: inherit; font-size: 11px; padding: 4px 10px; white-space: nowrap; flex: 0 0 auto;
+  border: 1px solid var(--border-2); border-radius: 999px; background: var(--surface);
+  color: #44515f; cursor: pointer;
+}
+.te-due-quick:hover { border-color: #2f6df0; color: #2f6df0; }
+/* the interpreted due dates in small print, aligned under the Due input (62px label + 10px gap) */
+.te-due-dates { margin: -5px 0 0 72px; font-size: 10.5px; color: var(--faint); min-height: 14px; display: flex; align-items: center; gap: 4px; }
+.te-due-spin { width: 10px !important; height: 10px !important; border-width: 2px !important; }
+/* the Who field's autocomplete: an anchored dropdown of known people after 2 typed letters */
+.te-who-wrap { position: relative; flex: 1 1 auto; display: flex; min-width: 0; }
+.te-who-wrap .pe-name { flex: 1 1 auto; min-width: 0; }
+.te-who-sug {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 40; margin-top: 3px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: #fff; border: 1px solid #d8e0ea; border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(20, 40, 80, 0.13); padding: 4px; max-height: 190px; overflow: auto;
+}
+.te-who-sugrow { display: flex; align-items: baseline; gap: 8px; font: inherit; font-size: 12.5px; text-align: left; padding: 5px 8px; border: none; border-radius: 6px; background: none; cursor: pointer; }
+.te-who-sugrow:hover { background: #eef4ff; }
+.te-who-sugname { font-weight: 600; color: var(--text); white-space: nowrap; }
+.te-who-sugaddr { color: var(--faint); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* the task editor's staged priority row (reuses the project editor's pe-prio dot buttons) */
+.te-prio-wrap { display: flex; align-items: center; gap: 8px; }
+.te-projline { display: flex; align-items: center; gap: 7px; font-size: 12.5px; flex-wrap: wrap; }
+.te-projname { font-weight: 650; color: var(--text); }
+.te-projnew { color: #1f6f3d; }
+.te-projarrow { color: var(--faint); }
+/* Save / Cancel — ABOVE the history trail (which can run to dozens of rows), so committing an
+   edit never means scrolling past the whole story first (user, 2026-08-31) */
+.te-actions { display: flex; gap: 8px; margin: 12px 0 6px; padding-top: 10px; border-top: 1px solid #eef1f6; }
+/* the shell focuses the box on open (modalStack FOCUS note) — that must not paint a ring */
+.epv-modal:focus, .epv-modal:focus-visible { outline: none; }
+
+/* ---- the task modal's HISTORY section: one row per evidence entry, newest first. Rows backed
+   by an email are buttons that open THAT message in the thread viewer. ---- */
+.te-hist { display: flex; flex-direction: column; gap: 2px; margin-top: 12px; }
+.te-hist-row {
+  display: flex; align-items: flex-start; gap: 7px; width: 100%; text-align: left;
+  font: inherit; color: inherit; background: none; border: 0; border-radius: 6px;
+  padding: 5px 6px; border-top: 1px solid #eef1f5;
+}
+.te-hist-row:first-of-type { border-top: 0; }
+.te-hist-row.clickable { cursor: pointer; }
+.te-hist-row.clickable:hover { background: #f4f7fb; }
+.te-hist-mid { flex: 1 1 auto; min-width: 0; }
+.te-hist-head { font-size: 12px; color: #1c2430; }
+.te-hist-verb { font-weight: 600; }
+.te-hist-who { color: #6b7686; margin-left: 4px; }
+/* a standing instruction the model cited for this change (rules_applied, prompt 0.54) */
+.te-hist-rule { margin-left: 6px; padding: 0 5px; border-radius: 8px; background: #e7eefb; color: #2d4e8f; font-size: 10.5px; white-space: nowrap; }
+.te-hist-diff { font-size: 11px; color: #4a5666; margin-top: 1px; display: flex; gap: 5px; align-items: baseline; flex-wrap: wrap; }
+.te-hist-field { color: #8b95a3; text-transform: lowercase; }
+.te-hist-val { color: #6b7686; }
+.te-hist-val.to { color: #1c2430; font-weight: 600; }
+.te-hist-arrow { color: #b7c0cc; }
+.te-hist-reason, .te-hist-sum {
+  font-size: 11px; color: #6b7686; margin-top: 2px; line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.te-hist-sum { font-style: italic; color: #8b95a3; }
+.te-hist-when { flex: 0 0 auto; font-size: 10.5px; color: #9aa6b5; white-space: nowrap; padding-top: 1px; }
+/* "— show details" at the end of a history entry's reason line: unfolds the complete
+   before/after of long diffs (rewritten descriptions), selectable so an overwritten phrasing
+   can be copied back out. Muted grey on purpose — a recovery affordance, not a call to action. */
+.te-hist-fulltoggle { color: #8b95a3; cursor: pointer; white-space: nowrap; }
+.te-hist-fulltoggle:hover { text-decoration: underline; color: #5b6878; }
+/* a reason line carrying the toggle drops its 2-line clamp — clipping the control is worse */
+.te-hist-reason.has-fulltoggle { display: block; -webkit-line-clamp: none; overflow: visible; }
+.te-hist-full { margin: 0 0 6px 30px; display: flex; flex-direction: column; gap: 4px; }
+.te-hist-full-field { font-size: 10.5px; color: #8b95a3; text-transform: lowercase; }
+.te-hist-full-block { border: 1px solid #e6ebf2; border-radius: 6px; padding: 5px 8px; background: #fbfcfe; }
+.te-hist-full-block.after { background: #fff; border-color: #d8e0ea; }
+.te-hist-full-lbl { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #9aa6b5; margin-bottom: 2px; }
+.te-hist-full-block.after .te-hist-full-lbl { color: #5b6878; }
+.te-hist-full-text { margin: 0; font: inherit; font-size: 11.5px; color: #1c2430; white-space: pre-wrap; word-break: break-word; user-select: text; }
+/* "↩ revert to N" — sits beside the Priority row's "set by you" note and hands the field back
+   to SuperLazy. Amber: it undoes YOUR override, so it should read as a change, not a save. */
+.te-revert {
+  font: inherit; font-size: 10.5px; line-height: 1; padding: 3px 8px; white-space: nowrap;
+  border: 1px solid #e2c79a; border-radius: 9px; background: #fdf7ee; color: #a8701c;
+  cursor: pointer; flex: 0 0 auto;
+}
+.te-revert:hover { background: #f7ebd8; border-color: #d8b478; }
+
+.pe-movepick { display: flex; flex-direction: column; gap: 6px; padding: 9px 11px; background: #fff; border: 1px solid #d8e0ea; border-radius: 8px; }
+.pe-msearch { font: inherit; font-size: 12.5px; padding: 5px 10px; border: 1px solid #d8e0ea; border-radius: 6px; }
+.pe-mplist { display: flex; flex-direction: column; gap: 3px; max-height: 200px; overflow: auto; }
+.pe-mprow { display: flex; align-items: center; gap: 8px; font: inherit; font-size: 12.5px; text-align: left; padding: 5px 8px; border: 1px solid #eef1f6; border-radius: 6px; background: #fbfcfe; cursor: pointer; }
+.pe-mprow:hover { background: #eef4ff; border-color: #c9d8f5; }
+.pe-mprow-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pe-mprow-new { color: #1f6f3d; border-color: #d2ecdb; background: #f2fbf5; }
+.prs-warn { font-size: 12px; color: #9a6a1a; background: #fff3d6; border: 1px solid #efd9a0; border-radius: 6px; padding: 6px 9px; line-height: 1.4; }
+
+/* ---- the Add/Edit-note modal (newNoteModal.js) ---- */
+.nn-body { width: 100%; min-height: 180px; resize: vertical; font: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid #d8e0ea; border-radius: 6px; box-sizing: border-box; }
+.nn-actions { justify-content: flex-end; margin-top: 2px; }
+.nn-when { flex: 0 1 220px; }
+.nn-sugwrap { position: relative; }
+.nn-suggest { position: absolute; top: calc(100% + 2px); left: 66px; right: 0; z-index: 600; background: #fff; border: 1px solid #d8e0ea; border-radius: 6px; box-shadow: 0 6px 18px rgba(20, 30, 45, 0.14); display: flex; flex-direction: column; max-height: 220px; overflow-y: auto; }
+.nn-sugrow { font: inherit; font-size: 12.5px; text-align: left; border: 0; background: none; padding: 6px 10px; cursor: pointer; }
+.nn-sugrow:hover, .nn-sugrow.on { background: #eef2f8; }
+.pe-desc { min-height: 72px; }
+.pe-restore { font: inherit; font-size: 11px; color: #4a90d9; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+.pe-restore:hover { text-decoration: underline; }
+
+/* scope chips on the person modal's rules list (personEditor.js) — the modal shows every rule
+   that applies to the sender; domain/all-mail ones are managed on Setup & Prefs → Rules */
+.prs-instr-chip { flex: none; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 7px; border-radius: 8px; background: #eef2f8; color: #66707d; }
+.prs-instr-chip-all { background: #e8f0fe; color: #2f6df0; }
+.prs-instr-chip-domain { background: #f4eefb; color: #7a5cc0; }
+.prs-instr-chip-account { background: #eaf6ef; color: #2f7a4d; }
+.prs-instr-domainopt { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #44515f; margin-top: 4px; }
+
+/* ---- rg-* : the one-project review modal (reorgReview.js — the clean-up view inside a modal) --- */
+.rg-modal .rg-body { display: flex; flex-direction: column; gap: 10px; }
+.rg-status { font-size: 13px; color: #555; background: #f2f4f7; border-radius: 6px; padding: 6px 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.rg-status .rg-spinner { width: 16px; height: 16px; flex: 0 0 auto; }
+.rg-status .rg-status-note { flex-basis: 100%; font-size: 12px; color: #8a4b00; }
+.rg-status.rg-status-busy { background: #fff6e5; }
+.rg-status.rg-status-error { background: #fbe9e7; color: #b3362a; }
+.rg-status.rg-status-ok { background: #eef7f0; color: #1f6b35; }
+.rg-review { max-height: 70vh; overflow-y: auto; }
+.rg-foot { display: flex; justify-content: flex-end; }
+
+/* repo chips on a project card (legacy, non-v2 board) */
+/* legacy (non-v2) board: on the sub-line, before the people */
+.epv-subline > .epv-repos { flex: 0 0 auto; max-width: 45%; align-self: center; }
+.epv-card.expanded .epv-subline > .epv-repos { align-self: flex-start; }
+.epv-repos { display: flex; flex-wrap: wrap; gap: 5px; min-width: 0; }
+.epv-repos .chip-repo { font-size: 10.5px; color: #6b7686; }
+.epv-repos .chip-txt { max-width: 13ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.epv-repos-more { align-self: center; font-size: 10.5px; color: #8a93a0; cursor: default; }
+
+/* project pillbox + repo stacked under it (legacy board) */
+.projbox { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; vertical-align: top; flex: 0 0 auto; }
+.projbox-repos { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.projbox-repos .chip-repo { padding: 0 5px; font-size: 9.5px; }
+.projbox-more { font-size: 9.5px; color: #8a93a0; align-self: center; }
+
+/* ---- the agent's PLAN and CHECKLIST on a work turn (emailViewer planRows / checklistRow) ---- */
+.emv-plans { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.emv-plan { border: 1px solid var(--border-2, #dde2ea); border-radius: 6px; background: var(--surface, #fff); min-width: 0; }
+.emv-plan > summary { cursor: pointer; padding: 5px 9px; font-size: 12px; color: var(--text-2, #3b4552); list-style: revert; }
+.emv-plan > summary:hover { background: var(--surface-tint, #f4f6f9); }
+.emv-plan-text { margin: 0; padding: 9px 11px 11px; border-top: 1px solid var(--border-2, #dde2ea); font-size: 11.5px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; max-height: 60vh; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.emv-checklist { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.emv-check { color: var(--text-2, #3b4552); }
+.emv-check-completed { color: var(--muted, #6b7686); text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
+.emv-check-in_progress { font-weight: 600; }
+
+/* ---- work-turn modal: Dialogue | Plan pane below Tasks; linked document names ---- */
+.emv-pane-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0 6px; border-bottom: 1px solid var(--border-2, #dde2ea); padding-bottom: 6px; }
+.emv-pane-tab { font: inherit; font-size: 12px; padding: 3px 10px; border: 1px solid var(--border-2, #dde2ea); border-radius: 999px; background: var(--surface, #fff); color: var(--text-2, #3b4552); cursor: pointer; max-width: 28ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emv-pane-tab:hover { background: var(--surface-tint, #f4f6f9); }
+.emv-pane-tab.active { background: var(--ent-project-band, #e9eef5); border-color: var(--ent-project-line, #c9d3e0); font-weight: 600; }
+.emv-pane { min-width: 0; }
+.emv-plan-meta { font-size: 11px; color: var(--muted, #6b7686); margin: 0 0 6px; }
+.emv-plan-row { display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.emv-plan-mark { font-size: 11.5px; color: var(--muted, #6b7686); }
+.emv-doc-link { font: inherit; font-size: inherit; padding: 0; border: 0; background: none; color: var(--link, #2563eb); cursor: pointer; text-decoration: underline dotted; }
+.emv-doc-link:hover { text-decoration: underline; }
+
+/* ---- markdownLite output (plans / documents in the modal) ---- */
+.emv-md-modes { display: flex; gap: 4px; margin: 0 0 8px; }
+.emv-md-mode { font: inherit; font-size: 11px; padding: 2px 8px; border: 1px solid var(--border-2, #dde2ea); border-radius: 999px; background: var(--surface, #fff); color: var(--text-2, #3b4552); cursor: pointer; }
+.emv-md-mode.active { background: var(--ent-project-band, #e9eef5); border-color: var(--ent-project-line, #c9d3e0); font-weight: 600; }
+.emv-md { font-size: 12.5px; line-height: 1.5; color: var(--text, #2b3442); max-height: 65vh; overflow: auto; padding-right: 4px; word-break: break-word; }
+.emv-md h1, .emv-md h2, .emv-md h3, .emv-md h4, .emv-md h5, .emv-md h6 { margin: 14px 0 6px; line-height: 1.25; font-weight: 700; }
+.emv-md h1 { font-size: 16px; } .emv-md h2 { font-size: 14.5px; } .emv-md h3 { font-size: 13.5px; } .emv-md h4, .emv-md h5, .emv-md h6 { font-size: 12.5px; }
+.emv-md p { margin: 6px 0; white-space: pre-wrap; }
+.emv-md ul, .emv-md ol { margin: 4px 0 4px 20px; padding: 0; }
+.emv-md li { margin: 2px 0; }
+.emv-md li > ul, .emv-md li > ol { margin-top: 2px; }
+.emv-md .emv-md-task { list-style: none; margin-left: -18px; }
+.emv-md .emv-md-task.done { color: var(--muted, #6b7686); text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
+.emv-md .emv-md-box { display: inline-block; width: 1.1em; text-decoration: none; }
+.emv-md code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; background: var(--surface-tint, #f4f6f9); padding: 0 4px; border-radius: 3px; }
+.emv-md pre.emv-md-code { background: var(--surface-tint, #f4f6f9); border: 1px solid var(--border-2, #dde2ea); border-radius: 6px; padding: 8px 10px; overflow: auto; margin: 8px 0; }
+.emv-md pre.emv-md-code code { background: none; padding: 0; font-size: 11.5px; white-space: pre; }
+.emv-md blockquote { margin: 6px 0; padding: 2px 10px; border-left: 3px solid var(--border-2, #dde2ea); color: var(--text-2, #3b4552); }
+.emv-md hr { border: 0; border-top: 1px solid var(--border-2, #dde2ea); margin: 12px 0; }
+.emv-md table.emv-md-table { border-collapse: collapse; margin: 8px 0; font-size: 12px; max-width: 100%; display: block; overflow-x: auto; }
+.emv-md .emv-md-table th, .emv-md .emv-md-table td { border: 1px solid var(--border-2, #dde2ea); padding: 3px 8px; text-align: left; vertical-align: top; }
+.emv-md .emv-md-table th { background: var(--surface-tint, #f4f6f9); font-weight: 600; }
+.emv-md a { color: var(--link, #2563eb); }
+.emv-md-body { min-width: 0; }
+
+/* ---- a work turn's session + files: the NAME is the link (opens in the editor) ---- */
+/* inline-* so a value stays on its label's line ("Session: name"); the list is an inline column */
+.emv-file-list { display: inline-flex; flex-direction: column; gap: 3px; vertical-align: top; max-width: 100%; }
+.emv-file-row { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.emv-file-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60ch; vertical-align: baseline; }
+.emv-file-link { color: var(--link, #2563eb); text-decoration: none; }
+.emv-file-link:hover { text-decoration: underline; }
+.emv-doc-here { font-size: 10px; }
+.emv-file-act { font: inherit; font-size: 10px; margin-left: 6px; padding: 0 5px; border: 1px solid var(--border-2, #dde2ea); border-radius: 999px; background: var(--surface, #fff); color: var(--text-2, #3b4552); text-decoration: none; line-height: 1.5; }
+.emv-file-act:hover { background: var(--surface-tint, #f4f6f9); }
+
+/* ============================================================================================
+   MUST STAY LAST IN THIS FILE. These rules win by ORDER, not specificity — .epv-imp-arrow and
+   .epv-check are single-class selectors defined above, so an earlier copy of this block simply
+   lost to them and did nothing at all (caught 2026-09-12).
+   ============================================================================================ */
+/* TOUCH: a hover-revealed control is an unreachable control on a phone — there is no hover to
+   give. Everything the row hides behind :hover has to stand permanently instead. This is the one
+   place that answers "what shows on a touch device"; the rules it overrides are the .sl-v2
+   visibility:hidden ones in entities.css plus .epv-imp-arrow above.
+   - the priority ▾▴ are the row's main dial
+   - the ✏️ is now the ONLY route to the edit modal (the title opens the description instead)
+   - the ✕ is the only way to cancel a task anywhere in the app — the modal has no such action */
+@media (hover: none) {
+  .epv-imp-arrow { visibility: visible; }
+  .sl-v2 .epv-headrow .epv-projedit,
+  .sl-v2 .task-row .task-editbtn,
+  .sl-v2 .epv-row .epv-cancel { visibility: visible; }
+  /* (.task-cancel / .task-date, hidden alongside these in entities.css, are not mirrored here:
+     no code renders either class — the row's ✕ is .epv-cancel and its date is the history strip.) */
+  /* a 15px checkbox is under every tap-target guideline going */
+  .epv-check, .task-check { width: 19px; height: 19px; }
+  .task-row > .epv-check { margin-top: 2px; }
+}

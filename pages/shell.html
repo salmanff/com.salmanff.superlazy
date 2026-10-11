@@ -1,0 +1,75 @@
+<div id="app" class="su sl-v2">
+  <div id="topbar"></div>
+
+  <div id="status" class="status info">Loading…</div>
+
+  <!-- DASHBOARD view (page key: index) — shown/hidden by shell.js; each view keeps its OWN
+       filter bar host so filter state (search text included) survives view switches -->
+  <div id="view-index" style="display:none">
+    <div id="filterbar-index"></div>
+    <div id="boardTools" class="su-board-tools"></div>
+    <div class="su-board-wrap">
+      <div id="board"></div>
+    </div>
+  </div>
+
+  <!-- TO-DOS view (page key: recent) -->
+  <div id="view-recent" style="display:none">
+    <div id="filterbar-recent"></div>
+
+    <!-- the page tab bar — the project card's tab language across ALL projects:
+         I owe / Team / Owed / Read / People / All To-dos / Events -->
+    <div id="rcTabs"></div>
+
+    <!-- the selected to-do view (direction tabs, People, All To-dos) -->
+    <section id="rcTasks" class="rc-section"></section>
+
+    <!-- the Events tab: what happened in the window — resolved, automation decisions, then the
+         rest of the project traffic -->
+    <section id="rcResolved" class="rc-section"></section>
+    <section id="rcDecisions" class="rc-section" style="display:none"></section>
+    <section id="rcProjects" class="rc-section"></section>
+    <div id="rcOlder" class="rc-older"></div>
+  </div>
+
+  <!-- THREADS view (page key: threads) — a mail client over every conversation: column 1 lists the
+       threads (threadsView.js), columns 2 + 3 are the email viewer embedded for the chosen one.
+       Full-width like Events; below 900px the list and the pane take turns (threads.css). -->
+  <div id="view-threads" style="display:none">
+    <div id="filterbar-threads"></div>
+    <div id="thCols" class="th-cols">
+      <div id="thList" class="th-list" role="listbox" aria-label="Threads"></div>
+      <div id="thPane" class="th-pane"></div>
+    </div>
+  </div>
+
+  <!-- EVENTS view (page key: events) — full-width feed: events.js lifts the .su width cap on
+       #app while this view is shown -->
+  <div id="view-events" style="display:none">
+    <div id="filterbar-events"></div>
+    <div id="feed" class="ev-feed"></div>
+    <div class="ev-more-wrap"><button id="moreBtn" type="button" class="ev-more" style="display:none">Show more</button></div>
+  </div>
+
+  <!-- PEOPLE view (page key: people) — list + meeting-prep detail; selection rides on the URL
+       hash (#<address>), orthogonal to the shell's path routing -->
+  <div id="view-people" style="display:none">
+    <div id="filterbar-people"></div>
+    <!-- Below 760px the list becomes a drawer over the page (people.css): the ☰ bar sticks to
+         the top of the detail column, #ppList goes position:fixed, and #ppScrim catches the tap
+         beside it. All three are display:none / static again on a wide screen, where .pp-cols is
+         simply the two columns it has always been. -->
+    <div class="pp-cols">
+      <button id="ppListBtn" type="button" class="pp-listbtn" aria-controls="ppList" aria-expanded="false">
+        <span class="pp-listbtn-glyph">☰</span><span class="pp-listbtn-txt">People</span><span id="ppListCount" class="pp-listbtn-n"></span>
+      </button>
+      <div id="ppList" class="pp-list"></div>
+      <div id="ppScrim" class="pp-scrim"></div>
+      <div id="ppDetail" class="pp-detail"></div>
+    </div>
+  </div>
+
+  <!-- hidden stubs for shared ui.js renderers (the run log / cost) -->
+  <div id="cost" style="display:none"></div>
+  <div id="log" style="display:none"></div>
+</div>

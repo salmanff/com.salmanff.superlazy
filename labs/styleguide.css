@@ -1,0 +1,38 @@
+/* styleguide.css — layout for the styleguide test page only (sections, swatches, captions).
+   The components it showcases are styled by tokens.css + entities.css + the page styles. */
+
+.sg-intro {
+  font-size: 13px; color: var(--text); line-height: 1.5; max-width: 760px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 14px; margin: 8px 0 4px;
+}
+.sg-note { min-height: 20px; font-size: 12px; font-weight: 600; color: var(--accent); padding: 2px 2px; }
+
+.sg-section { margin: 18px 0 26px; max-width: 860px; }
+.sg-h { font-size: 14px; font-weight: 800; color: var(--ink); }
+.sg-sub { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 3px 0 8px; max-width: 760px; }
+.sg-box { background: var(--surface-tint); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+.sg-cap {
+  font-size: 10.5px; font-weight: 700; color: var(--faint); text-transform: uppercase;
+  letter-spacing: 0.04em; margin: 12px 0 6px;
+}
+.sg-cap:first-child { margin-top: 0; }
+.sg-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 4px 0; }
+
+/* token swatches */
+.sg-swatch { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 76px; }
+.sg-swatch-c { width: 100%; height: 26px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08); }
+.sg-swatch-l { font-size: 10px; color: var(--text-2); }
+
+/* task-row examples sit on white so the row treatment is honest */
+.sg-box .task-row { background: var(--surface); border: 1px solid var(--hairline); border-radius: 6px; padding: 5px 8px; margin: 3px 0; }
+
+/* proposed people rows */
+.sg-pplist { max-width: 420px; }
+.sg-pp-top { align-items: center; flex-wrap: nowrap; }
+.sg-pp-mid { min-width: 0; flex: 1 1 auto; margin-left: 4px; }
+
+/* legend */
+.sg-legend { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.sg-legend-row { display: flex; align-items: center; gap: 10px; }
+.sg-legend-txt { font-size: 12px; color: var(--text-2); }

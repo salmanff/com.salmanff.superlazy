@@ -1,0 +1,12 @@
+/* slacklab.css — the Slack lab debug page (Stage 0). Small, self-contained, tokens.css palette. */
+.sl-lab { max-width: 1080px; margin: 0 auto; padding: 16px 20px 80px; font: 14px/1.5 -apple-system, system-ui, sans-serif; }
+.sl-lab-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-right: 56px; /* freezr button corner */ }
+.sl-lab-header h1 { font-size: 20px; margin: 8px 0; }
+.sl-lab-links a { margin-left: 12px; font-size: 13px; }
+.sl-lab-status { padding: 8px 10px; background: var(--sl-surface-2, #f2f2f0); border-radius: 8px; margin: 8px 0; font-weight: 500; }
+.sl-lab-warn { color: #9a6700; }
+.sl-lab-panel { margin-top: 18px; }
+.sl-lab-panel h2 { font-size: 15px; margin: 18px 0 6px; }
+.sl-lab-chunk { border: 1px solid var(--sl-border, #e4e4e0); border-radius: 8px; padding: 6px 10px; margin: 6px 0; }
+.sl-lab-chunk summary { cursor: pointer; font-size: 13px; }
+.sl-lab-pre { white-space: pre-wrap; font: 12px/1.5 ui-monospace, Menlo, monospace; background: var(--sl-surface-2, #f7f7f5); padding: 8px 10px; border-radius: 6px; max-height: 420px; overflow: auto; }

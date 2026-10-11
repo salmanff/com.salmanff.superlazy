@@ -1,0 +1,212 @@
+/* filterbar.css — the SHARED filter bar (filterBar.js) that sits under the top bar on every
+   page. Titled SECTIONS: each filter's name sits top-left with its controls below it, and a
+   subtle vertical rule separates the sections. Pages compose only the slots they need — same
+   look everywhere. */
+
+.fb-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  row-gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 4px;
+  margin-bottom: 14px;
+  background: #f7f9fc;
+  border: 1px solid #e6ebf2;
+  border-radius: 10px;
+}
+
+/* one titled section: title on top, controls below, hairline separator to the left */
+.fb-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 2px 16px;
+  border-left: 1px solid #e2e7ef;
+  min-width: 0;
+}
+.fb-group:first-child { border-left: none; }
+
+.fb-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9aa6b5;
+  white-space: nowrap;
+}
+
+.fb-chips { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; min-height: 26px; }
+.fb-chip {
+  --fb-chip-color: #44515f;
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 11px;
+  border-radius: 20px;
+  border: 1px solid #d8e0ea;
+  background: #fff;
+  color: var(--fb-chip-color);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fb-chip:hover { filter: brightness(0.97); }
+.fb-chip.active { background: #2f6df0; border-color: #2f6df0; color: #fff; }
+
+/* the Custom timeframe popover: "past X hours" / "past Y days" — no calendar */
+.fb-tf-group { position: relative; }
+.fb-pop {
+  position: absolute; top: 100%; left: 12px; z-index: 60; margin-top: 6px;
+  display: flex; flex-direction: column; gap: 8px;
+  background: #fff; border: 1px solid #d8e0ea; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(20, 40, 80, 0.13); padding: 10px 12px;
+}
+.fb-pop-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #44515f; white-space: nowrap; }
+.fb-pop-row input[type="radio"] { margin: 0 3px 0 0; cursor: pointer; }
+.fb-pop-num {
+  width: 54px; font: inherit; font-size: 12px; padding: 2px 6px; text-align: center;
+  border: 1px solid #d8e0ea; border-radius: 6px; background: #fff; color: #44515f;
+}
+.fb-pop-step {
+  font: inherit; font-size: 13px; line-height: 1; width: 22px; height: 22px;
+  border-radius: 6px; border: 1px solid #d8e0ea; background: #fff; color: #44515f; cursor: pointer;
+}
+.fb-pop-step:hover { background: #f3f6fb; }
+
+.fb-select {
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid #d8e0ea;
+  border-radius: 7px;
+  background: #fff;
+  color: #44515f;
+  cursor: pointer;
+  min-height: 26px;
+}
+
+/* the Hide section: one icon button per hideable kind. Resting = the kind is SHOWING (plain
+   icon); pressed (.fb-hidden) = HIDDEN — the icon dims and a red no-entry ring (circle with a
+   diagonal line) overlays it. The tooltip carries the words. */
+.fb-checks { display: flex; align-items: center; gap: 6px; min-height: 26px; flex-wrap: wrap; }
+.fb-hidebtn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 26px;
+  font: inherit; font-size: 14px; line-height: 1;
+  border: 1px solid #d8e0ea; border-radius: 7px;
+  background: #fff; cursor: pointer; padding: 0;
+}
+.fb-hidebtn:hover { background: #f3f6fb; }
+.fb-hideico { pointer-events: none; }
+.fb-ico-grey { filter: grayscale(1); opacity: 0.8; } /* the "greyish checkbox" for resolved */
+.fb-hidebtn.fb-hidden { background: #f7f8fa; }
+.fb-hidebtn.fb-hidden .fb-hideico { opacity: 0.35; filter: grayscale(1); }
+/* the no-entry mark: red ring + diagonal, centred over the icon */
+.fb-noslash { display: none; pointer-events: none; }
+.fb-hidebtn.fb-hidden .fb-noslash {
+  display: block;
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 20px; height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #d9534f;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, transparent calc(50% - 1px), #d9534f calc(50% - 1px), #d9534f calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+/* the "show only" section: same icon buttons, opposite meaning. Pressed = ONLY this kind shows,
+   so it LIGHTS UP (blue, like an active chip) rather than gaining the hide row's no-entry ring. */
+.fb-onlybtn .my-todos-icon { transform: translateY(-6px); }
+.fb-onlybtn.fb-only-on { background: #2f6df0; border-color: #2f6df0; }
+.fb-onlybtn.fb-only-on .fb-hideico { filter: none; opacity: 1; }
+.fb-onlybtn.fb-only-on .fb-ico-grey { filter: grayscale(1) brightness(1.9); opacity: 1; }
+
+/* the mini rule inside a "show only" row. Every pressed button ANDs, so the hairline marks where
+   one question ends and the next begins — buttons on the SAME side of it are mutually exclusive
+   (press two and you get nothing, on purpose). The repo chooser sits behind the last rule. */
+.fb-onlysep {
+  display: inline-block; width: 1px; height: 18px; margin: 0 3px;
+  background: #d8e0ea; flex: 0 0 auto;
+}
+
+/* the SuperLazy mark: the logo's inverted pentagon, RED-OUTLINED (hollow) — "SuperLazy did this",
+   as opposed to you (the pen) or the standing automation (the cog). Same clip-path geometry as
+   entities.css's .proj-mark, so the shape reads as the same mark everywhere. */
+.fb-sl-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 13px; height: 12px; background: #d9534f;
+  clip-path: polygon(50% 100%, 0% 38%, 18% 0%, 82% 0%, 100% 38%);
+}
+.fb-sl-core {
+  display: block; width: 58%; height: 52%; margin-top: -6%; background: #fff;
+  clip-path: polygon(50% 100%, 0% 38%, 18% 0%, 82% 0%, 100% 38%);
+}
+.fb-onlybtn.fb-only-on .fb-sl-core { background: #2f6df0; }
+
+/* the REPOS chooser: it rides at the END of the "show only" row, behind its own mini separator —
+   one more cut, not a section of its own. One button naming the current cut ("#" = no cut) that
+   opens a list anchored under it: Show all / Repos only / Hide repos, then the repos themselves */
+.fb-repo-wrap { position: relative; display: inline-flex; flex: 0 0 auto; }
+.fb-repobtn {
+  font: inherit; font-size: 12px; line-height: 1; min-height: 26px;
+  max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 3px 11px; border-radius: 7px;
+  border: 1px solid #d8e0ea; background: #fff; color: #44515f; cursor: pointer;
+}
+.fb-repobtn:hover { background: #f3f6fb; }
+.fb-repobtn.fb-repo-on { background: #2f6df0; border-color: #2f6df0; color: #fff; }
+.fb-repo-pop { top: 100%; left: 0; min-width: 170px; max-height: 320px; overflow-y: auto; padding: 6px; gap: 0; }
+.fb-repo-opt {
+  font: inherit; font-size: 12px; text-align: left; white-space: nowrap;
+  padding: 5px 10px; border: none; border-radius: 6px; background: none; color: #44515f; cursor: pointer;
+}
+.fb-repo-opt:hover { background: #f3f6fb; }
+.fb-repo-opt.active { background: #eef4ff; color: #2f6df0; font-weight: 600; }
+.fb-repo-hr { height: 1px; margin: 5px 4px; background: #e6ebf2; }
+
+/* the Search section flexes to fill the right side */
+.fb-search-group { flex: 1 1 220px; }
+.fb-search {
+  font: inherit;
+  font-size: 12.5px;
+  width: 100%;
+  max-width: 340px;
+  min-height: 26px;
+  box-sizing: border-box;
+  padding: 3px 12px;
+  border: 1px solid #d8e0ea;
+  border-radius: 20px;
+  background: #fff;
+}
+
+/* page actions (e.g. the Dashboard's Check Mail Here) */
+.fb-actions { display: flex; align-items: center; gap: 8px; min-height: 26px; }
+
+/* ---- the ADD section: the create actions, last on the bar --------------------------------
+   Everything to its left narrows what you are looking at; these two make something new, so they
+   are shaped differently from the filter chips — filled accent pills, not outlined toggles, and
+   they never carry an "active" state because they are actions rather than filters. */
+.fb-add-group { flex: 0 0 auto; }
+.fb-adds { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; min-height: 26px; }
+.fb-addbtn {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 3px 12px;
+  min-height: 26px;
+  border: 1px solid #cfe0ff;
+  border-radius: 20px;
+  background: #f1f6ff;
+  color: #2f6df0;
+  cursor: pointer;
+}
+.fb-addbtn:hover { background: #e4eeff; border-color: #b7d1ff; }
+.fb-addbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fb-actionbtn {
+  font: inherit; font-size: 12px; padding: 3px 12px; border-radius: 20px;
+  border: 1px solid #c9d8f5; background: #eef4ff; color: #2f6df0; cursor: pointer; white-space: nowrap;
+}
+.fb-actionbtn:hover:not(:disabled) { filter: brightness(0.97); }

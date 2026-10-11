@@ -1,0 +1,78 @@
+<div id="app" class="sl-v2 rp-page">
+  <div id="topbar"></div>
+
+  <h2 class="rp-h">Replay <span class="rp-muted">— play back what actually happened: each recorded input on top, your to-do list moving underneath. No model calls, no mail fetched; the board is reconstructed from the to-dos' own evidence trails.</span></h2>
+
+  <div id="rpStatus" class="rp-status">Loading the recording…</div>
+
+  <section class="rp-controls">
+    <div class="rp-ctl-group">
+      <div class="rp-ctl-label">Window</div>
+      <label>From <input id="rpFrom" type="date"></label>
+      <label>To <input id="rpTo" type="date"> <span class="rp-muted">(optional)</span></label>
+    </div>
+
+    <div class="rp-ctl-group">
+      <div class="rp-ctl-label">Pace</div>
+      <label><input id="rpSecs" type="number" value="0.25" min="0.05" max="10" step="0.05"> seconds between inputs</label>
+    </div>
+
+    <div class="rp-ctl-group">
+      <div class="rp-ctl-label">Inputs</div>
+      <label><input id="rpChMail" type="checkbox" checked> Email</label>
+      <label><input id="rpChWork" type="checkbox" checked> Agent sessions</label>
+      <label><input id="rpChMsg" type="checkbox" checked> Chat</label>
+    </div>
+
+    <div class="rp-ctl-group">
+      <div class="rp-ctl-label">Include</div>
+      <label title="Messages SuperLazy read and analysed."><input id="rpKindAnalysed" type="checkbox" checked> Analysed</label>
+      <label title="Mail the standing automation filed without an LLM read."><input id="rpKindAuto" type="checkbox" checked> Auto-filed</label>
+      <label title="Your own manual edits — the moments you overruled it."><input id="rpKindManual" type="checkbox" checked> Your edits</label>
+    </div>
+
+    <div class="rp-ctl-group">
+      <div class="rp-ctl-label">Repos</div>
+      <label><select id="rpRepo"><option value="all">All</option><option value="only">Repos only</option><option value="none">No repo</option></select></label>
+    </div>
+
+    <div class="rp-ctl-group rp-ctl-projects">
+      <div class="rp-ctl-label">Projects <span class="rp-muted">(none picked = everything in the window) · <span id="rpProjCount"></span></span></div>
+      <select id="rpProjects" multiple size="4"></select>
+    </div>
+
+    <div class="rp-ctl-group">
+      <div class="rp-ctl-label">Stage</div>
+      <label><select id="rpShape">
+        <option value="half">Half slide (portrait)</option>
+        <option value="full">Full slide (16:9)</option>
+      </select></label>
+      <label title="The board on the right normally shows only the projects this window touches, so the rows actually move. Switch to everything to show the real full list."><select id="rpScope">
+        <option value="touched">Projects in this window</option>
+        <option value="all">All projects</option>
+      </select></label>
+    </div>
+
+    <div class="rp-ctl-group rp-ctl-actions">
+      <button id="rpBuild" type="button" class="rp-btn rp-btn-primary">Build replay</button>
+      <div id="rpBuilt" class="rp-muted"></div>
+    </div>
+  </section>
+
+  <div class="rp-transport">
+    <button id="rpRestart" type="button" class="rp-btn" disabled title="Back to the start">⏮</button>
+    <button id="rpPlay" type="button" class="rp-btn rp-btn-primary" disabled>▶ Play</button>
+    <button id="rpStep" type="button" class="rp-btn" disabled title="One input forward">⏭</button>
+    <input id="rpScrub" type="range" min="0" max="0" value="0" disabled>
+    <button id="rpPresent" type="button" class="rp-btn" disabled title="Fill the screen — for the slide itself">⛶ Present</button>
+    <button id="rpExport" type="button" class="rp-btn" disabled title="Download this replay as an HTML fragment + a small player script, to drop into another freezr page">⤓ Export</button>
+  </div>
+
+  <div id="rpStageWrap" class="rp-stagewrap">
+    <div id="rpStage" class="rp-stage rp-stage-half">
+      <div id="rpInput" class="rp-in"></div>
+      <div id="rpBoard" class="rp-board"></div>
+      <div id="rpProgress" class="rp-prog"></div>
+    </div>
+  </div>
+</div>
